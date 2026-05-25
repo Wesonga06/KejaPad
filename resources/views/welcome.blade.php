@@ -1,50 +1,45 @@
-﻿<!doctype html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>KejaPad Dashboard</title>
-  <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-</head>
-<body class="dashboard-page">
-  <div class="shell">
-    <header class="topbar">
-      <nav class="nav" aria-label="Workspace">
-  <a href="{{ route('dashboard') }}">Dashboard</a>
-  <a href="{{ route('repairs') }}">Repairs</a>
-  <a href="{{ route('rent-pot') }}">Rent Pot</a>
-  <a href="{{ route('building-vibe') }}">Building Vibe</a>
-  <a href="{{ route('escrow') }}">Escrow</a>
-</nav>
+﻿@extends('layouts.app')
 
-<div class="actions">
-  <button class="icon-btn" data-theme-toggle type="button" aria-label="Toggle theme">
-    Moon
-  </button>
+@section('title', 'KejaPad Dashboard')
+@section('body_class', 'dashboard-page')
 
-  <a class="ghost-btn" href="{{ route('login') }}">Login</a>
-  <a class="primary-btn" href="{{ route('signup') }}">Sign up</a>
-  <a class="ghost-btn" href="{{ route('logout') }}">Logout</a>
-</div>
-    </header>
+@section('content')
+<main class="page">
+  <section class="hero-copy">
+    <div>
+      <div class="eyebrow">Landlord and tenant command center</div>
+      <h1>KejaPad</h1>
+      <p class="lead">{{ $property->name ?? 'Your property' }} brings rent, repairs, disputes, roommates, and building feedback into one accountable workspace.</p>
+    </div>
+    <div class="trust-strip">
+      <div><strong>{{ $score->score ?? 650 }}</strong><span>Rent score</span></div>
+      <div><strong>{{ $ticket->eta_minutes ?? 0 }}m</strong><span>Repair ETA</span></div>
+      <div><strong>{{ $paidPercent }}%</strong><span>Rent pot funded</span></div>
+    </div>
+  </section>
 
-    <main class="page">
-      <section class="hero-copy">
-        <div><div class="eyebrow">Landlord and tenant command center</div><h1>KejaPad</h1><p class="lead">A premium rental workspace where rent, repairs, disputes, roommates, and building feedback are handled with receipts, fairness, and less shouting.</p></div>
-        <div class="trust-strip"><div><strong>842</strong><span>Rent score</span></div><div><strong>8m</strong><span>Avg response</span></div><div><strong>4.8</strong><span>Service rating</span></div></div>
-      </section>
-
-      <section class="page-panel">
-        <div class="panel-head"><div><h2>Tenant cockpit</h2><p>House B12, Kilimani Heights - May rent cycle</p></div><div class="status-pill" data-user-badge>Guest mode</div></div>
-        <div class="content-grid">
-          <article class="module wide"><div class="module-head"><div><h3>Good Tenant Score</h3><p>On-time rent becomes visible rental reputation.</p></div><div class="status-pill">+18 this month</div></div><div class="score-wrap"><div class="score-ring"><div><strong>842</strong><span>Excellent</span></div></div><div class="list"><div class="item"><b>Free carpet cleaning</b><span>Unlocked</span></div><div class="item"><b>Priority parking</b><span>32 pts away</span></div><div class="item"><b>Certified reference</b><span>Ready</span></div></div></div></article>
-          <article class="module"><div class="module-head"><div><h3>Next rent</h3><p>Due in 5 days</p></div><div class="status-pill">75% funded</div></div><div class="list"><div class="item"><b>KSh 72,000 collected</b><span>of 96,000</span></div><div class="item"><b>One roommate pending</b><span>No house penalty</span></div></div></article>
-          <article class="module"><div class="module-head"><div><h3>Open repair</h3><p>Kitchen sink leak</p></div><div class="status-pill">Dispatched</div></div><div class="list"><div class="item"><b>Juma Maintenance</b><span>12 min away</span></div><div class="item"><b>Contractor rating</b><span>5 stars</span></div></div></article>
+  <section class="page-panel">
+    <div class="panel-head">
+      <div><h2>{{ auth()->user()->role === 'landlord' ? 'Landlord cockpit' : 'Tenant cockpit' }}</h2><p>{{ $unit->label ?? 'Unit' }}, {{ $property->name ?? 'Property' }} - {{ $rentPot->month ?? now()->format('F Y') }}</p></div>
+      <div class="status-pill">{{ auth()->user()->role }} mode</div>
+    </div>
+    <div class="content-grid">
+      <article class="module wide">
+        <div class="module-head"><div><h3>Good Tenant Score</h3><p>On-time rent becomes visible rental reputation.</p></div><div class="status-pill">{{ $score->on_time_payments ?? 0 }} on-time payments</div></div>
+        <div class="score-wrap">
+          <div class="score-ring"><div><strong>{{ $score->score ?? 650 }}</strong><span>{{ ($score->score ?? 0) >= 800 ? 'Excellent' : 'Building' }}</span></div></div>
+          <div class="list">
+            @forelse ($rewards as $reward)
+              <div class="item"><b>{{ $reward }}</b><span>{{ $loop->first ? 'Unlocked' : 'Active' }}</span></div>
+            @empty
+              <div class="item"><b>Certified reference</b><span>Start paying rent to unlock</span></div>
+            @endforelse
+          </div>
         </div>
-      </section>
-    </main>
-  </div>
-  <div class="toast"><strong>KejaPad updated</strong><span>Action completed.</span></div>
-  <script src="{{ asset('js/app.js') }}"></script>
-</body>
-</html>
+      </article>
+      <article class="module"><div class="module-head"><div><h3>Next rent</h3><p>{{ $rentPot->month ?? 'Current cycle' }}</p></div><div class="status-pill">{{ $paidPercent }}% funded</div></div><div class="list"><div class="item"><b>KSh {{ number_format($paidTotal) }} collected</b><span>of {{ number_format($rentTotal) }}</span></div><div class="item"><b>{{ $pendingPayments }} tenant pending</b><span>No house penalty</span></div></div></article>
+      <article class="module"><div class="module-head"><div><h3>Open repair</h3><p>{{ $ticket->title ?? 'No open repair' }}</p></div><div class="status-pill">{{ $ticket->status ?? 'clear' }}</div></div><div class="list"><div class="item"><b>{{ $ticket->contractor_name ?? 'No contractor assigned' }}</b><span>{{ $ticket->eta_minutes ?? 0 }} min ETA</span></div><div class="item"><b>Contractor rating</b><span>{{ $ticket->contractor_rating ?? 0 }} stars</span></div></div></article>
+    </div>
+  </section>
+</main>
+@endsection

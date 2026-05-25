@@ -208,3 +208,52 @@ p { color: var(--muted); line-height: 1.55; }
   .roommate { grid-template-columns: 78px 1fr 64px; }
   .secure-row { grid-template-columns: 1fr; }
 }
+
+.nav a.active {
+  color: var(--text);
+  background: var(--panel-strong);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+}
+
+.flash {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(85, 224, 168, 0.28);
+  background: rgba(85, 224, 168, 0.1);
+  color: var(--text);
+  border-radius: 8px;
+}
+
+.flash.error {
+  border-color: rgba(255, 111, 143, 0.38);
+  background: rgba(255, 111, 143, 0.12);
+}
+
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 14px;
+  margin-top: 12px;
+}
+
+.role-tabs label {
+  min-height: 40px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.role-tabs label:has(input:checked) {
+  color: #07110e;
+  background: linear-gradient(135deg, var(--brand), #dffff5);
+}
+
+.role-tabs input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
