@@ -13,6 +13,10 @@ use App\Http\Controllers\RentController;
 use App\Http\Controllers\TenantMaintenanceController;
 use App\Http\Controllers\LandlordMaintenanceController;
 use App\Http\Controllers\CaretakerMaintenanceController;
+use App\Http\Controllers\LandlordAnnouncementController;
+use App\Http\Controllers\TenantAnnouncementController;
+use App\Http\Controllers\CaretakerAnnouncementController;
+use App\Http\Controllers\ReportController;
 
 // Landing Page
 Route::get('/', function () {
@@ -49,6 +53,15 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
 // Landlord Routes
 Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord.')->group(function () {
     Route::get('/dashboard', [LandlordController::class, 'dashboard'])->name('dashboard');
+
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/rent-collection', [ReportController::class, 'rentCollection'])->name('reports.rent-collection');
+    Route::get('/reports/outstanding', [ReportController::class, 'outstandingBalances'])->name('reports.outstanding');
+    Route::get('/reports/occupancy', [ReportController::class, 'occupancy'])->name('reports.occupancy');
+    Route::get('/reports/maintenance', [ReportController::class, 'maintenance'])->name('reports.maintenance');
+    Route::get('/reports/export/excel/{type}', [ReportController::class, 'exportExcel'])->name('reports.export.excel');
+    Route::get('/reports/export/pdf/{type}', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
 
     // Property Management
     Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
@@ -90,11 +103,23 @@ Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord
     Route::get('/maintenance/{maintenance}', [LandlordMaintenanceController::class, 'show'])->name('maintenance.show');
     Route::post('/maintenance/{maintenance}/assign', [LandlordMaintenanceController::class, 'assign'])->name('maintenance.assign');
     Route::patch('/maintenance/{maintenance}/status', [LandlordMaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+
+    // Announcements
+    Route::get('/announcements', [LandlordAnnouncementController::class, 'index'])->name('announcements.index');
+    Route::get('/announcements/create', [LandlordAnnouncementController::class, 'create'])->name('announcements.create');
+    Route::post('/announcements', [LandlordAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::get('/announcements/{announcement}/edit', [LandlordAnnouncementController::class, 'edit'])->name('announcements.edit');
+    Route::put('/announcements/{announcement}', [LandlordAnnouncementController::class, 'update'])->name('announcements.update');
+    Route::delete('/announcements/{announcement}', [LandlordAnnouncementController::class, 'destroy'])->name('announcements.destroy');
+    Route::patch('/announcements/{announcement}/toggle', [LandlordAnnouncementController::class, 'togglePublish'])->name('announcements.toggle');
 });
 
 // Caretaker Routes
 Route::middleware(['auth', 'role:caretaker'])->prefix('caretaker')->name('caretaker.')->group(function () {
     Route::get('/dashboard', [CaretakerController::class, 'dashboard'])->name('dashboard');
+
+    // Announcements
+    Route::get('/announcements', [CaretakerAnnouncementController::class, 'index'])->name('announcements.index');
 
     // Maintenance
     Route::get('/maintenance', [CaretakerMaintenanceController::class, 'index'])->name('maintenance.index');
@@ -108,6 +133,9 @@ Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->g
     Route::get('/payments', [TenantController::class, 'paymentHistory'])->name('payments');
     Route::get('/profile', [TenantController::class, 'profile'])->name('profile');
     Route::put('/profile', [TenantController::class, 'updateProfile'])->name('profile.update');
+
+    // Announcements
+    Route::get('/announcements', [TenantAnnouncementController::class, 'index'])->name('announcements.index');
 
     // Maintenance
     Route::get('/maintenance', [TenantMaintenanceController::class, 'index'])->name('maintenance.index');

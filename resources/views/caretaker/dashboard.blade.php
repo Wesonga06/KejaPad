@@ -7,6 +7,9 @@
     <a href="{{ route('caretaker.dashboard') }}" class="nav-link active">
         <i class="bi bi-speedometer2"></i> Dashboard
     </a>
+    <a href="{{ route('caretaker.announcements.index') }}" class="nav-link">
+    <i class="bi bi-megaphone"></i> Announcements
+    </a>
 
     <div class="nav-section-title">Tasks</div>
     <a href="{{ route('caretaker.maintenance.index') }}" class="nav-link">
