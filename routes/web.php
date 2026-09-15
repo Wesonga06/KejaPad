@@ -1,0 +1,119 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\LandlordController;
+use App\Http\Controllers\CaretakerController;
+use App\Http\Controllers\TenantController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\LandlordTenantController;
+use App\Http\Controllers\RentController;
+use App\Http\Controllers\TenantMaintenanceController;
+use App\Http\Controllers\LandlordMaintenanceController;
+use App\Http\Controllers\CaretakerMaintenanceController;
+
+// Landing Page
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Redirect after login based on role
+Route::middleware('auth')->get('/dashboard', function () {
+    $role = auth()->user()->role;
+
+    return match($role) {
+        'super_admin' => redirect()->route('super_admin.dashboard'),
+        'landlord'    => redirect()->route('landlord.dashboard'),
+        'caretaker'   => redirect()->route('caretaker.dashboard'),
+        'tenant'      => redirect()->route('tenant.dashboard'),
+        default       => redirect()->route('login'),
+    };
+})->name('dashboard');
+
+// Super Admin Routes
+Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super_admin.')->group(function () {
+    Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
+
+    // User Management
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+});
+
+// Landlord Routes
+Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord.')->group(function () {
+    Route::get('/dashboard', [LandlordController::class, 'dashboard'])->name('dashboard');
+
+    // Property Management
+    Route::get('/properties', [PropertyController::class, 'index'])->name('properties.index');
+    Route::get('/properties/create', [PropertyController::class, 'create'])->name('properties.create');
+    Route::post('/properties', [PropertyController::class, 'store'])->name('properties.store');
+    Route::get('/properties/{property}/edit', [PropertyController::class, 'edit'])->name('properties.edit');
+    Route::put('/properties/{property}', [PropertyController::class, 'update'])->name('properties.update');
+    Route::delete('/properties/{property}', [PropertyController::class, 'destroy'])->name('properties.destroy');
+
+    // Unit Management
+    Route::get('/properties/{property}/units', [UnitController::class, 'index'])->name('units.index');
+    Route::get('/properties/{property}/units/create', [UnitController::class, 'create'])->name('units.create');
+    Route::post('/properties/{property}/units', [UnitController::class, 'store'])->name('units.store');
+    Route::get('/properties/{property}/units/{unit}/edit', [UnitController::class, 'edit'])->name('units.edit');
+    Route::put('/properties/{property}/units/{unit}', [UnitController::class, 'update'])->name('units.update');
+    Route::delete('/properties/{property}/units/{unit}', [UnitController::class, 'destroy'])->name('units.destroy');
+
+    // Tenant Management
+    Route::get('/tenants', [LandlordTenantController::class, 'index'])->name('tenants.index');
+    Route::get('/tenants/create', [LandlordTenantController::class, 'create'])->name('tenants.create');
+    Route::post('/tenants', [LandlordTenantController::class, 'store'])->name('tenants.store');
+    Route::get('/tenants/{tenant}', [LandlordTenantController::class, 'show'])->name('tenants.show');
+    Route::get('/tenants/{tenant}/edit', [LandlordTenantController::class, 'edit'])->name('tenants.edit');
+    Route::put('/tenants/{tenant}', [LandlordTenantController::class, 'update'])->name('tenants.update');
+    Route::patch('/tenants/{tenant}/deactivate', [LandlordTenantController::class, 'deactivate'])->name('tenants.deactivate');
+    Route::get('/properties/{property}/get-units', [LandlordTenantController::class, 'getUnits'])->name('properties.get-units');
+
+    // Rent Management
+    Route::get('/rent', [RentController::class, 'index'])->name('rent.index');
+    Route::get('/rent/create', [RentController::class, 'create'])->name('rent.create');
+    Route::post('/rent', [RentController::class, 'store'])->name('rent.store');
+    Route::get('/rent/{rent}', [RentController::class, 'show'])->name('rent.show');
+    Route::post('/rent/{rent}/payment', [RentController::class, 'recordPayment'])->name('rent.payment');
+    Route::patch('/rent/{rent}/overdue', [RentController::class, 'markOverdue'])->name('rent.overdue');
+    Route::post('/rent/generate-bulk', [RentController::class, 'generateBulk'])->name('rent.generate-bulk');
+
+    // Maintenance
+    Route::get('/maintenance', [LandlordMaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::get('/maintenance/{maintenance}', [LandlordMaintenanceController::class, 'show'])->name('maintenance.show');
+    Route::post('/maintenance/{maintenance}/assign', [LandlordMaintenanceController::class, 'assign'])->name('maintenance.assign');
+    Route::patch('/maintenance/{maintenance}/status', [LandlordMaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+});
+
+// Caretaker Routes
+Route::middleware(['auth', 'role:caretaker'])->prefix('caretaker')->name('caretaker.')->group(function () {
+    Route::get('/dashboard', [CaretakerController::class, 'dashboard'])->name('dashboard');
+
+    // Maintenance
+    Route::get('/maintenance', [CaretakerMaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::get('/maintenance/{maintenance}', [CaretakerMaintenanceController::class, 'show'])->name('maintenance.show');
+    Route::patch('/maintenance/{maintenance}/status', [CaretakerMaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+});
+
+// Tenant Routes
+Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->group(function () {
+    Route::get('/dashboard', [TenantController::class, 'dashboard'])->name('dashboard');
+    Route::get('/payments', [TenantController::class, 'paymentHistory'])->name('payments');
+    Route::get('/profile', [TenantController::class, 'profile'])->name('profile');
+    Route::put('/profile', [TenantController::class, 'updateProfile'])->name('profile.update');
+
+    // Maintenance
+    Route::get('/maintenance', [TenantMaintenanceController::class, 'index'])->name('maintenance.index');
+    Route::get('/maintenance/create', [TenantMaintenanceController::class, 'create'])->name('maintenance.create');
+    Route::post('/maintenance', [TenantMaintenanceController::class, 'store'])->name('maintenance.store');
+    Route::get('/maintenance/{maintenance}', [TenantMaintenanceController::class, 'show'])->name('maintenance.show');
+});
+
+require __DIR__.'/auth.php';
