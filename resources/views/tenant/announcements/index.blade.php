@@ -7,6 +7,9 @@
     <a href="{{ route('tenant.dashboard') }}" class="nav-link">
         <i class="bi bi-speedometer2"></i> Dashboard
     </a>
+    <a href="{{ route('tenant.announcements.index') }}" class="nav-link active">
+        <i class="bi bi-megaphone"></i> Announcements
+    </a>
 
     <div class="nav-section-title">My Account</div>
     <a href="{{ route('tenant.payments') }}" class="nav-link">
@@ -14,9 +17,6 @@
     </a>
     <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
         <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
     </a>
     <a href="{{ route('tenant.profile') }}" class="nav-link">
         <i class="bi bi-person-circle"></i> My Profile

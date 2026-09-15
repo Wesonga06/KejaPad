@@ -17,11 +17,11 @@ use App\Http\Controllers\LandlordAnnouncementController;
 use App\Http\Controllers\TenantAnnouncementController;
 use App\Http\Controllers\CaretakerAnnouncementController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\LandingController;
 
 // Landing Page
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/qrcode', [LandingController::class, 'qrcode'])->name('qrcode');
 
 // Redirect after login based on role
 Route::middleware('auth')->get('/dashboard', function () {

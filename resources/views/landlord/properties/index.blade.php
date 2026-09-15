@@ -12,13 +12,13 @@
     <a href="{{ route('landlord.properties.index') }}" class="nav-link active">
         <i class="bi bi-buildings"></i> Properties
     </a>
-    <a href="#" class="nav-link">
+    <a href="{{ route('landlord.units.index') }}" class="nav-link">
         <i class="bi bi-door-open"></i> Units
     </a>
     <a href="{{ route('landlord.tenants.index') }}" class="nav-link">
     <i class="bi bi-people"></i> Tenants
     </a>
-    <a href="#" class="nav-link">
+    <a href="{{ route('landlord.rent.index') }}" class="nav-link">
         <i class="bi bi-cash-coin"></i> Rent
     </a>
 
