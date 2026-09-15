@@ -26,7 +26,7 @@
     <a href="{{ route('landlord.announcements.index') }}" class="nav-link">
         <i class="bi bi-megaphone"></i> Announcements
     </a>
-    <a href="#" class="nav-link">
+    <a href="{{ route('landlord.reports.index') }}" class="nav-link">
         <i class="bi bi-bar-chart"></i> Reports
     </a>
 @endsection
