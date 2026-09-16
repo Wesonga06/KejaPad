@@ -12,7 +12,7 @@
     <a href="{{ route('landlord.properties.index') }}" class="nav-link active">
         <i class="bi bi-buildings"></i> Properties
     </a>
-    <a href="{{ route('landlord.units.index') }}" class="nav-link">
+    <a href="#" class="nav-link">
         <i class="bi bi-door-open"></i> Units
     </a>
     <a href="{{ route('landlord.tenants.index') }}" class="nav-link">
