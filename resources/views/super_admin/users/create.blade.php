@@ -12,15 +12,15 @@
     <a href="{{ route('super_admin.users.index') }}" class="nav-link active">
         <i class="bi bi-people"></i> Users
     </a>
-    <a href="#" class="nav-link">
+    <a href="{{ route('landlord.properties.index') }}" class="nav-link">
         <i class="bi bi-buildings"></i> Properties
     </a>
-    <a href="#" class="nav-link">
+    <a href="{{ route('super_admin.settings.index') }}" class="nav-link">
         <i class="bi bi-gear"></i> System Settings
     </a>
 
     <div class="nav-section-title">Reports</div>
-    <a href="#" class="nav-link">
+    <a href="{{ route('super_admin.reports.index') }}" class="nav-link">
         <i class="bi bi-bar-chart"></i> Reports
     </a>
 @endsection
