@@ -18,6 +18,9 @@
     <a href="{{ route('landlord.rent.index') }}" class="nav-link active">
         <i class="bi bi-cash-coin"></i> Rent
     </a>
+    <a href="{{ route('landlord.mpesa-payments') }}" class="nav-link">
+    <i class="bi bi-phone"></i> M-Pesa Payments
+</a>
 
     <div class="nav-section-title">Other</div>
     <a href="{{ route('landlord.maintenance.index') }}" class="nav-link">

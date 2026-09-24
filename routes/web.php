@@ -18,6 +18,7 @@ use App\Http\Controllers\TenantAnnouncementController;
 use App\Http\Controllers\CaretakerAnnouncementController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\MpesaController;
 
 // Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -89,6 +90,11 @@ Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord
     Route::patch('/tenants/{tenant}/deactivate', [LandlordTenantController::class, 'deactivate'])->name('tenants.deactivate');
     Route::get('/properties/{property}/get-units', [LandlordTenantController::class, 'getUnits'])->name('properties.get-units');
 
+    // M-Pesa Payments
+    Route::get('/mpesa-payments', [MpesaController::class, 'landlordPayments'])->name('mpesa-payments');
+    Route::post('/mpesa-payments/{payment}/confirm', [MpesaController::class, 'landlordConfirm'])->name('mpesa-payments.confirm');
+    Route::post('/mpesa-payments/{payment}/reject', [MpesaController::class, 'landlordReject'])->name('mpesa-payments.reject');
+
     // Rent Management
     Route::get('/rent', [RentController::class, 'index'])->name('rent.index');
     Route::get('/rent/create', [RentController::class, 'create'])->name('rent.create');
@@ -142,6 +148,15 @@ Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->g
     Route::get('/maintenance/create', [TenantMaintenanceController::class, 'create'])->name('maintenance.create');
     Route::post('/maintenance', [TenantMaintenanceController::class, 'store'])->name('maintenance.store');
     Route::get('/maintenance/{maintenance}', [TenantMaintenanceController::class, 'show'])->name('maintenance.show');
+
+    // M-Pesa Payments
+    Route::get('/pay/{rent}', [MpesaController::class, 'payPage'])->name('pay');
+    Route::post('/pay/{rent}/initiate', [MpesaController::class, 'initiate'])->name('pay.initiate');
+    Route::get('/pay/{rent}/pending', [MpesaController::class, 'pending'])->name('payment.pending');
+    Route::get('/payment/{payment}/status', [MpesaController::class, 'checkStatus'])->name('payment.status');
 });
+
+// M-Pesa Callback (public - called by Safaricom)
+Route::post('/api/mpesa/callback', [MpesaController::class, 'callback'])->name('mpesa.callback');
 
 require __DIR__.'/auth.php';

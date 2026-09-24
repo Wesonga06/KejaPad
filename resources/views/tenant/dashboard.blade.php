@@ -15,6 +15,17 @@
     <a href="{{ route('tenant.payments') }}" class="nav-link">
         <i class="bi bi-receipt"></i> Payment History
     </a>
+    @if($currentRent && $currentRent->status !== 'paid')
+    <a href="{{ route('tenant.pay', $currentRent) }}"
+       class="btn btn-primary mt-2">
+        <i class="bi bi-phone me-2"></i> Pay via M-Pesa
+    </a>
+@else
+    <p class="text-success mt-2 fw-semibold">
+        <i class="bi bi-check-circle me-1"></i>
+        Rent fully paid for this month.
+    </p>
+@endif
     <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
     <i class="bi bi-tools"></i> Maintenance
     </a>
