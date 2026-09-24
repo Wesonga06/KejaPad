@@ -14,13 +14,15 @@ class LandingController extends Controller
 
     public function qrcode()
     {
+        $url = config('app.url');
+
         $qrcode = QrCode::format('svg')
                          ->size(250)
                          ->color(15, 52, 96)
                          ->backgroundColor(255, 255, 255)
                          ->margin(1)
-                         ->generate('https://kejapad.co.ke');
+                         ->generate($url);
 
-        return view('qrcode', compact('qrcode'));
+        return view('qrcode', compact('qrcode', 'url'));
     }
 }

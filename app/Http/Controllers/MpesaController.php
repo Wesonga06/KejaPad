@@ -36,51 +36,71 @@ class MpesaController extends Controller
 
     // Initiate STK Push
     public function initiate(Request $request, RentRecord $rent)
-    {
-        $tenant = Tenant::where('user_id', auth()->id())->firstOrFail();
-        abort_if($rent->tenant_id !== $tenant->id, 403);
+{
+    $tenant = Tenant::where('user_id', auth()->id())->firstOrFail();
+    abort_if($rent->tenant_id !== $tenant->id, 403);
 
-        $request->validate([
-            'phone'  => 'required|string|min:10|max:13',
-            'amount' => 'required|numeric|min:1',
+    $request->validate([
+        'phone'  => ['required', 'string', 'regex:/^(07|01|2547|2541)\d{8}$/'],
+        'amount' => ['required', 'numeric', 'min:1'],
+    ], [
+        'phone.regex' => 'Enter a valid Safaricom number e.g. 0712345678',
+    ]);
+
+    $amount = min((float) $request->amount, $rent->balance());
+
+    if ($amount <= 0) {
+        return back()->with('error', 'This rent record is already fully paid.');
+    }
+
+    // Check no active pending payment already
+    $existing = MpesaPayment::where('rent_record_id', $rent->id)
+                              ->where('status', 'pending')
+                              ->where('created_at', '>=', now()->subMinutes(5))
+                              ->exists();
+
+    if ($existing) {
+        return redirect()->route('tenant.payment.pending', $rent)
+                         ->with('error', 'You already have a pending payment. Check your phone.');
+    }
+
+    // Initiate STK Push
+    $response = $this->mpesa->stkPush(
+        $request->phone,
+        $amount,
+        'RENT-' . $rent->id,
+        'Rent Payment ' . $rent->monthName() . ' ' . $rent->year
+    );
+
+    // Check for error
+    if (isset($response['error']) && $response['error']) {
+        return back()->with('error', $response['errorMessage']);
+    }
+
+    // Safaricom success check
+    if (isset($response['ResponseCode']) && $response['ResponseCode'] === '0') {
+        MpesaPayment::create([
+            'tenant_id'           => $tenant->id,
+            'rent_record_id'      => $rent->id,
+            'phone_number'        => $this->mpesa->formatPhone($request->phone),
+            'amount'              => $amount,
+            'checkout_request_id' => $response['CheckoutRequestID'],
+            'merchant_request_id' => $response['MerchantRequestID'],
+            'status'              => 'pending',
         ]);
 
-        $amount = min($request->amount, $rent->balance());
-
-        if ($amount <= 0) {
-            return back()->with('error', 'This rent record is already fully paid.');
-        }
-
-        // Initiate STK Push
-        $response = $this->mpesa->stkPush(
-            $request->phone,
-            $amount,
-            'KEJAPAD-' . $rent->id,
-            'Rent for ' . $rent->monthName() . ' ' . $rent->year
-        );
-
-        if (isset($response['ResponseCode']) && $response['ResponseCode'] === '0') {
-            // Save payment record
-            MpesaPayment::create([
-                'tenant_id'           => $tenant->id,
-                'rent_record_id'      => $rent->id,
-                'phone_number'        => $this->mpesa->formatPhone($request->phone),
-                'amount'              => $amount,
-                'checkout_request_id' => $response['CheckoutRequestID'],
-                'merchant_request_id' => $response['MerchantRequestID'],
-                'status'              => 'pending',
-            ]);
-
-            return redirect()->route('tenant.payment.pending', $rent)
-                             ->with('success', 'STK Push sent! Check your phone and enter your M-Pesa PIN.');
-        }
-
-        $errorMsg = $response['errorMessage']
-                    ?? $response['CustomerMessage']
-                    ?? 'Failed to initiate payment. Please try again.';
-
-        return back()->with('error', $errorMsg);
+        return redirect()->route('tenant.payment.pending', $rent)
+                         ->with('success', 'STK Push sent! Check your phone and enter your M-Pesa PIN.');
     }
+
+    // Safaricom returned an error
+    $errorMsg = $response['errorMessage']
+                ?? $response['ResultDesc']
+                ?? $response['CustomerMessage']
+                ?? 'M-Pesa request failed. Please try again.';
+
+    return back()->with('error', $errorMsg);
+}
 
     // Pending payment page
     public function pending(RentRecord $rent)
@@ -92,7 +112,7 @@ class MpesaController extends Controller
                                 ->latest()
                                 ->firstOrFail();
 
-        return view('tenant.payment-pending', compact('rent', 'payment'));
+        return view('tenant.pending-payment', compact('rent', 'payment'));
     }
 
     // M-Pesa Callback (called by Safaricom)

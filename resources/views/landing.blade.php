@@ -844,7 +844,7 @@
                             ->size(200)
                             ->color(15, 52, 96)
                             ->margin(1)
-                            ->generate(route('landing')) !!}
+                            ->generate(config('app.url')) !!}
                         <p class="mt-3 mb-0"
                            style="color:#0f3460; font-weight:600; font-size:0.88rem;">
                             <i class="bi bi-qr-code me-1"></i> Scan to access KejaPad
