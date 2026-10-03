@@ -422,7 +422,6 @@
                 Platform roles
             </p>
             <div class="d-flex justify-content-center gap-2 flex-wrap">
-                <span class="badge bg-danger" style="font-size:0.7rem;">Super Admin</span>
                 <span class="badge bg-primary" style="font-size:0.7rem;">Landlord</span>
                 <span class="badge bg-success" style="font-size:0.7rem;">Caretaker</span>
                 <span class="badge" style="font-size:0.7rem; background:#4cc9f0; color:#000;">Tenant</span>

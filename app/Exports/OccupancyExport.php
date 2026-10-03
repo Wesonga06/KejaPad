@@ -18,7 +18,7 @@ class OccupancyExport implements FromCollection, WithHeadings, WithStyles
         $this->landlordId = $landlordId;
     }
 
-    public function collection()
+    public function collection(): \Illuminate\Support\Collection
     {
         $propertyIds = Property::where('user_id', $this->landlordId)->pluck('id');
 
@@ -46,7 +46,7 @@ class OccupancyExport implements FromCollection, WithHeadings, WithStyles
         ];
     }
 
-    public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet): array
     {
         return [1 => ['font' => ['bold' => true]]];
     }

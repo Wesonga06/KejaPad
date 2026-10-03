@@ -254,6 +254,237 @@
         .badge-landlord { background-color: #0f3460; }
         .badge-caretaker { background-color: #198754; }
         .badge-tenant { background-color: #4cc9f0; color: #000; }
+
+                /* Dark Mode */
+        body.dark-mode {
+            background-color: #0f0f1a;
+        }
+
+        body.dark-mode .main-content {
+            background-color: #0f0f1a;
+        }
+
+        body.dark-mode .topbar {
+            background: #1a1a2e;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        body.dark-mode .topbar .page-title {
+            color: #fff;
+        }
+
+        body.dark-mode .topbar .user-name {
+            color: #fff;
+        }
+
+        body.dark-mode .topbar .user-role {
+            color: rgba(255,255,255,0.5);
+        }
+
+        body.dark-mode .stat-card {
+            background: #1e1e2e;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        body.dark-mode .stat-card .stat-value {
+            color: #fff;
+        }
+
+        body.dark-mode .stat-card .stat-label {
+            color: rgba(255,255,255,0.5);
+        }
+
+        body.dark-mode .stat-card h6,
+        body.dark-mode .stat-card h5 {
+            color: #fff;
+        }
+
+        body.dark-mode .table {
+            color: #ccc;
+        }
+
+        body.dark-mode .table-light th {
+            background: #2a2a3e;
+            color: #ccc;
+            border-color: rgba(255,255,255,0.06);
+        }
+
+        body.dark-mode .table-hover tbody tr:hover {
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+        }
+
+        body.dark-mode .table td,
+        body.dark-mode .table th {
+            border-color: rgba(255,255,255,0.06);
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background: #2a2a3e;
+            border-color: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background: #2a2a3e;
+            border-color: #4cc9f0;
+            color: #fff;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+
+        body.dark-mode .input-group-text {
+            background: #2a2a3e;
+            border-color: rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.5);
+        }
+
+        body.dark-mode .alert-light {
+            background: #2a2a3e;
+            border-color: rgba(255,255,255,0.08);
+            color: #ccc;
+        }
+
+        body.dark-mode .alert-info {
+            background: rgba(76,201,240,0.1);
+            border-color: rgba(76,201,240,0.2);
+            color: #4cc9f0;
+        }
+
+        body.dark-mode .alert-warning {
+            background: rgba(253,126,20,0.1);
+            border-color: rgba(253,126,20,0.2);
+            color: #fd7e14;
+        }
+
+        body.dark-mode .alert-success {
+            background: rgba(25,135,84,0.1);
+            border-color: rgba(25,135,84,0.2);
+            color: #4cff9f;
+        }
+
+        body.dark-mode .alert-danger {
+            background: rgba(220,53,69,0.1);
+            border-color: rgba(220,53,69,0.2);
+            color: #ff6b7a;
+        }
+
+        body.dark-mode .border-bottom {
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+
+        body.dark-mode .border-top {
+            border-color: rgba(255,255,255,0.08) !important;
+        }
+
+        body.dark-mode .breadcrumb {
+            background: transparent;
+        }
+
+        body.dark-mode .breadcrumb-item a {
+            color: #4cc9f0;
+        }
+
+        body.dark-mode .breadcrumb-item.active {
+            color: rgba(255,255,255,0.5);
+        }
+
+        body.dark-mode .text-muted {
+            color: rgba(255,255,255,0.4) !important;
+        }
+
+        body.dark-mode .text-dark {
+            color: #fff !important;
+        }
+
+        body.dark-mode .bg-light {
+            background: #2a2a3e !important;
+        }
+
+        body.dark-mode .badge.bg-light {
+            background: #2a2a3e !important;
+            color: #ccc !important;
+        }
+
+        body.dark-mode .btn-outline-secondary {
+            color: #aaa;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        body.dark-mode .btn-outline-secondary:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+        }
+
+        body.dark-mode .btn-outline-primary {
+            color: #4cc9f0;
+            border-color: #4cc9f0;
+        }
+
+        body.dark-mode .btn-outline-danger {
+            color: #ff6b7a;
+            border-color: #ff6b7a;
+        }
+
+        body.dark-mode .btn-outline-warning {
+            color: #fd7e14;
+            border-color: #fd7e14;
+        }
+
+        body.dark-mode .btn-outline-success {
+            color: #4cff9f;
+            border-color: #4cff9f;
+        }
+
+        body.dark-mode .btn-outline-info {
+            color: #4cc9f0;
+            border-color: #4cc9f0;
+        }
+
+        body.dark-mode .page-content h5,
+        body.dark-mode .page-content h6,
+        body.dark-mode .page-content p:not(.text-muted),
+        body.dark-mode .page-content span:not(.badge):not(.text-muted) {
+            color: inherit;
+        }
+
+        body.dark-mode .nav-section-title {
+            color: rgba(255,255,255,0.25);
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid #e9ecef;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: #f0f2f5;
+            color: #0f3460;
+        }
+
+        body.dark-mode .theme-toggle {
+            border-color: rgba(255,255,255,0.15);
+            color: #4cc9f0;
+        }
+
+        body.dark-mode .theme-toggle:hover {
+            background: rgba(255,255,255,0.08);
+        }
     </style>
 
     @stack('styles')
@@ -298,6 +529,11 @@
         </div>
 
         <div class="user-info">
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+                <i class="bi bi-moon-fill" id="themeIcon"></i>
+            </button>
+
             <div class="user-avatar">
                 {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
             </div>
@@ -347,6 +583,30 @@
     overlay.addEventListener('click', () => {
         sidebar.classList.remove('open');
         overlay.classList.remove('show');
+    });
+
+    // Theme toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon   = document.getElementById('themeIcon');
+    const body        = document.body;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('kejapad-theme');
+    if (savedTheme === 'dark') {
+        body.classList.add('dark-mode');
+        themeIcon.className = 'bi bi-sun-fill';
+    }
+
+    themeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+
+        if (body.classList.contains('dark-mode')) {
+            themeIcon.className = 'bi bi-sun-fill';
+            localStorage.setItem('kejapad-theme', 'dark');
+        } else {
+            themeIcon.className = 'bi bi-moon-fill';
+            localStorage.setItem('kejapad-theme', 'light');
+        }
     });
 </script>
 

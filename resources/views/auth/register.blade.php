@@ -423,15 +423,7 @@
                         <span class="role-icon">🏠</span>
                         <span class="role-label">Tenant</span>
                     </label>
-
-                    <label class="role-option {{ old('role') === 'super_admin' ? 'selected' : '' }}"
-                           id="label-super_admin">
-                        <input type="radio" name="role" value="super_admin"
-                               {{ old('role') === 'super_admin' ? 'checked' : '' }}
-                               onchange="selectRole('super_admin')">
-                        <span class="role-icon">🛡️</span>
-                        <span class="role-label">Super Admin</span>
-                    </label>
+                    
                 </div>
                 @error('role')
                     <div class="text-danger" style="font-size:0.82rem;">{{ $message }}</div>

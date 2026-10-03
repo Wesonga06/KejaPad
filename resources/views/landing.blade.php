@@ -935,7 +935,6 @@
             <div class="border-top pt-3 d-flex flex-wrap justify-content-between align-items-center gap-2"
                  style="border-color:rgba(255,255,255,0.1) !important;">
                 <small>© {{ date('Y') }} KejaPad. All rights reserved.</small>
-                <small>Built with Laravel 12 & Bootstrap 5</small>
             </div>
         </div>
     </footer>
