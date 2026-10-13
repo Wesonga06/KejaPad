@@ -212,7 +212,7 @@
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h6 class="fw-bold mb-0">Rent Records</h6>
             <span class="badge bg-light text-dark border">
-                {{ $rentRecords->count() }} records
+                {{ $rentRecords->total() }} records
             </span>
         </div>
 
@@ -241,7 +241,7 @@
                     <tbody>
                         @foreach($rentRecords as $index => $rent)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $rentRecords->firstItem() + $index }}</td>
                             <td>
                                 <div class="fw-semibold" style="font-size:0.9rem;">
                                     {{ $rent->tenant->full_name }}
@@ -304,4 +304,10 @@
             </div>
         @endif
     </div>
+
+    @if($rentRecords->hasPages())
+        <div class="mt-3">
+            {{ $rentRecords->links() }}
+        </div>
+    @endif
 @endsection

@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -27,8 +28,8 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'is_active'         => 'boolean',
+            'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -62,5 +63,11 @@ class User extends Authenticatable
     public function properties()
     {
         return $this->hasMany(Property::class);
+    }
+
+    // User (caretaker) is responsible for many properties
+    public function caretakerProperties()
+    {
+        return $this->belongsToMany(Property::class, 'caretaker_property');
     }
 }

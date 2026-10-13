@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('page-title', 'My Tasks')
+@section('page-title', 'Maintenance Requests')
 
 @section('sidebar-links')
     <div class="nav-section-title">Main</div>
@@ -19,9 +19,9 @@
 
 @section('content')
     <div class="mb-4">
-        <h5 class="fw-bold mb-1">My Assigned Tasks</h5>
+        <h5 class="fw-bold mb-1">Maintenance Requests</h5>
         <p class="text-muted mb-0" style="font-size:0.85rem;">
-            Maintenance requests assigned to you.
+            Requests for the properties you manage.
         </p>
     </div>
 
@@ -47,7 +47,7 @@
         </div>
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
-                <h4 class="fw-bold text-primary mb-0">{{ $requests->count() }}</h4>
+                <h4 class="fw-bold text-primary mb-0">{{ $totalRequests }}</h4>
                 <small class="text-muted">Total</small>
             </div>
         </div>
@@ -58,7 +58,7 @@
             <div class="text-center py-5">
                 <i class="bi bi-clipboard-check"
                    style="font-size:3rem; color:#dee2e6;"></i>
-                <p class="mt-3 text-muted">No tasks assigned to you yet.</p>
+                <p class="mt-3 text-muted">No maintenance requests for your properties yet.</p>
             </div>
         @else
             <div class="table-responsive">
@@ -78,7 +78,7 @@
                     <tbody>
                         @foreach($requests as $index => $req)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $requests->firstItem() + $index }}</td>
                             <td class="fw-semibold">{{ $req->title }}</td>
                             <td>{{ $req->tenant->full_name }}</td>
                             <td>
@@ -115,4 +115,10 @@
             </div>
         @endif
     </div>
+
+    @if($requests->hasPages())
+        <div class="mt-3">
+            {{ $requests->links() }}
+        </div>
+    @endif
 @endsection

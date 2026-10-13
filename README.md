@@ -1,58 +1,69 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# KejaPad
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+KejaPad is a property and rental management platform with integrated **M-Pesa** rent collection. Landlords manage properties and units, onboard tenants, generate and track rent, assign maintenance to caretakers, publish announcements, and review reports. Tenants pay rent via M-Pesa STK Push and raise maintenance requests.
 
-## About Laravel
+## Tech Stack
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Laravel 13** on **PHP 8.3**
+- **MySQL** in production; **SQLite** for the example env / tests
+- Blade + Bootstrap 5 UI
+- `barryvdh/laravel-dompdf` (PDF reports) and `maatwebsite/excel` (Excel exports)
+- `simplesoftwareio/simple-qrcode`
+- M-Pesa (Safaricom Daraja) STK Push + callback
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Roles
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Role | Capabilities |
+| --- | --- |
+| `super_admin` | Manage all user accounts |
+| `landlord` | Properties, units, tenants, rent, maintenance, announcements, reports, M-Pesa payments |
+| `caretaker` | View assigned maintenance requests and announcements |
+| `tenant` | Pay rent (M-Pesa), view payment history, submit maintenance requests, view announcements |
 
-## Learning Laravel
+Public registration is limited to `landlord`, `caretaker`, and `tenant`.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Getting Started
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```sh
+composer install
+copy .env.example .env        # Windows; use `cp` on Unix
+php artisan key:generate
+php artisan migrate
+npm install
+npm run build
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Configure the M-Pesa (Daraja) credentials in `.env` — see `.env.example` for the full
+`MPESA_*` list.
 
-## Contributing
+## M-Pesa Callback Security
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+The `/api/mpesa/callback` route is public and hardened:
 
-## Code of Conduct
+- **IP allowlist** — `MPESA_CALLBACK_ALLOWED_IPS` (comma-separated). Set
+  `MPESA_CALLBACK_ENFORCE_IP=false` for local development or when behind a proxy you
+  do not control.
+- **Idempotency** — duplicate callbacks never double-credit a rent record.
+- **Amount reconciliation** — the paid amount in the callback is parsed and compared
+  against the initiated amount.
+- All rent crediting happens inside a database transaction with row locking.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Scheduled Tasks
 
-## Security Vulnerabilities
+`php artisan schedule:run` should be registered with the OS scheduler. The
+`rent:mark-overdue` command runs daily at 01:00 to flag overdue rent records.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Useful Commands
+
+```sh
+php artisan test                       # run the test suite
+vendor/bin/pint                        # format code (Laravel Pint)
+php artisan migrate                    # run migrations
+php artisan rent:mark-overdue          # mark overdue rent records
+php artisan dev                        # convenience dev runner (composer run dev)
+```
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT.

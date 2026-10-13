@@ -69,7 +69,7 @@
                     <tbody>
                         @foreach($tenants as $index => $tenant)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $tenants->firstItem() + $index }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
                                     <div style="width:34px; height:34px; background:linear-gradient(135deg,#4cc9f0,#0f3460); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600; font-size:0.8rem; flex-shrink:0;">
@@ -118,5 +118,9 @@
                 </table>
             </div>
         </div>
+    @endif
+
+    @if($tenants->hasPages())
+        <div class="mt-3">{{ $tenants->links() }}</div>
     @endif
 @endsection

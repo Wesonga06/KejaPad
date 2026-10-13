@@ -8,22 +8,28 @@ use Illuminate\Support\Facades\Log;
 class MpesaService
 {
     protected $consumerKey;
+
     protected $consumerSecret;
+
     protected $shortCode;
+
     protected $passkey;
+
     protected $callbackUrl;
+
     protected $env;
+
     protected $baseUrl;
 
     public function __construct()
     {
-        $this->consumerKey    = config('mpesa.consumer_key');
+        $this->consumerKey = config('mpesa.consumer_key');
         $this->consumerSecret = config('mpesa.consumer_secret');
-        $this->shortCode      = config('mpesa.shortcode');
-        $this->passkey        = config('mpesa.passkey');
-        $this->callbackUrl    = config('mpesa.callback_url');
-        $this->env            = config('mpesa.env', 'sandbox');
-        $this->baseUrl        = $this->env === 'live'
+        $this->shortCode = config('mpesa.shortcode');
+        $this->passkey = config('mpesa.passkey');
+        $this->callbackUrl = config('mpesa.callback_url');
+        $this->env = config('mpesa.env', 'sandbox');
+        $this->baseUrl = $this->env === 'live'
             ? 'https://api.safaricom.co.ke'
             : 'https://sandbox.safaricom.co.ke';
     }
@@ -31,26 +37,28 @@ class MpesaService
     // Get access token
     public function getAccessToken()
     {
-        $credentials = base64_encode($this->consumerKey . ':' . $this->consumerSecret);
+        $credentials = base64_encode($this->consumerKey.':'.$this->consumerSecret);
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Basic ' . $credentials,
-            ])->get($this->baseUrl . '/oauth/v1/generate?grant_type=client_credentials');
+                'Authorization' => 'Basic '.$credentials,
+            ])->timeout(30)->connectTimeout(10)
+                ->get($this->baseUrl.'/oauth/v1/generate?grant_type=client_credentials');
 
             if ($response->successful()) {
                 return $response->json()['access_token'] ?? null;
             }
 
             Log::error('M-Pesa Token Error', [
-                'status'   => $response->status(),
+                'status' => $response->status(),
                 'response' => $response->json(),
             ]);
 
             return null;
 
         } catch (\Exception $e) {
-            Log::error('M-Pesa Token Exception: ' . $e->getMessage());
+            Log::error('M-Pesa Token Exception: '.$e->getMessage());
+
             return null;
         }
     }
@@ -60,46 +68,51 @@ class MpesaService
     {
         $token = $this->getAccessToken();
 
-        if (!$token) {
+        if (! $token) {
             return ['error' => true, 'errorMessage' => 'Could not connect to M-Pesa. Please try again.'];
         }
 
         $timestamp = now()->format('YmdHis');
-        $password  = base64_encode($this->shortCode . $this->passkey . $timestamp);
-        $phone     = $this->formatPhone($phone);
+        $password = base64_encode($this->shortCode.$this->passkey.$timestamp);
+        $phone = $this->formatPhone($phone);
 
         try {
             $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $token,
-                'Content-Type'  => 'application/json',
-            ])->post($this->baseUrl . '/mpesa/stkpush/v1/processrequest', [
-                'BusinessShortCode' => $this->shortCode,
-                'Password'          => $password,
-                'Timestamp'         => $timestamp,
-                'TransactionType'   => 'CustomerPayBillOnline',
-                'Amount'            => (int) ceil($amount),
-                'PartyA'            => $phone,
-                'PartyB'            => $this->shortCode,
-                'PhoneNumber'       => $phone,
-                'CallBackURL'       => $this->callbackUrl,
-                'AccountReference'  => $accountRef,
-                'TransactionDesc'   => $description,
-            ]);
+                'Authorization' => 'Bearer '.$token,
+                'Content-Type' => 'application/json',
+            ])->timeout(30)->connectTimeout(10)
+                ->post($this->baseUrl.'/mpesa/stkpush/v1/processrequest', [
+                    'BusinessShortCode' => $this->shortCode,
+                    'Password' => $password,
+                    'Timestamp' => $timestamp,
+                    'TransactionType' => 'CustomerPayBillOnline',
+                    'Amount' => (int) ceil($amount),
+                    'PartyA' => $phone,
+                    'PartyB' => $this->shortCode,
+                    'PhoneNumber' => $phone,
+                    'CallBackURL' => $this->callbackUrl,
+                    'AccountReference' => $accountRef,
+                    'TransactionDesc' => $description,
+                ]);
 
             Log::info('STK Push Request', [
-                'phone'  => $phone,
+                'phone' => $this->maskPhone($phone),
                 'amount' => $amount,
-                'ref'    => $accountRef,
+                'ref' => $accountRef,
             ]);
 
-            Log::info('STK Push Response', $response->json());
+            Log::info('STK Push Response', [
+                'response_code' => $response->json('ResponseCode'),
+                'checkout_request_id' => $response->json('CheckoutRequestID'),
+            ]);
 
             return $response->json();
 
         } catch (\Exception $e) {
-            Log::error('STK Push Exception: ' . $e->getMessage());
+            Log::error('STK Push Exception: '.$e->getMessage());
+
             return [
-                'error'        => true,
+                'error' => true,
                 'errorMessage' => 'Network error. Please try again.',
             ];
         }
@@ -112,13 +125,25 @@ class MpesaService
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
         if (str_starts_with($phone, '0')) {
-            return '254' . substr($phone, 1);
+            return '254'.substr($phone, 1);
         }
 
         if (str_starts_with($phone, '254')) {
             return $phone;
         }
 
-        return '254' . $phone;
+        return '254'.$phone;
+    }
+
+    // Hide all but the last 3 digits for safe logging
+    public function maskPhone($phone)
+    {
+        $phone = (string) $phone;
+
+        if (strlen($phone) <= 3) {
+            return '***';
+        }
+
+        return str_repeat('*', strlen($phone) - 3).substr($phone, -3);
     }
 }

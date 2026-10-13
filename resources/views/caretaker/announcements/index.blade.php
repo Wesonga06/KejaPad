@@ -64,4 +64,8 @@
             @endforeach
         </div>
     @endif
+
+    @if($announcements->hasPages())
+        <div class="mt-3">{{ $announcements->links() }}</div>
+    @endif
 @endsection

@@ -116,4 +116,8 @@
             @endforeach
         </div>
     @endif
+
+    @if($properties->hasPages())
+        <div class="mt-3">{{ $properties->links() }}</div>
+    @endif
 @endsection

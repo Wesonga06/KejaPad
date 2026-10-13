@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\Maintenance\AssignMaintenanceRequest;
+use App\Http\Requests\Maintenance\UpdateMaintenanceStatusRequest;
 use App\Models\MaintenanceRequest;
 use App\Models\Property;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class LandlordMaintenanceController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', MaintenanceRequest::class);
+
         $propertyIds = Property::where('user_id', auth()->id())->pluck('id');
 
         $query = MaintenanceRequest::whereIn('property_id', $propertyIds)
-                                    ->with(['tenant', 'property', 'unit', 'assignedTo']);
+            ->with(['tenant', 'property', 'unit', 'assignedTo']);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -28,7 +32,7 @@ class LandlordMaintenanceController extends Controller
             $query->where('priority', $request->priority);
         }
 
-        $requests   = $query->latest()->get();
+        $requests = $query->latest()->paginate(15)->withQueryString();
         $caretakers = User::where('role', 'caretaker')->where('is_active', true)->get();
 
         return view('landlord.maintenance.index', compact('requests', 'caretakers'));
@@ -36,45 +40,30 @@ class LandlordMaintenanceController extends Controller
 
     public function show(MaintenanceRequest $maintenance)
     {
-        $propertyIds = Property::where('user_id', auth()->id())->pluck('id');
-        abort_if(!$propertyIds->contains($maintenance->property_id), 403);
+        $this->authorize('view', $maintenance);
 
         $caretakers = User::where('role', 'caretaker')->where('is_active', true)->get();
 
         return view('landlord.maintenance.show', compact('maintenance', 'caretakers'));
     }
 
-    public function assign(Request $request, MaintenanceRequest $maintenance)
+    public function assign(AssignMaintenanceRequest $request, MaintenanceRequest $maintenance)
     {
-        $propertyIds = Property::where('user_id', auth()->id())->pluck('id');
-        abort_if(!$propertyIds->contains($maintenance->property_id), 403);
-
-        $request->validate([
-            'assigned_to' => 'required|exists:users,id',
-        ]);
-
         $maintenance->update([
             'assigned_to' => $request->assigned_to,
-            'status'      => 'assigned',
+            'status' => 'assigned',
         ]);
 
         return back()->with('success', 'Request assigned to caretaker successfully.');
     }
 
-    public function updateStatus(Request $request, MaintenanceRequest $maintenance)
+    public function updateStatus(UpdateMaintenanceStatusRequest $request, MaintenanceRequest $maintenance)
     {
-        $propertyIds = Property::where('user_id', auth()->id())->pluck('id');
-        abort_if(!$propertyIds->contains($maintenance->property_id), 403);
-
-        $request->validate([
-            'status' => 'required|in:pending,assigned,in_progress,resolved,closed',
-        ]);
-
         $data = ['status' => $request->status];
 
         if ($request->status === 'resolved') {
-            $data['resolved_at']       = now();
-            $data['resolution_notes']  = $request->resolution_notes;
+            $data['resolved_at'] = now();
+            $data['resolution_notes'] = $request->resolution_notes;
         }
 
         $maintenance->update($data);

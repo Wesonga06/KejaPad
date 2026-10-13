@@ -58,25 +58,25 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
-                <h4 class="fw-bold text-primary mb-0">{{ $units->count() }}</h4>
+                <h4 class="fw-bold text-primary mb-0">{{ $totalUnits }}</h4>
                 <small class="text-muted">Total Units</small>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
-                <h4 class="fw-bold text-success mb-0">{{ $units->where('status', 'vacant')->count() }}</h4>
+                <h4 class="fw-bold text-success mb-0">{{ $vacantCount }}</h4>
                 <small class="text-muted">Vacant</small>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
-                <h4 class="fw-bold text-danger mb-0">{{ $units->where('status', 'occupied')->count() }}</h4>
+                <h4 class="fw-bold text-danger mb-0">{{ $occupiedCount }}</h4>
                 <small class="text-muted">Occupied</small>
             </div>
         </div>
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
-                <h4 class="fw-bold text-warning mb-0">{{ $units->where('status', 'reserved')->count() }}</h4>
+                <h4 class="fw-bold text-warning mb-0">{{ $reservedCount }}</h4>
                 <small class="text-muted">Reserved</small>
             </div>
         </div>
@@ -107,7 +107,7 @@
                     <tbody>
                         @foreach($units as $index => $unit)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $units->firstItem() + $index }}</td>
                             <td><span class="fw-semibold">{{ $unit->unit_number }}</span></td>
                             <td>KES {{ number_format($unit->rent_amount, 2) }}</td>
                             <td>
@@ -142,5 +142,11 @@
                 </table>
             </div>
         </div>
+
+        @if($units->hasPages())
+            <div class="mt-3">
+                {{ $units->links() }}
+            </div>
+        @endif
     @endif
 @endsection

@@ -489,7 +489,7 @@
     }
 
     function selectRole(role) {
-        const roles = ['landlord', 'caretaker', 'tenant', 'super_admin'];
+        const roles = ['landlord', 'caretaker', 'tenant'];
         roles.forEach(r => {
             const el = document.getElementById('label-' + r);
             if (el) el.classList.remove('selected');

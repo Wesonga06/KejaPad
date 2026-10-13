@@ -40,7 +40,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-primary mb-0">
-                    {{ $payments->count() }}
+                    {{ $totalRecords }}
                 </h4>
                 <small class="text-muted">Total Records</small>
             </div>
@@ -48,7 +48,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-success mb-0">
-                    {{ $payments->where('status', 'paid')->count() }}
+                    {{ $paidCount }}
                 </h4>
                 <small class="text-muted">Paid</small>
             </div>
@@ -56,7 +56,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-warning mb-0">
-                    {{ $payments->whereIn('status', ['pending', 'partial'])->count() }}
+                    {{ $pendingCount }}
                 </h4>
                 <small class="text-muted">Pending / Partial</small>
             </div>
@@ -64,7 +64,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-danger mb-0">
-                    KES {{ number_format($payments->sum(fn($p) => $p->balance()), 2) }}
+                    KES {{ number_format($totalBalance, 2) }}
                 </h4>
                 <small class="text-muted">Total Balance</small>
             </div>
@@ -98,7 +98,7 @@
                     <tbody>
                         @foreach($payments as $index => $payment)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $payments->firstItem() + $index }}</td>
                             <td>
                                 <span class="fw-semibold">
                                     {{ $payment->monthName() }} {{ $payment->year }}
@@ -155,4 +155,10 @@
             </div>
         @endif
     </div>
+
+    @if($payments->hasPages())
+        <div class="mt-3">
+            {{ $payments->links() }}
+        </div>
+    @endif
 @endsection

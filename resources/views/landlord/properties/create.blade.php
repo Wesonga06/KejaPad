@@ -95,6 +95,22 @@
                 @error('photo') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
+            <div class="mb-4">
+                <label class="form-label fw-semibold">Caretakers <span class="text-muted fw-normal">(optional)</span></label>
+                <select name="caretakers[]" class="form-select @error('caretakers') is-invalid @enderror" multiple size="4">
+                    @foreach($caretakers as $caretaker)
+                        <option value="{{ $caretaker->id }}" {{ in_array($caretaker->id, old('caretakers', [])) ? 'selected' : '' }}>
+                            {{ $caretaker->name }}
+                        </option>
+                    @endforeach
+                </select>
+                <div class="form-text">Hold Ctrl (Cmd on Mac) to select multiple. Assigned caretakers will see maintenance requests for this property.</div>
+                @error('caretakers') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                @if($caretakers->isEmpty())
+                    <div class="form-text text-muted">No caretakers available yet.</div>
+                @endif
+            </div>
+
             <button type="submit" class="btn btn-primary w-100">
                 <i class="bi bi-buildings me-2"></i> Save Property
             </button>

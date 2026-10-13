@@ -63,7 +63,7 @@
                     <tbody>
                         @foreach($requests as $index => $req)
                         <tr>
-                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $requests->firstItem() + $index }}</td>
                             <td class="fw-semibold">{{ $req->title }}</td>
                             <td>
                                 <span class="badge bg-light text-dark border">
@@ -94,5 +94,9 @@
                 </table>
             </div>
         </div>
+    @endif
+
+    @if($requests->hasPages())
+        <div class="mt-3">{{ $requests->links() }}</div>
     @endif
 @endsection

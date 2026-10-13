@@ -15,17 +15,6 @@
     <a href="{{ route('tenant.payments') }}" class="nav-link">
         <i class="bi bi-receipt"></i> Payment History
     </a>
-    @if($currentRent && $currentRent->status !== 'paid')
-    <a href="{{ route('tenant.pay', $currentRent) }}"
-       class="btn btn-primary mt-2">
-        <i class="bi bi-phone me-2"></i> Pay via M-Pesa
-    </a>
-@else
-    <p class="text-success mt-2 fw-semibold">
-        <i class="bi bi-check-circle me-1"></i>
-        Rent fully paid for this month.
-    </p>
-@endif
     <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
     <i class="bi bi-tools"></i> Maintenance
     </a>
@@ -44,6 +33,48 @@
             Unit {{ $tenant->unit->unit_number }}
         </p>
     </div>
+
+    <!-- Rent Status Banner -->
+    @if($currentRent && $currentRent->status === 'paid')
+        <div class="alert alert-success d-flex align-items-center gap-3">
+            <i class="bi bi-check-circle-fill fs-4"></i>
+            <div>
+                <strong>Rent fully paid for {{ date('F Y') }}.</strong>
+                <div class="small">Thank you! Your payment has been received.</div>
+            </div>
+        </div>
+    @elseif($currentRent && $currentRent->status === 'overdue')
+        <div class="alert alert-danger d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                <div>
+                    <strong>Rent overdue for {{ date('F Y') }}.</strong>
+                    <div class="small">
+                        Outstanding balance: KES {{ number_format($currentRent->balance(), 2) }}.
+                        Please pay as soon as possible.
+                    </div>
+                </div>
+            </div>
+            <a href="{{ route('tenant.pay', $currentRent) }}" class="btn btn-danger">
+                <i class="bi bi-phone me-2"></i> Pay via M-Pesa
+            </a>
+        </div>
+    @elseif($currentRent)
+        <div class="alert alert-warning d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <i class="bi bi-hourglass-split fs-4"></i>
+                <div>
+                    <strong>{{ ucfirst($currentRent->status) }} — {{ date('F Y') }}.</strong>
+                    <div class="small">
+                        Outstanding balance: KES {{ number_format($currentRent->balance(), 2) }}.
+                    </div>
+                </div>
+            </div>
+            <a href="{{ route('tenant.pay', $currentRent) }}" class="btn btn-primary">
+                <i class="bi bi-phone me-2"></i> Pay via M-Pesa
+            </a>
+        </div>
+    @endif
 
     <!-- Stat Cards -->
     <div class="row g-4 mb-4">

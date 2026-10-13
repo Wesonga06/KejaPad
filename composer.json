@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "kejapad/kejapad",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "KejaPad - property and rental management platform with M-Pesa rent collection.",
+    "keywords": ["laravel", "property", "rental", "mpesa"],
     "license": "MIT",
     "require": {
         "php": "^8.3",

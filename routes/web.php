@@ -1,24 +1,25 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SuperAdminController;
-use App\Http\Controllers\LandlordController;
-use App\Http\Controllers\CaretakerController;
-use App\Http\Controllers\TenantController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\PropertyController;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\LandlordTenantController;
-use App\Http\Controllers\RentController;
-use App\Http\Controllers\TenantMaintenanceController;
-use App\Http\Controllers\LandlordMaintenanceController;
-use App\Http\Controllers\CaretakerMaintenanceController;
-use App\Http\Controllers\LandlordAnnouncementController;
-use App\Http\Controllers\TenantAnnouncementController;
 use App\Http\Controllers\CaretakerAnnouncementController;
-use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CaretakerController;
+use App\Http\Controllers\CaretakerMaintenanceController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LandlordAnnouncementController;
+use App\Http\Controllers\LandlordController;
+use App\Http\Controllers\LandlordMaintenanceController;
+use App\Http\Controllers\LandlordTenantController;
 use App\Http\Controllers\MpesaController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\RentController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SuperAdminController;
+use App\Http\Controllers\TenantAnnouncementController;
+use App\Http\Controllers\TenantController;
+use App\Http\Controllers\TenantMaintenanceController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 // Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('landing');
@@ -28,17 +29,19 @@ Route::get('/qrcode', [LandingController::class, 'qrcode'])->name('qrcode');
 Route::middleware('auth')->get('/dashboard', function () {
     $role = auth()->user()->role;
 
-    return match($role) {
+    return match ($role) {
         'super_admin' => redirect()->route('super_admin.dashboard'),
-        'landlord'    => redirect()->route('landlord.dashboard'),
-        'caretaker'   => redirect()->route('caretaker.dashboard'),
-        'tenant'      => redirect()->route('tenant.dashboard'),
-        default       => redirect()->route('login'),
+        'landlord' => redirect()->route('landlord.dashboard'),
+        'caretaker' => redirect()->route('caretaker.dashboard'),
+        'tenant' => redirect()->route('tenant.dashboard'),
+        default => redirect()->route('login'),
     };
 })->name('dashboard');
 
+$verified = config('app.email_verification') ? ['verified'] : [];
+
 // Super Admin Routes
-Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('super_admin.')->group(function () {
+Route::middleware(array_merge(['auth', 'role:super_admin'], $verified))->prefix('super-admin')->name('super_admin.')->group(function () {
     Route::get('/dashboard', [SuperAdminController::class, 'dashboard'])->name('dashboard');
 
     // User Management
@@ -52,7 +55,7 @@ Route::middleware(['auth', 'role:super_admin'])->prefix('super-admin')->name('su
 });
 
 // Landlord Routes
-Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord.')->group(function () {
+Route::middleware(array_merge(['auth', 'role:landlord'], $verified))->prefix('landlord')->name('landlord.')->group(function () {
     Route::get('/dashboard', [LandlordController::class, 'dashboard'])->name('dashboard');
 
     // Reports
@@ -121,7 +124,7 @@ Route::middleware(['auth', 'role:landlord'])->prefix('landlord')->name('landlord
 });
 
 // Caretaker Routes
-Route::middleware(['auth', 'role:caretaker'])->prefix('caretaker')->name('caretaker.')->group(function () {
+Route::middleware(array_merge(['auth', 'role:caretaker'], $verified))->prefix('caretaker')->name('caretaker.')->group(function () {
     Route::get('/dashboard', [CaretakerController::class, 'dashboard'])->name('dashboard');
 
     // Announcements
@@ -134,7 +137,7 @@ Route::middleware(['auth', 'role:caretaker'])->prefix('caretaker')->name('careta
 });
 
 // Tenant Routes
-Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->group(function () {
+Route::middleware(array_merge(['auth', 'role:tenant'], $verified))->prefix('tenant')->name('tenant.')->group(function () {
     Route::get('/dashboard', [TenantController::class, 'dashboard'])->name('dashboard');
     Route::get('/payments', [TenantController::class, 'paymentHistory'])->name('payments');
     Route::get('/profile', [TenantController::class, 'profile'])->name('profile');
@@ -154,6 +157,13 @@ Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->g
     Route::post('/pay/{rent}/initiate', [MpesaController::class, 'initiate'])->name('pay.initiate');
     Route::get('/pay/{rent}/pending', [MpesaController::class, 'pending'])->name('payment.pending');
     Route::get('/payment/{payment}/status', [MpesaController::class, 'checkStatus'])->name('payment.status');
+});
+
+// Profile
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 // M-Pesa Callback (public - called by Safaricom)

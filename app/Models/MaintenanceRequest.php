@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class MaintenanceRequest extends Model
 {
@@ -48,6 +48,17 @@ class MaintenanceRequest extends Model
         return $this->belongsTo(User::class, 'assigned_to');
     }
 
+    // Requests a caretaker should see: their properties', plus anything assigned to them
+    public function scopeVisibleToCaretaker($query, User $user)
+    {
+        $propertyIds = $user->caretakerProperties()->pluck('properties.id');
+
+        return $query->where(function ($q) use ($propertyIds, $user) {
+            $q->whereIn('property_id', $propertyIds)
+                ->orWhere('assigned_to', $user->id);
+        });
+    }
+
     public function categoryLabel()
     {
         return ucfirst($this->category);
@@ -55,23 +66,23 @@ class MaintenanceRequest extends Model
 
     public function statusColor()
     {
-        return match($this->status) {
-            'pending'     => 'secondary',
-            'assigned'    => 'info',
+        return match ($this->status) {
+            'pending' => 'secondary',
+            'assigned' => 'info',
             'in_progress' => 'warning',
-            'resolved'    => 'success',
-            'closed'      => 'dark',
-            default       => 'secondary',
+            'resolved' => 'success',
+            'closed' => 'dark',
+            default => 'secondary',
         };
     }
 
     public function priorityColor()
     {
-        return match($this->priority) {
-            'low'    => 'success',
+        return match ($this->priority) {
+            'low' => 'success',
             'medium' => 'warning',
-            'high'   => 'danger',
-            default  => 'secondary',
+            'high' => 'danger',
+            default => 'secondary',
         };
     }
 }

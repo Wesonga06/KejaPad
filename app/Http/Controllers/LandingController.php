@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class LandingController extends Controller
@@ -17,11 +16,11 @@ class LandingController extends Controller
         $url = config('app.url');
 
         $qrcode = QrCode::format('svg')
-                         ->size(250)
-                         ->color(15, 52, 96)
-                         ->backgroundColor(255, 255, 255)
-                         ->margin(1)
-                         ->generate($url);
+            ->size(250)
+            ->color(15, 52, 96)
+            ->backgroundColor(255, 255, 255)
+            ->margin(1)
+            ->generate($url);
 
         return view('qrcode', compact('qrcode', 'url'));
     }

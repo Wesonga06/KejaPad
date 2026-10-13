@@ -47,7 +47,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-warning mb-0">
-                    {{ $payments->where('status', 'pending')->count() }}
+                    {{ $pendingCount }}
                 </h4>
                 <small class="text-muted">Pending</small>
             </div>
@@ -55,7 +55,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-success mb-0">
-                    {{ $payments->where('status', 'confirmed')->count() }}
+                    {{ $confirmedCount }}
                 </h4>
                 <small class="text-muted">Confirmed</small>
             </div>
@@ -63,7 +63,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-danger mb-0">
-                    {{ $payments->where('status', 'failed')->count() }}
+                    {{ $failedCount }}
                 </h4>
                 <small class="text-muted">Failed</small>
             </div>
@@ -71,7 +71,7 @@
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
                 <h4 class="fw-bold text-primary mb-0">
-                    KES {{ number_format($payments->where('status', 'confirmed')->sum('amount'), 0) }}
+                    KES {{ number_format($confirmedTotal, 0) }}
                 </h4>
                 <small class="text-muted">Total Received</small>
             </div>
@@ -188,4 +188,10 @@
             </div>
         @endif
     </div>
+
+    @if($payments->hasPages())
+        <div class="mt-3">
+            {{ $payments->links() }}
+        </div>
+    @endif
 @endsection

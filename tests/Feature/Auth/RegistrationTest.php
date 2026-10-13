@@ -21,11 +21,27 @@ class RegistrationTest extends TestCase
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'role' => 'landlord',
             'password' => 'password',
             'password_confirmation' => 'password',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+    }
+
+    public function test_users_cannot_self_register_as_super_admin(): void
+    {
+        $response = $this->post('/register', [
+            'name' => 'Attacker',
+            'email' => 'attacker@example.com',
+            'role' => 'super_admin',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ]);
+
+        $response->assertSessionHasErrors('role');
+        $this->assertGuest();
+        $this->assertDatabaseMissing('users', ['email' => 'attacker@example.com']);
     }
 }

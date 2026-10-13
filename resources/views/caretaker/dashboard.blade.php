@@ -21,7 +21,7 @@
     <div class="p-4 mb-4 rounded-3"
          style="background: linear-gradient(135deg, #198754, #4cc9f0); color: white;">
         <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} 👋</h4>
-        <p class="mb-0 opacity-75">Here are your assigned maintenance tasks.</p>
+        <p class="mb-0 opacity-75">Here are the maintenance requests for your properties.</p>
     </div>
 
     <div class="row g-4 mb-4">
@@ -71,7 +71,7 @@
             <div class="stat-card">
                 <div class="d-flex align-items-center justify-content-between">
                     <div>
-                        <p class="stat-label">Total Assigned</p>
+                        <p class="stat-label">Total</p>
                         <h3 class="stat-value">{{ $totalCount }}</h3>
                     </div>
                     <div class="stat-icon" style="background:#e8f0fe;">
