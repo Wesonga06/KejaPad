@@ -16,7 +16,7 @@ class GenerateBulkRentRequest extends FormRequest
         return [
             'month' => 'required|integer|between:1,12',
             'year' => 'required|integer|min:2020',
-            'day' => 'required|integer|between:1,28',
+            'day' => 'nullable|integer|between:1,28',
         ];
     }
 }

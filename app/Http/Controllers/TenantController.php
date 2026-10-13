@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Tenant\UpdateTenantProfileRequest;
 use App\Models\RentRecord;
 use App\Models\Tenant;
+use App\Services\PaymentBehaviourService;
+use App\Services\RentStatusService;
 use Illuminate\Support\Facades\Hash;
 
 class TenantController extends Controller
 {
-    public function dashboard()
+    public function dashboard(RentStatusService $status, PaymentBehaviourService $behaviour)
     {
         $tenant = Tenant::where('user_id', auth()->id())
             ->with(['property', 'unit'])
@@ -27,26 +29,31 @@ class TenantController extends Controller
 
         // Recent payment history
         $recentPayments = RentRecord::where('tenant_id', $tenant->id)
-            ->whereIn('status', ['paid', 'partial'])
+            ->whereIn('status', ['paid', 'partial', 'overdue'])
             ->latest()
             ->take(5)
             ->get();
 
         // Outstanding balance across all records
         $totalOutstanding = RentRecord::where('tenant_id', $tenant->id)
-            ->whereIn('status', ['pending', 'partial', 'overdue'])
             ->get()
             ->sum(fn ($r) => $r->balance());
+
+        // Derived, colour-coded status + payment behaviour (never rely on stored status)
+        $rentStatus = $status->summary($tenant);
+        $behaviour = $behaviour->indicators($tenant, now()->subMonths(6));
 
         return view('tenant.dashboard', compact(
             'tenant',
             'currentRent',
             'recentPayments',
-            'totalOutstanding'
+            'totalOutstanding',
+            'rentStatus',
+            'behaviour'
         ));
     }
 
-    public function paymentHistory()
+    public function paymentHistory(RentStatusService $status, PaymentBehaviourService $behaviour)
     {
         $tenant = Tenant::where('user_id', auth()->id())->firstOrFail();
 
@@ -54,12 +61,13 @@ class TenantController extends Controller
 
         $totalRecords = (clone $base)->count();
         $paidCount = (clone $base)->where('status', 'paid')->count();
-        $pendingCount = (clone $base)->whereIn('status', ['pending', 'partial'])->count();
-        $totalBalance = (clone $base)->whereIn('status', ['pending', 'partial', 'overdue'])
-            ->get()
-            ->sum(fn ($r) => $r->balance());
+        $pendingCount = (clone $base)->whereIn('status', ['pending', 'partial', 'overdue'])->count();
 
-        $payments = $base->latest()->paginate(15);
+        $summary = $status->summary($tenant);
+        $totalBalance = $summary['outstanding'];
+        $ledger = $status->breakdown($tenant);
+        $payments = $tenant->payments()->latest('payment_date')->latest('id')->paginate(15);
+        $behaviour = $behaviour->indicators($tenant, now()->subMonths(6));
 
         return view('tenant.payments', compact(
             'tenant',
@@ -67,7 +75,10 @@ class TenantController extends Controller
             'totalRecords',
             'paidCount',
             'pendingCount',
-            'totalBalance'
+            'totalBalance',
+            'summary',
+            'ledger',
+            'behaviour'
         ));
     }
 

@@ -53,7 +53,7 @@
 
                 @elseif($payment->status === 'failed')
                     <!-- Failed -->
-                    <div style="width:80px; height:80px; background:#fce4ec;
+                    <div style="width:80px; height:80px; background:#fbf3d5;
                                 border-radius:50%; display:flex; align-items:center;
                                 justify-content:center; margin:0 auto 20px;">
                         <i class="bi bi-x-circle-fill"
@@ -143,7 +143,7 @@
                 } else if (data.status === 'failed') {
                     document.getElementById('pendingIcon').innerHTML =
                         '<i class="bi bi-x-circle-fill" style="font-size:2.5rem; color:#dc3545;"></i>';
-                    document.getElementById('pendingIcon').style.background = '#fce4ec';
+                    document.getElementById('pendingIcon').style.background = '#fbf3d5';
                     document.getElementById('statusTitle').textContent = 'Payment Failed';
                     document.getElementById('statusTitle').className = 'fw-bold text-danger';
                     document.getElementById('statusDesc').textContent =

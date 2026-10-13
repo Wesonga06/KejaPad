@@ -6,10 +6,11 @@ use App\Models\Property;
 use App\Models\RentRecord;
 use App\Models\Tenant;
 use App\Models\Unit;
+use App\Services\RentStatusService;
 
 class LandlordController extends Controller
 {
-    public function dashboard()
+    public function dashboard(RentStatusService $status)
     {
         $properties = Property::where('user_id', auth()->id())->get();
         $propertyIds = $properties->pluck('id')->toArray();
@@ -36,6 +37,22 @@ class LandlordController extends Controller
         $totalCollected = $rentRecords->sum('amount_paid');
         $totalOutstanding = $totalExpected - $totalCollected;
 
+        // Arrears across all active tenants (derived from the payment ledger)
+        $activeTenants = Tenant::whereIn('property_id', $propertyIds)
+            ->where('is_active', true)
+            ->get();
+
+        $arrearsTotal = 0.0;
+        $statusCounts = ['green' => 0, 'red' => 0, 'orange' => 0, 'yellow' => 0];
+
+        foreach ($activeTenants as $tenant) {
+            $summary = $status->summary($tenant);
+            $arrearsTotal += $summary['arrears'];
+            $statusCounts[$summary['status_key']]++;
+        }
+
+        $arrearsTotal = round($arrearsTotal, 2);
+
         return view('landlord.dashboard', compact(
             'totalProperties',
             'totalUnits',
@@ -44,7 +61,9 @@ class LandlordController extends Controller
             'totalTenants',
             'totalExpected',
             'totalCollected',
-            'totalOutstanding'
+            'totalOutstanding',
+            'arrearsTotal',
+            'statusCounts'
         ));
     }
 }

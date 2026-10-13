@@ -39,7 +39,7 @@
                 <div class="text-center mb-3">
                     <div class="mx-auto mb-3"
                          style="width:65px; height:65px;
-                                background:linear-gradient(135deg,#4cc9f0,#0f3460);
+                                background:linear-gradient(135deg,#d4af37,#4c1d95);
                                 border-radius:50%; display:flex;
                                 align-items:center; justify-content:center;
                                 color:white; font-weight:700; font-size:1.4rem;">

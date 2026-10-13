@@ -18,6 +18,9 @@
     <a href="{{ route('landlord.rent.index') }}" class="nav-link">
         <i class="bi bi-cash-coin"></i> Rent
     </a>
+    <a href="{{ route('landlord.arrears.index') }}" class="nav-link">
+        <i class="bi bi-exclamation-octagon"></i> Arrears
+    </a>
     <a href="{{ route('landlord.mpesa-payments') }}" class="nav-link">
     <i class="bi bi-phone"></i> M-Pesa Payments
     </a>
@@ -37,7 +40,7 @@
 @section('content')
     <!-- Welcome Banner -->
     <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #0f3460, #4cc9f0); color: white;">
+         style="background: linear-gradient(135deg, #4c1d95, #d4af37); color: white;">
         <h4 class="fw-bold mb-1">
             Welcome back, {{ auth()->user()->name }} 👋
         </h4>
@@ -55,8 +58,8 @@
                         <p class="stat-label">Total Properties</p>
                         <h3 class="stat-value">{{ $totalProperties }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#e8f0fe;">
-                        <i class="bi bi-buildings" style="color:#0f3460;"></i>
+                    <div class="stat-icon" style="background:#efe7fb;">
+                        <i class="bi bi-buildings" style="color:#4c1d95;"></i>
                     </div>
                 </div>
             </div>
@@ -97,8 +100,8 @@
                         <p class="stat-label">Active Tenants</p>
                         <h3 class="stat-value">{{ $totalTenants }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#fce4ec;">
-                        <i class="bi bi-people" style="color:#e91e63;"></i>
+                    <div class="stat-icon" style="background:#fbf3d5;">
+                        <i class="bi bi-people" style="color:#b8860b;"></i>
                     </div>
                 </div>
             </div>
@@ -119,8 +122,8 @@
                             KES {{ number_format($totalExpected, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#e8f0fe;">
-                        <i class="bi bi-cash-stack" style="color:#0f3460;"></i>
+                    <div class="stat-icon" style="background:#efe7fb;">
+                        <i class="bi bi-cash-stack" style="color:#4c1d95;"></i>
                     </div>
                 </div>
             </div>
@@ -153,6 +156,54 @@
                     </div>
                     <div class="stat-icon" style="background:#fff3e0;">
                         <i class="bi bi-hourglass-split" style="color:#fd7e14;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arrears Overview -->
+    <h6 class="fw-bold mb-3 text-muted" style="font-size:0.8rem; text-transform:uppercase; letter-spacing:1px;">
+        Arrears Overview
+    </h6>
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-4">
+            <div class="stat-card h-100">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <p class="stat-label">Total Arrears</p>
+                        <h3 class="stat-value" style="font-size:1.4rem; color:#dc3545;">
+                            KES {{ number_format($arrearsTotal, 2) }}
+                        </h3>
+                    </div>
+                    <div class="stat-icon" style="background:#fbe3e5;">
+                        <i class="bi bi-exclamation-octagon" style="color:#dc3545;"></i>
+                    </div>
+                </div>
+                <a href="{{ route('landlord.arrears.index') }}" class="btn btn-sm btn-outline-danger mt-2 w-100">
+                    Review Arrears
+                </a>
+            </div>
+        </div>
+        <div class="col-12 col-lg-8">
+            <div class="stat-card h-100">
+                <h6 class="fw-bold mb-3">Tenants by Rent Status</h6>
+                <div class="row g-3 text-center">
+                    <div class="col-3">
+                        <div class="fw-bold" style="font-size:1.4rem; color:#198754;">{{ $statusCounts['green'] }}</div>
+                        <small class="text-muted">Up to date</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="fw-bold" style="font-size:1.4rem; color:#dc3545;">{{ $statusCounts['red'] }}</div>
+                        <small class="text-muted">Overdue</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="fw-bold" style="font-size:1.4rem; color:#fd7e14;">{{ $statusCounts['orange'] }}</div>
+                        <small class="text-muted">Escalated</small>
+                    </div>
+                    <div class="col-3">
+                        <div class="fw-bold" style="font-size:1.4rem; color:#b8860b;">{{ $statusCounts['yellow'] }}</div>
+                        <small class="text-muted">Further action</small>
                     </div>
                 </div>
             </div>

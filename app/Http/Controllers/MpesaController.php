@@ -8,7 +8,7 @@ use App\Models\Property;
 use App\Models\RentRecord;
 use App\Models\Tenant;
 use App\Services\MpesaService;
-use App\Services\RentPaymentService;
+use App\Services\RentAllocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -17,12 +17,12 @@ class MpesaController extends Controller
 {
     protected $mpesa;
 
-    protected RentPaymentService $rentPayments;
+    protected RentAllocationService $rentAllocations;
 
-    public function __construct(MpesaService $mpesa, RentPaymentService $rentPayments)
+    public function __construct(MpesaService $mpesa, RentAllocationService $rentAllocations)
     {
         $this->mpesa = $mpesa;
-        $this->rentPayments = $rentPayments;
+        $this->rentAllocations = $rentAllocations;
     }
 
     // Show Pay Rent page for tenant
@@ -168,10 +168,16 @@ class MpesaController extends Controller
                     'result_desc' => $resultDesc,
                 ]);
 
-                $this->rentPayments->apply(
-                    $payment->rentRecord,
+                $this->rentAllocations->recordPayment(
+                    $payment->rentRecord->tenant,
                     (float) $payment->amount,
-                    $receiptNumber,
+                    [
+                        'payment_date' => now()->toDateString(),
+                        'reference' => $receiptNumber,
+                        'method' => 'mpesa',
+                        'source' => 'tenant',
+                        'mpesa_payment_id' => $payment->id,
+                    ],
                 );
             } else {
                 $payment->update([
@@ -282,10 +288,16 @@ class MpesaController extends Controller
                 'status' => 'confirmed',
             ]);
 
-            $this->rentPayments->apply(
-                $payment->rentRecord,
+            $this->rentAllocations->recordPayment(
+                $payment->rentRecord->tenant,
                 (float) $payment->amount,
-                $payment->mpesa_receipt_number ?? 'MANUAL-'.$payment->id,
+                [
+                    'payment_date' => now()->toDateString(),
+                    'reference' => $payment->mpesa_receipt_number ?? 'MANUAL-'.$payment->id,
+                    'method' => 'mpesa',
+                    'source' => 'landlord',
+                    'mpesa_payment_id' => $payment->id,
+                ],
             );
         });
 

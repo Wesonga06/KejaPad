@@ -19,7 +19,7 @@
 
 @section('content')
     <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #198754, #4cc9f0); color: white;">
+         style="background: linear-gradient(135deg, #198754, #d4af37); color: white;">
         <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} 👋</h4>
         <p class="mb-0 opacity-75">Here are the maintenance requests for your properties.</p>
     </div>
@@ -74,8 +74,8 @@
                         <p class="stat-label">Total</p>
                         <h3 class="stat-value">{{ $totalCount }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#e8f0fe;">
-                        <i class="bi bi-clipboard-check" style="color:#0f3460;"></i>
+                    <div class="stat-icon" style="background:#efe7fb;">
+                        <i class="bi bi-clipboard-check" style="color:#4c1d95;"></i>
                     </div>
                 </div>
             </div>

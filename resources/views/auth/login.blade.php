@@ -34,7 +34,7 @@
         /* Left Panel */
         .auth-left {
             flex: 1;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #1a0b2e 0%, #2e1065 50%, #4c1d95 100%);
             padding: 50px 40px;
             display: flex;
             flex-direction: column;
@@ -50,7 +50,7 @@
             right: -60px;
             width: 300px;
             height: 300px;
-            background: radial-gradient(circle, rgba(76,201,240,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -61,7 +61,7 @@
             left: -40px;
             width: 200px;
             height: 200px;
-            background: radial-gradient(circle, rgba(76,201,240,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -73,7 +73,7 @@
             z-index: 1;
         }
 
-        .brand span { color: #4cc9f0; }
+        .brand span { color: #d4af37; }
 
         .auth-left-content {
             position: relative;
@@ -113,13 +113,13 @@
         .feature-list li .icon {
             width: 30px;
             height: 30px;
-            background: rgba(76,201,240,0.15);
-            border: 1px solid rgba(76,201,240,0.25);
+            background: rgba(212,175,55,0.15);
+            border: 1px solid rgba(212,175,55,0.25);
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #4cc9f0;
+            color: #d4af37;
             font-size: 0.85rem;
             flex-shrink: 0;
         }
@@ -148,7 +148,7 @@
         .auth-right h4 {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 6px;
         }
 
@@ -161,7 +161,7 @@
         .form-label {
             font-weight: 600;
             font-size: 0.85rem;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 6px;
         }
 
@@ -170,13 +170,13 @@
             border-radius: 10px;
             padding: 11px 14px;
             font-size: 0.9rem;
-            color: #1a1a2e;
+            color: #1a0b2e;
             transition: all 0.2s;
         }
 
         .form-control:focus {
-            border-color: #4cc9f0;
-            box-shadow: 0 0 0 3px rgba(76,201,240,0.12);
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
         }
 
         .input-group .form-control {
@@ -195,20 +195,20 @@
         }
 
         .input-group .btn-toggle:hover {
-            color: #0f3460;
+            color: #4c1d95;
         }
 
         .input-group:focus-within .form-control,
         .input-group:focus-within .btn-toggle {
-            border-color: #4cc9f0;
+            border-color: #d4af37;
         }
 
         .input-group:focus-within .btn-toggle {
-            box-shadow: 0 0 0 3px rgba(76,201,240,0.12);
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
         }
 
         .btn-primary-custom {
-            background: linear-gradient(135deg, #0f3460, #1a5276);
+            background: linear-gradient(135deg, #4c1d95, #1a5276);
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -220,10 +220,10 @@
         }
 
         .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #4cc9f0, #0096c7);
+            background: linear-gradient(135deg, #d4af37, #4c1d95);
             color: #fff;
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(76,201,240,0.3);
+            box-shadow: 0 6px 20px rgba(212,175,55,0.3);
         }
 
         .divider {
@@ -250,13 +250,13 @@
         }
 
         .register-link a {
-            color: #0f3460;
+            color: #4c1d95;
             font-weight: 600;
             text-decoration: none;
         }
 
         .register-link a:hover {
-            color: #4cc9f0;
+            color: #d4af37;
         }
 
         .back-link {
@@ -270,7 +270,7 @@
             transition: color 0.2s;
         }
 
-        .back-link:hover { color: #0f3460; }
+        .back-link:hover { color: #4c1d95; }
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -371,7 +371,7 @@
                     <label class="form-label mb-0">Password</label>
                     @if (Route::has('password.request'))
                         <a href="{{ route('password.request') }}"
-                           style="font-size:0.8rem; color:#4cc9f0; text-decoration:none;">
+                           style="font-size:0.8rem; color:#a67c00; text-decoration:none;">
                             Forgot password?
                         </a>
                     @endif
@@ -424,7 +424,7 @@
             <div class="d-flex justify-content-center gap-2 flex-wrap">
                 <span class="badge bg-primary" style="font-size:0.7rem;">Landlord</span>
                 <span class="badge bg-success" style="font-size:0.7rem;">Caretaker</span>
-                <span class="badge" style="font-size:0.7rem; background:#4cc9f0; color:#000;">Tenant</span>
+                <span class="badge" style="font-size:0.7rem; background:#d4af37; color:#000;">Tenant</span>
             </div>
         </div>
     </div>

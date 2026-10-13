@@ -44,8 +44,8 @@
         <div class="col-12 col-md-6">
             <div class="stat-card h-100">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:#e8f0fe;">
-                        <i class="bi bi-cash-stack" style="color:#0f3460;"></i>
+                    <div class="stat-icon" style="background:#efe7fb;">
+                        <i class="bi bi-cash-stack" style="color:#4c1d95;"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0">Rent Collection Report</h6>
@@ -79,8 +79,8 @@
         <div class="col-12 col-md-6">
             <div class="stat-card h-100">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:#fce4ec;">
-                        <i class="bi bi-exclamation-triangle" style="color:#e91e63;"></i>
+                    <div class="stat-icon" style="background:#fbf3d5;">
+                        <i class="bi bi-exclamation-triangle" style="color:#b8860b;"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0">Outstanding Balances</h6>

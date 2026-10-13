@@ -33,7 +33,7 @@
         /* Left Panel */
         .auth-left {
             flex: 1;
-            background: linear-gradient(135deg, #0f3460 0%, #16213e 60%, #1a1a2e 100%);
+            background: linear-gradient(135deg, #4c1d95 0%, #2e1065 60%, #1a0b2e 100%);
             padding: 50px 40px;
             display: flex;
             flex-direction: column;
@@ -49,7 +49,7 @@
             right: -60px;
             width: 280px;
             height: 280px;
-            background: radial-gradient(circle, rgba(76,201,240,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -60,7 +60,7 @@
             left: -40px;
             width: 200px;
             height: 200px;
-            background: radial-gradient(circle, rgba(76,201,240,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -72,7 +72,7 @@
             z-index: 1;
         }
 
-        .brand span { color: #4cc9f0; }
+        .brand span { color: #d4af37; }
 
         .auth-left-content {
             position: relative;
@@ -112,13 +112,13 @@
         .step-num {
             width: 26px;
             height: 26px;
-            background: rgba(76,201,240,0.2);
-            border: 1px solid rgba(76,201,240,0.4);
+            background: rgba(212,175,55,0.2);
+            border: 1px solid rgba(212,175,55,0.4);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #4cc9f0;
+            color: #d4af37;
             font-weight: 700;
             font-size: 0.75rem;
             flex-shrink: 0;
@@ -149,7 +149,7 @@
         .auth-right h4 {
             font-size: 1.4rem;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 4px;
         }
 
@@ -162,7 +162,7 @@
         .form-label {
             font-weight: 600;
             font-size: 0.82rem;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 5px;
         }
 
@@ -171,13 +171,13 @@
             border-radius: 10px;
             padding: 10px 14px;
             font-size: 0.88rem;
-            color: #1a1a2e;
+            color: #1a0b2e;
             transition: all 0.2s;
         }
 
         .form-control:focus {
-            border-color: #4cc9f0;
-            box-shadow: 0 0 0 3px rgba(76,201,240,0.12);
+            border-color: #d4af37;
+            box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
         }
 
         .input-group .form-control {
@@ -196,7 +196,7 @@
 
         .input-group:focus-within .form-control,
         .input-group:focus-within .btn-toggle {
-            border-color: #4cc9f0;
+            border-color: #d4af37;
         }
 
         .role-select {
@@ -218,7 +218,7 @@
         }
 
         .role-option:hover {
-            border-color: #4cc9f0;
+            border-color: #d4af37;
             background: #f8fcff;
         }
 
@@ -227,8 +227,8 @@
         }
 
         .role-option.selected {
-            border-color: #0f3460;
-            background: #e8f0fe;
+            border-color: #4c1d95;
+            background: #efe7fb;
         }
 
         .role-option .role-icon {
@@ -238,11 +238,11 @@
         .role-option .role-label {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #1a1a2e;
+            color: #1a0b2e;
         }
 
         .btn-primary-custom {
-            background: linear-gradient(135deg, #0f3460, #1a5276);
+            background: linear-gradient(135deg, #4c1d95, #1a5276);
             color: #fff;
             border: none;
             border-radius: 10px;
@@ -254,10 +254,10 @@
         }
 
         .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #4cc9f0, #0096c7);
+            background: linear-gradient(135deg, #d4af37, #4c1d95);
             color: #fff;
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(76,201,240,0.3);
+            box-shadow: 0 6px 20px rgba(212,175,55,0.3);
         }
 
         .login-link {
@@ -268,12 +268,12 @@
         }
 
         .login-link a {
-            color: #0f3460;
+            color: #4c1d95;
             font-weight: 600;
             text-decoration: none;
         }
 
-        .login-link a:hover { color: #4cc9f0; }
+        .login-link a:hover { color: #a67c00; }
 
         .back-link {
             display: inline-flex;
@@ -286,7 +286,7 @@
             transition: color 0.2s;
         }
 
-        .back-link:hover { color: #0f3460; }
+        .back-link:hover { color: #4c1d95; }
 
         @media (max-width: 768px) {
             .auth-left { display: none; }

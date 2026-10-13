@@ -11,7 +11,7 @@
         * { font-family: 'Inter', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            background: linear-gradient(135deg, #1a0b2e, #4c1d95);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -32,23 +32,23 @@
         .brand {
             font-size: 1.8rem;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 4px;
         }
 
-        .brand span { color: #4cc9f0; }
+        .brand span { color: #b8860b; }
 
         .qr-wrapper {
             background: #f8f9ff;
             border-radius: 16px;
             padding: 20px;
             margin: 25px 0;
-            border: 2px dashed #e8f0fe;
+            border: 2px dashed #efe7fb;
         }
 
         .url-badge {
-            background: #e8f0fe;
-            color: #0f3460;
+            background: #efe7fb;
+            color: #4c1d95;
             padding: 8px 20px;
             border-radius: 50px;
             font-size: 0.82rem;
@@ -75,7 +75,7 @@
         .steps p {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #0f3460;
+            color: #4c1d95;
             margin-bottom: 8px;
         }
 
@@ -91,7 +91,7 @@
         }
 
         .btn-primary-custom {
-            background: linear-gradient(135deg, #0f3460, #1a5276);
+            background: linear-gradient(135deg, #4c1d95, #1a5276);
             color: white;
             border: none;
             border-radius: 10px;
@@ -106,7 +106,7 @@
         }
 
         .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #4cc9f0, #0096c7);
+            background: linear-gradient(135deg, #d4af37, #4c1d95);
             color: white;
             transform: translateY(-1px);
         }
@@ -178,7 +178,7 @@
             </a>
             <a href="{{ $url }}/register"
                class="btn flex-fill btn-sm py-2"
-               style="background:#4cc9f0; color:#1a1a2e; font-weight:600;">
+               style="background:#d4af37; color:#1a0b2e; font-weight:600;">
                 <i class="bi bi-person-plus me-1"></i> Register
             </a>
         </div>

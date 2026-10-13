@@ -91,10 +91,10 @@
             <!-- M-Pesa Payment Form -->
             <div class="stat-card">
                 <div class="text-center mb-4">
-                    <div style="width:70px; height:70px; background:#e8f0fe;
+                    <div style="width:70px; height:70px; background:#efe7fb;
                                 border-radius:50%; display:flex; align-items:center;
                                 justify-content:center; margin:0 auto 12px;">
-                        <i class="bi bi-phone" style="font-size:1.8rem; color:#0f3460;"></i>
+                        <i class="bi bi-phone" style="font-size:1.8rem; color:#4c1d95;"></i>
                     </div>
                     <h6 class="fw-bold">Pay with M-Pesa</h6>
                     <p class="text-muted mb-0" style="font-size:0.85rem;">
@@ -150,8 +150,8 @@
 
                     <!-- M-Pesa Steps -->
                     <div class="p-3 rounded-3 mb-4"
-                         style="background:#f8f9ff; border:1px solid #e8f0fe;">
-                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#0f3460;">
+                         style="background:#f8f9ff; border:1px solid #efe7fb;">
+                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#4c1d95;">
                             <i class="bi bi-info-circle me-1"></i> How it works:
                         </p>
                         <ol style="font-size:0.82rem; color:#555; margin:0; padding-left:18px;">

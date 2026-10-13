@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Rent\RecordTenantPaymentRequest;
 use App\Http\Requests\Tenant\StoreTenantRequest;
 use App\Http\Requests\Tenant\UpdateTenantRequest;
 use App\Models\Property;
 use App\Models\Tenant;
 use App\Models\Unit;
 use App\Models\User;
+use App\Services\PaymentBehaviourService;
+use App\Services\RentAllocationService;
+use App\Services\RentStatusService;
 use Illuminate\Support\Facades\Hash;
 
 class LandlordTenantController extends Controller
@@ -166,11 +170,56 @@ class LandlordTenantController extends Controller
         return back()->with('success', 'Tenant deactivated and unit marked as vacant.');
     }
 
-    // Show tenant details
-    public function show(Tenant $tenant)
+    // Show tenant details, rent ledger, arrears breakdown, behaviour + notices
+    public function show(Tenant $tenant, RentStatusService $status, PaymentBehaviourService $behaviour)
     {
         $this->authorize('view', $tenant);
 
-        return view('landlord.tenants.show', compact('tenant'));
+        $tenant->load(['property', 'unit']);
+
+        $summary = $status->summary($tenant);
+        $breakdown = $status->breakdown($tenant);
+        $indicators = $behaviour->indicators($tenant, now()->subMonths(6));
+        $notices = $tenant->rentNotices()->latest('issued_at')->latest('id')->get();
+        $payments = $tenant->payments()->latest('payment_date')->latest('id')->take(50)->get();
+
+        return view('landlord.tenants.show', compact(
+            'tenant',
+            'summary',
+            'breakdown',
+            'indicators',
+            'notices',
+            'payments'
+        ));
+    }
+
+    // Record a payment (possibly partial) against a tenant's rent account
+    public function recordPayment(RecordTenantPaymentRequest $request, Tenant $tenant, RentAllocationService $allocation)
+    {
+        $options = [
+            'payment_date' => $request->payment_date,
+            'reference' => $request->reference,
+            'method' => $request->input('method', 'cash'),
+            'source' => 'landlord',
+            'recorded_by' => auth()->id(),
+            'notes' => $request->input('notes'),
+        ];
+
+        if ($request->filled('rent_record_id')) {
+            $options['policy'] = RentAllocationService::POLICY_MANUAL;
+            $options['rent_record_id'] = $request->input('rent_record_id');
+        } else {
+            $options['policy'] = $request->input('policy', config('rent.allocation_policy'));
+        }
+
+        $payment = $allocation->recordPayment($tenant, (float) $request->amount_paid, $options);
+
+        $message = 'Payment of KES '.number_format((float) $payment->amount, 2).' recorded for '.$tenant->full_name.'.';
+
+        if ((float) $payment->unallocated_amount > 0) {
+            $message .= ' KES '.number_format((float) $payment->unallocated_amount, 2).' held as credit.';
+        }
+
+        return back()->with('success', $message);
     }
 }

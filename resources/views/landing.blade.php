@@ -34,16 +34,16 @@
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #1a1a2e !important;
+            color: #1a0b2e !important;
         }
 
         .navbar-brand span {
-            color: #4cc9f0;
+            color: #b8860b;
         }
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+            background: linear-gradient(135deg, #1a0b2e 0%, #2e1065 40%, #4c1d95 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -58,7 +58,7 @@
             right: -20%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(76,201,240,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -69,15 +69,15 @@
             left: -10%;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(76,201,240,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
             border-radius: 50%;
         }
 
         .hero-badge {
             display: inline-block;
-            background: rgba(76,201,240,0.15);
-            color: #4cc9f0;
-            border: 1px solid rgba(76,201,240,0.3);
+            background: rgba(212,175,55,0.15);
+            color: #d4af37;
+            border: 1px solid rgba(212,175,55,0.3);
             padding: 6px 16px;
             border-radius: 50px;
             font-size: 0.82rem;
@@ -95,7 +95,7 @@
         }
 
         .hero h1 span {
-            color: #4cc9f0;
+            color: #d4af37;
         }
 
         .hero p {
@@ -112,8 +112,8 @@
         }
 
         .btn-hero-primary {
-            background: #4cc9f0;
-            color: #1a1a2e;
+            background: #d4af37;
+            color: #1a0b2e;
             padding: 14px 32px;
             border-radius: 10px;
             font-weight: 600;
@@ -125,9 +125,9 @@
 
         .btn-hero-primary:hover {
             background: #fff;
-            color: #0f3460;
+            color: #4c1d95;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(76,201,240,0.3);
+            box-shadow: 0 8px 25px rgba(212,175,55,0.3);
         }
 
         .btn-hero-outline {
@@ -166,7 +166,7 @@
         }
 
         .mini-stat h4 {
-            color: #4cc9f0;
+            color: #d4af37;
             font-weight: 700;
             margin-bottom: 2px;
         }
@@ -184,8 +184,8 @@
 
         .section-badge {
             display: inline-block;
-            background: #e8f0fe;
-            color: #0f3460;
+            background: #efe7fb;
+            color: #4c1d95;
             padding: 5px 14px;
             border-radius: 50px;
             font-size: 0.8rem;
@@ -196,7 +196,7 @@
         .section-title {
             font-size: 2.2rem;
             font-weight: 800;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 12px;
         }
 
@@ -218,7 +218,7 @@
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            border-color: #e8f0fe;
+            border-color: #efe7fb;
         }
 
         .feature-icon {
@@ -234,7 +234,7 @@
 
         .feature-card h5 {
             font-weight: 700;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 10px;
         }
 
@@ -313,7 +313,7 @@
         .step-number {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #0f3460, #4cc9f0);
+            background: linear-gradient(135deg, #4c1d95, #d4af37);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -326,7 +326,7 @@
 
         .step-card h5 {
             font-weight: 700;
-            color: #1a1a2e;
+            color: #1a0b2e;
             margin-bottom: 10px;
         }
 
@@ -338,7 +338,7 @@
         /* QR Section */
         .qr-section {
             padding: 80px 0;
-            background: linear-gradient(135deg, #1a1a2e, #0f3460);
+            background: linear-gradient(135deg, #1a0b2e, #4c1d95);
             color: white;
         }
 
@@ -356,7 +356,7 @@
         }
 
         .cta-box {
-            background: linear-gradient(135deg, #0f3460, #4cc9f0);
+            background: linear-gradient(135deg, #4c1d95, #d4af37);
             border-radius: 24px;
             padding: 60px 40px;
             text-align: center;
@@ -376,7 +376,7 @@
 
         /* Footer */
         footer {
-            background: #1a1a2e;
+            background: #1a0b2e;
             color: rgba(255,255,255,0.6);
             padding: 40px 0 20px;
         }
@@ -388,7 +388,7 @@
         }
 
         footer .brand span {
-            color: #4cc9f0;
+            color: #d4af37;
         }
 
         footer a {
@@ -398,7 +398,7 @@
         }
 
         footer a:hover {
-            color: #4cc9f0;
+            color: #d4af37;
         }
 
         /* Responsive */
@@ -493,7 +493,7 @@
                     <div class="row g-3 mt-4">
                         <div class="col-4">
                             <div class="text-white">
-                                <div style="font-size:1.6rem; font-weight:800; color:#4cc9f0;">
+                                <div style="font-size:1.6rem; font-weight:800; color:#d4af37;">
                                     100%
                                 </div>
                                 <div style="font-size:0.78rem; opacity:0.6;">
@@ -503,7 +503,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-white">
-                                <div style="font-size:1.6rem; font-weight:800; color:#4cc9f0;">
+                                <div style="font-size:1.6rem; font-weight:800; color:#d4af37;">
                                     M-Pesa
                                 </div>
                                 <div style="font-size:0.78rem; opacity:0.6;">
@@ -513,7 +513,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-white">
-                                <div style="font-size:1.6rem; font-weight:800; color:#4cc9f0;">
+                                <div style="font-size:1.6rem; font-weight:800; color:#d4af37;">
                                     4 Roles
                                 </div>
                                 <div style="font-size:0.78rem; opacity:0.6;">
@@ -569,12 +569,12 @@
                                 <span style="color:rgba(255,255,255,0.7); font-size:0.82rem;">
                                     Occupancy Rate
                                 </span>
-                                <span style="color:#4cc9f0; font-weight:600; font-size:0.82rem;">
+                                <span style="color:#d4af37; font-weight:600; font-size:0.82rem;">
                                     75%
                                 </span>
                             </div>
                             <div style="background:rgba(255,255,255,0.1); border-radius:10px; height:8px;">
-                                <div style="background:linear-gradient(90deg,#4cc9f0,#7ae7ff); width:75%; height:100%; border-radius:10px;"></div>
+                                <div style="background:linear-gradient(90deg,#d4af37,#7c3aed); width:75%; height:100%; border-radius:10px;"></div>
                             </div>
                         </div>
 
@@ -588,7 +588,7 @@
                             <div class="d-flex align-items-center justify-content-between py-2"
                                  style="border-bottom:1px solid rgba(255,255,255,0.06);">
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:28px; height:28px; border-radius:50%; background:rgba(76,201,240,0.2); display:flex; align-items:center; justify-content:center; color:#4cc9f0; font-size:0.7rem; font-weight:700;">
+                                    <div style="width:28px; height:28px; border-radius:50%; background:rgba(212,175,55,0.2); display:flex; align-items:center; justify-content:center; color:#d4af37; font-size:0.7rem; font-weight:700;">
                                         {{ substr($item[0], 0, 1) }}
                                     </div>
                                     <span style="color:rgba(255,255,255,0.8); font-size:0.82rem;">
@@ -622,14 +622,14 @@
             <div class="row g-4">
                 @php
                     $features = [
-                        ['bi-buildings', '#e8f0fe', '#0f3460', 'Property Management', 'Add and manage multiple properties with photos, locations, and status tracking.'],
+                        ['bi-buildings', '#efe7fb', '#4c1d95', 'Property Management', 'Add and manage multiple properties with photos, locations, and status tracking.'],
                         ['bi-door-open', '#e6f9f0', '#198754', 'Unit Management', 'Create units, set rent amounts, and track vacancy status in real time.'],
                         ['bi-people', '#fff3e0', '#fd7e14', 'Tenant Management', 'Add tenants, manage profiles, emergency contacts, and tenancy history.'],
-                        ['bi-phone', '#e8f0fe', '#0f3460', 'M-Pesa Payments', 'Collect rent via Safaricom M-Pesa STK Push with automatic confirmation.'],
-                        ['bi-tools', '#fce4ec', '#e91e63', 'Maintenance Requests', 'Tenants report issues, caretakers get assigned, landlords track progress.'],
+                        ['bi-phone', '#efe7fb', '#4c1d95', 'M-Pesa Payments', 'Collect rent via Safaricom M-Pesa STK Push with automatic confirmation.'],
+                        ['bi-tools', '#fbf3d5', '#b8860b', 'Maintenance Requests', 'Tenants report issues, caretakers get assigned, landlords track progress.'],
                         ['bi-megaphone', '#fff3e0', '#fd7e14', 'Announcements', 'Post water, electricity, security, and maintenance notices instantly.'],
                         ['bi-bar-chart', '#e6f9f0', '#198754', 'Reports & Analytics', 'Export rent collection, occupancy, and maintenance reports to PDF or Excel.'],
-                        ['bi-bell', '#e8f0fe', '#0f3460', 'SMS & Email Alerts', 'Automated reminders for rent due, overdue payments, and complaint updates.'],
+                        ['bi-bell', '#efe7fb', '#4c1d95', 'SMS & Email Alerts', 'Automated reminders for rent due, overdue payments, and complaint updates.'],
                     ];
                 @endphp
 
@@ -682,7 +682,7 @@
 
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="role-card"
-                         style="background:linear-gradient(135deg,#0f3460,#1a5276);">
+                         style="background:linear-gradient(135deg,#4c1d95,#1a5276);">
                         <div class="mb-3">
                             <i class="bi bi-person-badge" style="font-size:2rem;"></i>
                         </div>
@@ -716,7 +716,7 @@
 
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="role-card"
-                         style="background:linear-gradient(135deg,#4cc9f0,#0096c7);">
+                         style="background:linear-gradient(135deg,#d4af37,#4c1d95);">
                         <div class="mb-3">
                             <i class="bi bi-house-heart" style="font-size:2rem;"></i>
                         </div>
@@ -768,8 +768,8 @@
 
             <!-- M-Pesa Flow -->
             <div class="mt-5 p-4 rounded-4 text-center"
-                 style="background:#fff; border: 1px solid #e8f0fe;">
-                <h6 class="fw-bold mb-4" style="color:#0f3460;">
+                 style="background:#fff; border: 1px solid #efe7fb;">
+                <h6 class="fw-bold mb-4" style="color:#4c1d95;">
                     <i class="bi bi-phone me-2"></i>M-Pesa Payment Flow
                 </h6>
                 <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
@@ -792,7 +792,7 @@
                             <i class="bi {{ $f[0] }} text-muted d-none d-md-block"></i>
                         @else
                             <div class="text-center">
-                                <div style="width:48px; height:48px; background:#e8f0fe; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:1.2rem; color:#0f3460;">
+                                <div style="width:48px; height:48px; background:#efe7fb; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:1.2rem; color:#4c1d95;">
                                     <i class="bi {{ $f[0] }}"></i>
                                 </div>
                                 <small style="color:#555; font-size:0.75rem;">
@@ -812,8 +812,8 @@
             <div class="row align-items-center g-5">
                 <div class="col-lg-6 text-center text-lg-start">
                     <div class="section-badge"
-                         style="background:rgba(76,201,240,0.15);
-                                color:#4cc9f0; border:1px solid rgba(76,201,240,0.3);">
+                         style="background:rgba(212,175,55,0.15);
+                                color:#d4af37; border:1px solid rgba(212,175,55,0.3);">
                         Quick Access
                     </div>
                     <h2 style="font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:15px;">
@@ -846,7 +846,7 @@
                             ->margin(1)
                             ->generate(config('app.url')) !!}
                         <p class="mt-3 mb-0"
-                           style="color:#0f3460; font-weight:600; font-size:0.88rem;">
+                           style="color:#4c1d95; font-weight:600; font-size:0.88rem;">
                             <i class="bi bi-qr-code me-1"></i> Scan to access KejaPad
                         </p>
                         <p style="color:#6c757d; font-size:0.78rem; margin-top:4px;">
@@ -870,7 +870,7 @@
                 <div class="d-flex gap-3 justify-content-center flex-wrap">
                     <a href="{{ route('register') }}"
                        class="btn btn-light fw-600 px-5 py-3 rounded-3"
-                       style="font-weight:600; color:#0f3460;">
+                       style="font-weight:600; color:#4c1d95;">
                         <i class="bi bi-rocket-takeoff me-2"></i>
                         Get Started Free
                     </a>

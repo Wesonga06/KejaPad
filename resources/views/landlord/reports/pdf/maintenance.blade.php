@@ -5,10 +5,10 @@
     <title>Maintenance Report</title>
     <style>
         body { font-family: sans-serif; font-size: 11px; color: #333; }
-        h2 { color: #0f3460; margin-bottom: 4px; }
+        h2 { color: #4c1d95; margin-bottom: 4px; }
         p { margin: 2px 0; color: #666; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { background: #0f3460; color: white; padding: 7px 6px; text-align: left; }
+        th { background: #4c1d95; color: white; padding: 7px 6px; text-align: left; }
         td { padding: 6px; border-bottom: 1px solid #eee; }
         tr:nth-child(even) { background: #f9f9f9; }
         .footer { margin-top: 20px; font-size: 10px; color: #999; text-align: right; }

@@ -135,13 +135,32 @@
                       action="{{ route('landlord.rent.payment', $rent) }}">
                     @csrf
 
+                    <div class="row g-3 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold">Method</label>
+                            <select name="method" class="form-select">
+                                @foreach(['cash' => 'Cash', 'mpesa' => 'M-Pesa', 'bank_transfer' => 'Bank Transfer', 'cheque' => 'Cheque', 'other' => 'Other'] as $val => $label)
+                                    <option value="{{ $val }}" @selected(old('method') === $val)>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label fw-semibold">Apply To</label>
+                            <select name="policy" class="form-select">
+                                <option value="manual" @selected(old('policy') === 'manual')>This period only</option>
+                                <option value="oldest" @selected(old('policy') === 'oldest')>Oldest outstanding first</option>
+                                <option value="current" @selected(old('policy') === 'current')>Current first</option>
+                            </select>
+                            <input type="hidden" name="rent_record_id" value="{{ $rent->id }}">
+                        </div>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Amount Paid (KES)</label>
                         <input type="number" name="amount_paid"
                                class="form-control @error('amount_paid') is-invalid @enderror"
                                value="{{ old('amount_paid', $rent->balance()) }}"
-                               min="1" step="0.01"
-                               max="{{ $rent->balance() }}">
+                               min="0.01" step="0.01">
                         @error('amount_paid')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

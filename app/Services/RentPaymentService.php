@@ -3,26 +3,30 @@
 namespace App\Services;
 
 use App\Models\RentRecord;
-use Illuminate\Support\Facades\DB;
 
 class RentPaymentService
 {
+    public function __construct(
+        protected RentAllocationService $allocation,
+    ) {}
+
+    /**
+     * Apply a payment to a specific rent record.
+     *
+     * Retained for backwards compatibility; delegates to the allocation ledger so
+     * every payment is preserved as an individual, auditable transaction.
+     */
     public function apply(RentRecord $rent, float $amount, ?string $transactionCode = null, ?string $paymentDate = null): RentRecord
     {
-        return DB::transaction(function () use ($rent, $amount, $transactionCode, $paymentDate) {
-            $rent = RentRecord::whereKey($rent->id)->lockForUpdate()->firstOrFail();
+        $this->allocation->recordPayment($rent->tenant, $amount, [
+            'payment_date' => $paymentDate ?? now()->toDateString(),
+            'reference' => $transactionCode,
+            'method' => 'mpesa',
+            'source' => 'tenant',
+            'policy' => RentAllocationService::POLICY_MANUAL,
+            'rent_record_id' => $rent->id,
+        ]);
 
-            $amountDue = (float) $rent->amount_due;
-            $totalPaid = (float) $rent->amount_paid + $amount;
-
-            $rent->update([
-                'amount_paid' => min($totalPaid, $amountDue),
-                'payment_date' => $paymentDate ?? now()->toDateString(),
-                'transaction_code' => $transactionCode ?? $rent->transaction_code,
-                'status' => $totalPaid >= $amountDue ? 'paid' : 'partial',
-            ]);
-
-            return $rent;
-        });
+        return $rent->fresh();
     }
 }

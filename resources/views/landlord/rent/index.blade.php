@@ -18,6 +18,9 @@
     <a href="{{ route('landlord.rent.index') }}" class="nav-link active">
         <i class="bi bi-cash-coin"></i> Rent
     </a>
+    <a href="{{ route('landlord.arrears.index') }}" class="nav-link">
+        <i class="bi bi-exclamation-octagon"></i> Arrears
+    </a>
     <a href="{{ route('landlord.mpesa-payments') }}" class="nav-link">
     <i class="bi bi-phone"></i> M-Pesa Payments
 </a>
@@ -47,8 +50,8 @@
                             KES {{ number_format($totalExpected, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#e8f0fe;">
-                        <i class="bi bi-cash-stack" style="color:#0f3460;"></i>
+                    <div class="stat-icon" style="background:#efe7fb;">
+                        <i class="bi bi-cash-stack" style="color:#4c1d95;"></i>
                     </div>
                 </div>
             </div>
@@ -95,8 +98,8 @@
                             KES {{ number_format($totalOverdue, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#fce4ec;">
-                        <i class="bi bi-exclamation-triangle" style="color:#e91e63;"></i>
+                    <div class="stat-icon" style="background:#fbf3d5;">
+                        <i class="bi bi-exclamation-triangle" style="color:#b8860b;"></i>
                     </div>
                 </div>
             </div>
@@ -133,7 +136,7 @@
             <div class="col-6 col-md-2">
                 <label class="form-label fw-semibold">Due Day</label>
                 <input type="number" name="day" class="form-control"
-                       value="5" min="1" max="28" placeholder="e.g. 5">
+                       value="{{ config('rent.due_day', 3) }}" min="1" max="28" placeholder="e.g. 3">
             </div>
             <div class="col-6 col-md-3">
                 <button type="submit" class="btn btn-warning w-100"

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Announcement extends Model
 {
@@ -37,25 +37,25 @@ class Announcement extends Model
 
     public function categoryColor()
     {
-        return match($this->category) {
-            'water'       => 'info',
+        return match ($this->category) {
+            'water' => 'info',
             'electricity' => 'warning',
-            'security'    => 'danger',
+            'security' => 'danger',
             'maintenance' => 'secondary',
-            'other'       => 'dark',
-            default       => 'primary',
+            'other' => 'dark',
+            default => 'primary',
         };
     }
 
     public function categoryIcon()
     {
-        return match($this->category) {
-            'water'       => 'bi-droplet',
+        return match ($this->category) {
+            'water' => 'bi-droplet',
             'electricity' => 'bi-lightning',
-            'security'    => 'bi-shield-exclamation',
+            'security' => 'bi-shield-exclamation',
             'maintenance' => 'bi-tools',
-            'other'       => 'bi-three-dots',
-            default       => 'bi-megaphone',
+            'other' => 'bi-three-dots',
+            default => 'bi-megaphone',
         };
     }
 }

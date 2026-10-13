@@ -26,7 +26,7 @@
 @section('content')
     <!-- Welcome Banner -->
     <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #0f3460, #4cc9f0); color: white;">
+         style="background: linear-gradient(135deg, #4c1d95, #d4af37); color: white;">
         <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} 👋</h4>
         <p class="mb-0 opacity-75">
             {{ $tenant->property->name }} —
@@ -87,8 +87,8 @@
                             KES {{ number_format($tenant->unit->rent_amount, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#e8f0fe;">
-                        <i class="bi bi-cash-coin" style="color:#0f3460;"></i>
+                    <div class="stat-icon" style="background:#efe7fb;">
+                        <i class="bi bi-cash-coin" style="color:#4c1d95;"></i>
                     </div>
                 </div>
             </div>
@@ -104,8 +104,8 @@
                             KES {{ number_format($totalOutstanding, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#fce4ec;">
-                        <i class="bi bi-exclamation-circle" style="color:#e91e63;"></i>
+                    <div class="stat-icon" style="background:#fbf3d5;">
+                        <i class="bi bi-exclamation-circle" style="color:#b8860b;"></i>
                     </div>
                 </div>
             </div>
@@ -200,6 +200,81 @@
         Please contact your landlord.
     </div>
     @endif
+
+    <!-- Rent Status & Payment Behaviour -->
+    @php
+        $trendMeta = [
+            'increasing' => ['label' => 'Increasing', 'badge' => 'danger', 'icon' => 'arrow-up-right'],
+            'decreasing' => ['label' => 'Decreasing', 'badge' => 'success', 'icon' => 'arrow-down-right'],
+            'unchanged'  => ['label' => 'Unchanged', 'badge' => 'secondary', 'icon' => 'arrow-right'],
+        ][$behaviour['trend']] ?? ['label' => 'Unchanged', 'badge' => 'secondary', 'icon' => 'arrow-right'];
+    @endphp
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="stat-card h-100">
+                <h6 class="fw-bold mb-3 pb-2 border-bottom">My Rent Status</h6>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <span class="text-muted">Status</span>
+                    <span class="badge rounded-pill px-3 py-2"
+                          style="background:{{ $rentStatus['status']['color'] }}; font-size:0.85rem;">
+                        {{ $rentStatus['status']['label'] }}
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Total charged</span>
+                    <span class="fw-semibold">KES {{ number_format($rentStatus['charged'], 2) }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Total paid</span>
+                    <span class="fw-semibold text-success">KES {{ number_format($rentStatus['paid'], 2) }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Outstanding</span>
+                    <span class="fw-semibold {{ $rentStatus['outstanding'] > 0 ? 'text-danger' : 'text-success' }}">
+                        KES {{ number_format($rentStatus['outstanding'], 2) }}
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Arrears</span>
+                    <span class="fw-semibold {{ $rentStatus['arrears'] > 0 ? 'text-danger' : 'text-success' }}">
+                        KES {{ number_format($rentStatus['arrears'], 2) }}
+                        @if($rentStatus['max_overdue_days'] > 0)
+                            <small>({{ $rentStatus['max_overdue_days'] }} days)</small>
+                        @endif
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Credit balance</span>
+                    <span class="fw-semibold {{ $rentStatus['credit'] > 0 ? 'text-success' : 'text-muted' }}">
+                        KES {{ number_format($rentStatus['credit'], 2) }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="stat-card h-100">
+                <h6 class="fw-bold mb-3 pb-2 border-bottom">Payment Activity</h6>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Paid this month</span>
+                    <span class="fw-semibold">KES {{ number_format($behaviour['paid_this_month'], 2) }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Payments (6 months)</span>
+                    <span class="fw-semibold">{{ $behaviour['payments_count'] }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Last payment</span>
+                    <span class="fw-semibold">{{ $behaviour['last_payment_date']?->format('d M Y') ?? '—' }}</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">Balance trend</span>
+                    <span class="badge bg-{{ $trendMeta['badge'] }}">
+                        <i class="bi bi-{{ $trendMeta['icon'] }} me-1"></i>{{ $trendMeta['label'] }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Recent Payments -->
     <div class="stat-card">

@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class MpesaPayment extends Model
 {
@@ -26,7 +26,7 @@ class MpesaPayment extends Model
 
     protected $casts = [
         'landlord_confirmed' => 'boolean',
-        'confirmed_at'       => 'datetime',
+        'confirmed_at' => 'datetime',
     ];
 
     public function tenant()
@@ -39,14 +39,19 @@ class MpesaPayment extends Model
         return $this->belongsTo(RentRecord::class);
     }
 
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
+
     public function statusColor()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'confirmed' => 'success',
-            'pending'   => 'warning',
-            'failed'    => 'danger',
+            'pending' => 'warning',
+            'failed' => 'danger',
             'cancelled' => 'secondary',
-            default     => 'secondary',
+            default => 'secondary',
         };
     }
 }

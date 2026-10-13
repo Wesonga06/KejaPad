@@ -8,7 +8,8 @@ use App\Http\Requests\Rent\StoreRentRequest;
 use App\Models\Property;
 use App\Models\RentRecord;
 use App\Models\Tenant;
-use Illuminate\Database\UniqueConstraintViolationException;
+use App\Services\RentAllocationService;
+use App\Services\RentGenerationService;
 use Illuminate\Http\Request;
 
 class RentController extends Controller
@@ -122,26 +123,40 @@ class RentController extends Controller
     }
 
     // Record a payment
-    public function recordPayment(RecordPaymentRequest $request, RentRecord $rent)
+    public function recordPayment(RecordPaymentRequest $request, RentRecord $rent, RentAllocationService $allocation)
     {
-        $totalPaid = $rent->amount_paid + $request->amount_paid;
+        $policy = $request->input('policy');
 
-        // Determine status
-        if ($totalPaid >= $rent->amount_due) {
-            $status = 'paid';
-            $totalPaid = $rent->amount_due; // cap at amount due
+        // Default: apply to the period being viewed, unless the landlord chooses an
+        // allocation policy (oldest / current) to spread the payment across arrears.
+        $options = [
+            'payment_date' => $request->payment_date,
+            'reference' => $request->transaction_code,
+            'method' => $request->input('method', 'cash'),
+            'source' => 'landlord',
+            'recorded_by' => auth()->id(),
+            'notes' => $request->input('notes'),
+        ];
+
+        if ($policy === RentAllocationService::POLICY_OLDEST || $policy === RentAllocationService::POLICY_CURRENT) {
+            $options['policy'] = $policy;
+        } elseif ($request->filled('rent_record_id')) {
+            $options['policy'] = RentAllocationService::POLICY_MANUAL;
+            $options['rent_record_id'] = $request->input('rent_record_id');
         } else {
-            $status = 'partial';
+            $options['policy'] = RentAllocationService::POLICY_MANUAL;
+            $options['rent_record_id'] = $rent->id;
         }
 
-        $rent->update([
-            'amount_paid' => $totalPaid,
-            'payment_date' => $request->payment_date,
-            'transaction_code' => $request->transaction_code,
-            'status' => $status,
-        ]);
+        $payment = $allocation->recordPayment($rent->tenant, (float) $request->amount_paid, $options);
 
-        return back()->with('success', 'Payment recorded successfully.');
+        $message = 'Payment of KES '.number_format((float) $payment->amount, 2).' recorded successfully.';
+
+        if ((float) $payment->unallocated_amount > 0) {
+            $message .= ' KES '.number_format((float) $payment->unallocated_amount, 2).' held as credit.';
+        }
+
+        return back()->with('success', $message);
     }
 
     // Mark overdue
@@ -155,47 +170,23 @@ class RentController extends Controller
     }
 
     // Generate rent records for all active tenants in bulk
-    public function generateBulk(GenerateBulkRentRequest $request)
+    public function generateBulk(GenerateBulkRentRequest $request, RentGenerationService $generation)
     {
-        $propertyIds = Property::where('user_id', auth()->id())->pluck('id');
-        $tenants = Tenant::whereIn('property_id', $propertyIds)
-            ->where('is_active', true)
-            ->with('unit')
-            ->get();
+        $propertyIds = Property::where('user_id', auth()->id())->pluck('id')->all();
 
-        $created = 0;
-        $skipped = 0;
+        $result = $generation->generate(
+            (int) $request->month,
+            (int) $request->year,
+            $propertyIds,
+            $request->filled('day') ? (int) $request->day : null,
+        );
 
-        foreach ($tenants as $tenant) {
-            if (! $tenant->unit) {
-                $skipped++;
+        $message = "Rent records generated: {$result['created']} created, {$result['skipped']} skipped (already exist).";
 
-                continue;
-            }
-
-            $dueDate = $request->year.'-'.
-                       str_pad($request->month, 2, '0', STR_PAD_LEFT).'-'.
-                       str_pad($request->day, 2, '0', STR_PAD_LEFT);
-
-            try {
-                RentRecord::create([
-                    'tenant_id' => $tenant->id,
-                    'property_id' => $tenant->property_id,
-                    'unit_id' => $tenant->unit_id,
-                    'amount_due' => $tenant->unit->rent_amount,
-                    'amount_paid' => 0,
-                    'due_date' => $dueDate,
-                    'status' => 'pending',
-                    'month' => $request->month,
-                    'year' => $request->year,
-                ]);
-
-                $created++;
-            } catch (UniqueConstraintViolationException) {
-                $skipped++;
-            }
+        if ($result['credit_applied'] > 0) {
+            $message .= ' KES '.number_format($result['credit_applied'], 2).' of held credit was applied.';
         }
 
-        return back()->with('success', "Rent records generated: {$created} created, {$skipped} skipped (already exist).");
+        return back()->with('success', $message);
     }
 }

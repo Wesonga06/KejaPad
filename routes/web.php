@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArrearsController;
 use App\Http\Controllers\CaretakerAnnouncementController;
 use App\Http\Controllers\CaretakerController;
 use App\Http\Controllers\CaretakerMaintenanceController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\RentController;
+use App\Http\Controllers\RentNoticeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\TenantAnnouncementController;
@@ -92,6 +94,14 @@ Route::middleware(array_merge(['auth', 'role:landlord'], $verified))->prefix('la
     Route::put('/tenants/{tenant}', [LandlordTenantController::class, 'update'])->name('tenants.update');
     Route::patch('/tenants/{tenant}/deactivate', [LandlordTenantController::class, 'deactivate'])->name('tenants.deactivate');
     Route::get('/properties/{property}/get-units', [LandlordTenantController::class, 'getUnits'])->name('properties.get-units');
+
+    // Tenant rent account: payments + notices
+    Route::post('/tenants/{tenant}/payments', [LandlordTenantController::class, 'recordPayment'])->name('tenants.payments.store');
+    Route::post('/tenants/{tenant}/notices', [RentNoticeController::class, 'store'])->name('tenants.notices.store');
+    Route::patch('/notices/{notice}', [RentNoticeController::class, 'update'])->name('notices.update');
+
+    // Arrears overview
+    Route::get('/arrears', [ArrearsController::class, 'index'])->name('arrears.index');
 
     // M-Pesa Payments
     Route::get('/mpesa-payments', [MpesaController::class, 'landlordPayments'])->name('mpesa-payments');

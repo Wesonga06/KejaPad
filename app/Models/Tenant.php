@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Tenant extends Model
 {
@@ -25,9 +25,9 @@ class Tenant extends Model
     ];
 
     protected $casts = [
-        'move_in_date'  => 'date',
+        'move_in_date' => 'date',
         'move_out_date' => 'date',
-        'is_active'     => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     // Tenant belongs to a user account
@@ -46,5 +46,40 @@ class Tenant extends Model
     public function unit()
     {
         return $this->belongsTo(Unit::class);
+    }
+
+    // All rent charges for this tenant (one per period)
+    public function rentRecords()
+    {
+        return $this->hasMany(RentRecord::class);
+    }
+
+    // Individual payment transactions recorded against this tenant
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    // Reminders and formal notices issued to this tenant
+    public function rentNotices()
+    {
+        return $this->hasMany(RentNotice::class);
+    }
+
+    // Landlord / property owner (via property)
+    public function landlord()
+    {
+        return $this->property?->landlord;
+    }
+
+    // Unallocated payment credit held on the tenant's account.
+    public function creditBalance(): float
+    {
+        return (float) $this->payments()->sum('unallocated_amount');
+    }
+
+    public function firstName(): string
+    {
+        return explode(' ', trim($this->full_name))[0] ?: $this->full_name;
     }
 }

@@ -62,9 +62,9 @@
                         <div class="d-flex align-items-center gap-2">
                             <div class="stat-icon"
                                  style="width:38px; height:38px; border-radius:8px;
-                                        background: var(--bs-{{ $ann->categoryColor() }}-bg-subtle, #e8f0fe);">
+                                        background: var(--bs-{{ $ann->categoryColor() }}-bg-subtle, #efe7fb);">
                                 <i class="bi {{ $ann->categoryIcon() }}"
-                                   style="color: var(--bs-{{ $ann->categoryColor() }}, #0f3460); font-size:1rem;"></i>
+                                   style="color: var(--bs-{{ $ann->categoryColor() }}, #4c1d95); font-size:1rem;"></i>
                             </div>
                             <div>
                                 <span class="badge bg-{{ $ann->categoryColor() }} rounded-pill"

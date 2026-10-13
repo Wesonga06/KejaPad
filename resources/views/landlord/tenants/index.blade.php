@@ -18,6 +18,9 @@
     <a href="{{ route('landlord.rent.index') }}" class="nav-link">
     <i class="bi bi-cash-coin"></i> Rent
     </a>
+    <a href="{{ route('landlord.arrears.index') }}" class="nav-link">
+        <i class="bi bi-exclamation-octagon"></i> Arrears
+    </a>
 
     <div class="nav-section-title">Other</div>
     <a href="{{ route('landlord.maintenance.index') }}" class="nav-link">
@@ -72,7 +75,7 @@
                             <td>{{ $tenants->firstItem() + $index }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:34px; height:34px; background:linear-gradient(135deg,#4cc9f0,#0f3460); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600; font-size:0.8rem; flex-shrink:0;">
+                                    <div style="width:34px; height:34px; background:linear-gradient(135deg,#d4af37,#4c1d95); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600; font-size:0.8rem; flex-shrink:0;">
                                         {{ strtoupper(substr($tenant->full_name, 0, 2)) }}
                                     </div>
                                     <div>

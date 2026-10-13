@@ -44,9 +44,9 @@
                 <div class="d-flex align-items-start gap-3">
                     <div style="width:44px; height:44px; border-radius:10px; flex-shrink:0;
                                 display:flex; align-items:center; justify-content:center;
-                                background:#e8f0fe;">
+                                background:#efe7fb;">
                         <i class="bi {{ $ann->categoryIcon() }}"
-                           style="font-size:1.2rem; color:#0f3460;"></i>
+                           style="font-size:1.2rem; color:#4c1d95;"></i>
                     </div>
                     <div class="flex-fill">
                         <div class="d-flex align-items-center gap-2 mb-1">
