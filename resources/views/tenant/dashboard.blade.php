@@ -2,32 +2,11 @@
 
 @section('page-title', 'My Dashboard')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link active">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link">
-    <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
-    <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
-
 @section('content')
     <!-- Welcome Banner -->
     <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #4c1d95, #d4af37); color: white;">
-        <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} 👋</h4>
+         style="background: linear-gradient(135deg, #32145C, #5926C8); color: white;">
+        <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} &#128075;</h4>
         <p class="mb-0 opacity-75">
             {{ $tenant->property->name }} —
             Unit {{ $tenant->unit->unit_number }}
@@ -87,8 +66,8 @@
                             KES {{ number_format($tenant->unit->rent_amount, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#efe7fb;">
-                        <i class="bi bi-cash-coin" style="color:#4c1d95;"></i>
+                    <div class="stat-icon" style="background:rgba(89,38,200,0.08);">
+                        <i class="bi bi-cash-coin" style="color:#5926C8;"></i>
                     </div>
                 </div>
             </div>
@@ -100,12 +79,12 @@
                     <div>
                         <p class="stat-label">Outstanding Balance</p>
                         <h3 class="stat-value" style="font-size:1.3rem;
-                            {{ $totalOutstanding > 0 ? 'color:#dc3545;' : 'color:#198754;' }}">
+                            {{ $totalOutstanding > 0 ? 'color:#DC4545;' : 'color:#168653;' }}">
                             KES {{ number_format($totalOutstanding, 2) }}
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#fbf3d5;">
-                        <i class="bi bi-exclamation-circle" style="color:#b8860b;"></i>
+                    <div class="stat-icon" style="background:rgba(244,197,66,0.18);">
+                        <i class="bi bi-exclamation-circle" style="color:#E99B20;"></i>
                     </div>
                 </div>
             </div>
@@ -131,8 +110,8 @@
                             @endif
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#e6f9f0;">
-                        <i class="bi bi-calendar-check" style="color:#198754;"></i>
+                    <div class="stat-icon" style="background:rgba(22,134,83,0.12);">
+                        <i class="bi bi-calendar-check" style="color:#168653;"></i>
                     </div>
                 </div>
             </div>
@@ -151,10 +130,72 @@
                             @endif
                         </h3>
                     </div>
-                    <div class="stat-icon" style="background:#fff3e0;">
-                        <i class="bi bi-calendar-event" style="color:#fd7e14;"></i>
+                    <div class="stat-icon" style="background:rgba(89,38,200,0.08);">
+                        <i class="bi bi-calendar-event" style="color:#5926C8;"></i>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Tenancy -->
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="stat-card h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-shield-check me-2" style="color:#5926C8;"></i>Security Deposit</h6>
+                    <a href="{{ route('tenant.deposit.show') }}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+                @if($deposit)
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status</span>
+                        <span class="badge kp-badge {{ $deposit->statusBadgeClass() }}">{{ $deposit->statusLabel() }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Required</span>
+                        <span class="fw-semibold">KES {{ number_format((float) $deposit->required_amount, 2) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Received</span>
+                        <span class="fw-semibold text-success">KES {{ number_format((float) $deposit->received_amount, 2) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Outstanding</span>
+                        <span class="fw-semibold {{ $deposit->outstanding() > 0 ? 'text-danger' : 'text-success' }}">
+                            KES {{ number_format($deposit->outstanding(), 2) }}
+                        </span>
+                    </div>
+                @else
+                    <p class="text-muted mb-0">No security deposit is on record for your tenancy.</p>
+                @endif
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="stat-card h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-box-arrow-right me-2" style="color:#5926C8;"></i>Notice to Vacate</h6>
+                    <a href="{{ route('tenant.move-out.index') }}" class="btn btn-sm btn-outline-primary">View</a>
+                </div>
+                @if($activeMoveOut)
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status</span>
+                        <span class="badge kp-badge {{ $activeMoveOut->statusBadgeClass() }}">{{ $activeMoveOut->statusLabelText() }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Submitted</span>
+                        <span class="fw-semibold">{{ $activeMoveOut->submitted_at?->format('d M Y') ?? '—' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Proposed move-out</span>
+                        <span class="fw-semibold">{{ $activeMoveOut->proposed_move_out_date?->format('d M Y') ?? '—' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Earliest permitted</span>
+                        <span class="fw-semibold">{{ $activeMoveOut->earliest_permitted_date?->format('d M Y') ?? '—' }}</span>
+                    </div>
+                @else
+                    <p class="text-muted mb-0">No active notice to vacate. You can submit one from the Notice to Vacate page.</p>
+                @endif
             </div>
         </div>
     </div>

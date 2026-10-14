@@ -3,11 +3,14 @@
 use App\Http\Controllers\ArrearsController;
 use App\Http\Controllers\CaretakerAnnouncementController;
 use App\Http\Controllers\CaretakerController;
+use App\Http\Controllers\CaretakerInspectionController;
 use App\Http\Controllers\CaretakerMaintenanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LandlordAnnouncementController;
 use App\Http\Controllers\LandlordController;
+use App\Http\Controllers\LandlordDepositController;
 use App\Http\Controllers\LandlordMaintenanceController;
+use App\Http\Controllers\LandlordMoveOutController;
 use App\Http\Controllers\LandlordTenantController;
 use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\ProfileController;
@@ -18,7 +21,9 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\TenantAnnouncementController;
 use App\Http\Controllers\TenantController;
+use App\Http\Controllers\TenantDepositController;
 use App\Http\Controllers\TenantMaintenanceController;
+use App\Http\Controllers\TenantMoveOutController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -98,10 +103,30 @@ Route::middleware(array_merge(['auth', 'role:landlord'], $verified))->prefix('la
     // Tenant rent account: payments + notices
     Route::post('/tenants/{tenant}/payments', [LandlordTenantController::class, 'recordPayment'])->name('tenants.payments.store');
     Route::post('/tenants/{tenant}/notices', [RentNoticeController::class, 'store'])->name('tenants.notices.store');
+    Route::get('/notices', [RentNoticeController::class, 'index'])->name('notices.index');
+    Route::get('/notices/create', [RentNoticeController::class, 'create'])->name('notices.create');
     Route::patch('/notices/{notice}', [RentNoticeController::class, 'update'])->name('notices.update');
 
     // Arrears overview
     Route::get('/arrears', [ArrearsController::class, 'index'])->name('arrears.index');
+
+    // Move-out / Notice to Vacate management
+    Route::get('/move-outs', [LandlordMoveOutController::class, 'index'])->name('move-outs.index');
+    Route::get('/move-outs/{moveOut}', [LandlordMoveOutController::class, 'show'])->name('move-outs.show');
+    Route::patch('/move-outs/{moveOut}/review', [LandlordMoveOutController::class, 'review'])->name('move-outs.review');
+    Route::post('/move-outs/{moveOut}/inspection', [LandlordMoveOutController::class, 'assignInspection'])->name('move-outs.inspection.assign');
+    Route::patch('/move-outs/{moveOut}/clear', [LandlordMoveOutController::class, 'clear'])->name('move-outs.clear');
+
+    // Security deposits
+    Route::get('/deposits', [LandlordDepositController::class, 'index'])->name('deposits.index');
+    Route::post('/deposits/sync', [LandlordDepositController::class, 'sync'])->name('deposits.sync');
+    Route::get('/deposits/{deposit}', [LandlordDepositController::class, 'show'])->name('deposits.show');
+    Route::post('/deposits/{deposit}/receipts', [LandlordDepositController::class, 'recordReceipt'])->name('deposits.receipts.store');
+    Route::post('/deposits/{deposit}/receipts/{transaction}/verify', [LandlordDepositController::class, 'verifyReceipt'])->name('deposits.receipts.verify');
+    Route::post('/deposits/{deposit}/verify', [LandlordDepositController::class, 'verify'])->name('deposits.verify');
+    Route::post('/deposits/{deposit}/deductions', [LandlordDepositController::class, 'proposeDeduction'])->name('deposits.deductions.store');
+    Route::post('/deposits/{deposit}/deductions/{transaction}/approve', [LandlordDepositController::class, 'approveDeduction'])->name('deposits.deductions.approve');
+    Route::post('/deposits/{deposit}/refunds', [LandlordDepositController::class, 'refund'])->name('deposits.refunds.store');
 
     // M-Pesa Payments
     Route::get('/mpesa-payments', [MpesaController::class, 'landlordPayments'])->name('mpesa-payments');
@@ -144,6 +169,11 @@ Route::middleware(array_merge(['auth', 'role:caretaker'], $verified))->prefix('c
     Route::get('/maintenance', [CaretakerMaintenanceController::class, 'index'])->name('maintenance.index');
     Route::get('/maintenance/{maintenance}', [CaretakerMaintenanceController::class, 'show'])->name('maintenance.show');
     Route::patch('/maintenance/{maintenance}/status', [CaretakerMaintenanceController::class, 'updateStatus'])->name('maintenance.status');
+
+    // Move-out inspections
+    Route::get('/inspections', [CaretakerInspectionController::class, 'index'])->name('inspections.index');
+    Route::get('/inspections/{inspection}', [CaretakerInspectionController::class, 'show'])->name('inspections.show');
+    Route::post('/inspections/{inspection}/submit', [CaretakerInspectionController::class, 'submit'])->name('inspections.submit');
 });
 
 // Tenant Routes
@@ -167,6 +197,16 @@ Route::middleware(array_merge(['auth', 'role:tenant'], $verified))->prefix('tena
     Route::post('/pay/{rent}/initiate', [MpesaController::class, 'initiate'])->name('pay.initiate');
     Route::get('/pay/{rent}/pending', [MpesaController::class, 'pending'])->name('payment.pending');
     Route::get('/payment/{payment}/status', [MpesaController::class, 'checkStatus'])->name('payment.status');
+
+    // Notice to Vacate
+    Route::get('/move-out', [TenantMoveOutController::class, 'index'])->name('move-out.index');
+    Route::get('/move-out/create', [TenantMoveOutController::class, 'create'])->name('move-out.create');
+    Route::post('/move-out', [TenantMoveOutController::class, 'store'])->name('move-out.store');
+    Route::get('/move-out/{moveOut}', [TenantMoveOutController::class, 'show'])->name('move-out.show');
+    Route::patch('/move-out/{moveOut}/cancel', [TenantMoveOutController::class, 'cancel'])->name('move-out.cancel');
+
+    // Security deposit
+    Route::get('/deposit', [TenantDepositController::class, 'show'])->name('deposit.show');
 });
 
 // Profile

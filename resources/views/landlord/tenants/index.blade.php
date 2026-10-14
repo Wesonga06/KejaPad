@@ -2,62 +2,67 @@
 
 @section('page-title', 'Tenants')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('landlord.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('landlord.properties.index') }}" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="{{ route('landlord.tenants.index') }}" class="nav-link active">
-        <i class="bi bi-people"></i> Tenants
-    </a>
-    <a href="{{ route('landlord.rent.index') }}" class="nav-link">
-    <i class="bi bi-cash-coin"></i> Rent
-    </a>
-    <a href="{{ route('landlord.arrears.index') }}" class="nav-link">
-        <i class="bi bi-exclamation-octagon"></i> Arrears
-    </a>
-
-    <div class="nav-section-title">Other</div>
-    <a href="{{ route('landlord.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('landlord.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('landlord.reports.index') }}" class="nav-link">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
-
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">All Tenants</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">Manage tenants across all your properties.</p>
+            <h1 class="kp-page-title">Tenants</h1>
+            <p class="kp-page-subtitle">Manage tenants across all your properties.</p>
         </div>
-        <a href="{{ route('landlord.tenants.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i> Add Tenant
-        </a>
-    </div>
-
-    @if($tenants->isEmpty())
-        <div class="stat-card text-center py-5">
-            <i class="bi bi-people" style="font-size:3rem; color:#dee2e6;"></i>
-            <p class="mt-3 text-muted">No tenants yet. Add your first tenant.</p>
-            <a href="{{ route('landlord.tenants.create') }}" class="btn btn-primary mt-2">
-                <i class="bi bi-plus-circle me-2"></i> Add Tenant
+        <div class="kp-page-actions">
+            <a href="{{ route('landlord.tenants.create') }}" class="btn btn-primary">
+                <i class="bi bi-person-plus me-2"></i> Add Tenant
             </a>
         </div>
-    @else
-        <div class="stat-card">
+    </div>
+
+    <div class="kp-card mb-4">
+        <form method="GET" action="{{ route('landlord.tenants.index') }}" class="row g-2 align-items-end">
+            <div class="col-12 col-md-4">
+                <label class="form-label" for="q">Search</label>
+                <input type="search" name="q" id="q" class="form-control"
+                       value="{{ request('q') }}" placeholder="Name, phone or email">
+            </div>
+            <div class="col-6 col-md-3">
+                <label class="form-label" for="property_id">Property</label>
+                <select name="property_id" id="property_id" class="form-select">
+                    <option value="">All properties</option>
+                    @foreach($properties as $property)
+                        <option value="{{ $property->id }}" @selected(request('property_id') == $property->id)>
+                            {{ $property->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label" for="status">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="">Any</option>
+                    <option value="active" @selected(request('status') === 'active')>Active</option>
+                    <option value="inactive" @selected(request('status') === 'inactive')>Inactive</option>
+                </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                    <i class="bi bi-funnel me-1"></i> Filter
+                </button>
+                <a href="{{ route('landlord.tenants.index') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="kp-card">
+        @if($tenants->isEmpty())
+            <div class="kp-empty">
+                <i class="bi bi-people"></i>
+                <p class="mb-3">No tenants found. Add your first tenant to get started.</p>
+                <a href="{{ route('landlord.tenants.create') }}" class="btn btn-primary">
+                    <i class="bi bi-person-plus me-2"></i> Add Tenant
+                </a>
+            </div>
+        @else
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table table-hover align-middle">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>Tenant</th>
@@ -66,37 +71,37 @@
                             <th>Unit</th>
                             <th>Move-in Date</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($tenants as $index => $tenant)
                         <tr>
-                            <td>{{ $tenants->firstItem() + $index }}</td>
+                            <td class="text-muted">{{ $tenants->firstItem() + $index }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:34px; height:34px; background:linear-gradient(135deg,#d4af37,#4c1d95); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600; font-size:0.8rem; flex-shrink:0;">
+                                    <div class="kp-avatar sm">
                                         {{ strtoupper(substr($tenant->full_name, 0, 2)) }}
                                     </div>
                                     <div>
                                         <div class="fw-semibold" style="font-size:0.9rem;">{{ $tenant->full_name }}</div>
-                                        <div class="text-muted" style="font-size:0.8rem;">{{ $tenant->email ?? '—' }}</div>
+                                        <div class="text-muted" style="font-size:0.78rem;">{{ $tenant->email ?? '—' }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td>{{ $tenant->phone }}</td>
                             <td>{{ $tenant->property->name }}</td>
-                            <td><span class="badge bg-light text-dark border">{{ $tenant->unit->unit_number }}</span></td>
+                            <td><span class="badge kp-badge-purple">{{ $tenant->unit->unit_number }}</span></td>
                             <td>{{ $tenant->move_in_date->format('d M Y') }}</td>
                             <td>
-                                <span class="badge {{ $tenant->is_active ? 'bg-success' : 'bg-secondary' }}">
+                                <span class="badge {{ $tenant->is_active ? 'kp-badge-success' : 'kp-badge-muted' }}">
                                     {{ $tenant->is_active ? 'Active' : 'Inactive' }}
                                 </span>
                             </td>
-                            <td>
-                                <div class="d-flex gap-2">
+                            <td class="text-end">
+                                <div class="d-flex gap-1 justify-content-end">
                                     <a href="{{ route('landlord.tenants.show', $tenant) }}"
-                                       class="btn btn-sm btn-outline-info" title="View">
+                                       class="btn btn-sm btn-outline-info" title="View account">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                     <a href="{{ route('landlord.tenants.edit', $tenant) }}"
@@ -120,10 +125,10 @@
                     </tbody>
                 </table>
             </div>
-        </div>
-    @endif
 
-    @if($tenants->hasPages())
-        <div class="mt-3">{{ $tenants->links() }}</div>
-    @endif
+            @if($tenants->hasPages())
+                <div class="mt-3">{{ $tenants->links() }}</div>
+            @endif
+        @endif
+    </div>
 @endsection

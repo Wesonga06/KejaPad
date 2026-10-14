@@ -34,16 +34,16 @@
         .navbar-brand {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #1a0b2e !important;
+            color: #32145C !important;
         }
 
         .navbar-brand span {
-            color: #b8860b;
+            color: #b7791f;
         }
 
         /* Hero Section */
         .hero {
-            background: linear-gradient(135deg, #1a0b2e 0%, #2e1065 40%, #4c1d95 100%);
+            background: linear-gradient(135deg, #32145C 0%, #2A114E 40%, #5926C8 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -58,7 +58,7 @@
             right: -20%;
             width: 600px;
             height: 600px;
-            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(244,197,66,0.15) 0%, transparent 70%);
             border-radius: 50%;
         }
 
@@ -69,15 +69,15 @@
             left: -10%;
             width: 400px;
             height: 400px;
-            background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(244,197,66,0.08) 0%, transparent 70%);
             border-radius: 50%;
         }
 
         .hero-badge {
             display: inline-block;
-            background: rgba(212,175,55,0.15);
-            color: #d4af37;
-            border: 1px solid rgba(212,175,55,0.3);
+            background: rgba(244,197,66,0.15);
+            color: #F4C542;
+            border: 1px solid rgba(244,197,66,0.3);
             padding: 6px 16px;
             border-radius: 50px;
             font-size: 0.82rem;
@@ -95,7 +95,7 @@
         }
 
         .hero h1 span {
-            color: #d4af37;
+            color: #F4C542;
         }
 
         .hero p {
@@ -112,8 +112,8 @@
         }
 
         .btn-hero-primary {
-            background: #d4af37;
-            color: #1a0b2e;
+            background: #F4C542;
+            color: #32145C;
             padding: 14px 32px;
             border-radius: 10px;
             font-weight: 600;
@@ -125,9 +125,9 @@
 
         .btn-hero-primary:hover {
             background: #fff;
-            color: #4c1d95;
+            color: #5926C8;
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(212,175,55,0.3);
+            box-shadow: 0 8px 25px rgba(244,197,66,0.3);
         }
 
         .btn-hero-outline {
@@ -166,7 +166,7 @@
         }
 
         .mini-stat h4 {
-            color: #d4af37;
+            color: #F4C542;
             font-weight: 700;
             margin-bottom: 2px;
         }
@@ -184,8 +184,8 @@
 
         .section-badge {
             display: inline-block;
-            background: #efe7fb;
-            color: #4c1d95;
+            background: rgba(89,38,200,0.08);
+            color: #5926C8;
             padding: 5px 14px;
             border-radius: 50px;
             font-size: 0.8rem;
@@ -196,7 +196,7 @@
         .section-title {
             font-size: 2.2rem;
             font-weight: 800;
-            color: #1a0b2e;
+            color: #32145C;
             margin-bottom: 12px;
         }
 
@@ -218,7 +218,7 @@
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-            border-color: #efe7fb;
+            border-color: rgba(89,38,200,0.08);
         }
 
         .feature-icon {
@@ -234,7 +234,7 @@
 
         .feature-card h5 {
             font-weight: 700;
-            color: #1a0b2e;
+            color: #32145C;
             margin-bottom: 10px;
         }
 
@@ -313,7 +313,7 @@
         .step-number {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, #4c1d95, #d4af37);
+            background: linear-gradient(135deg, #5926C8, #F4C542);
             color: white;
             border-radius: 50%;
             display: flex;
@@ -326,7 +326,7 @@
 
         .step-card h5 {
             font-weight: 700;
-            color: #1a0b2e;
+            color: #32145C;
             margin-bottom: 10px;
         }
 
@@ -338,7 +338,7 @@
         /* QR Section */
         .qr-section {
             padding: 80px 0;
-            background: linear-gradient(135deg, #1a0b2e, #4c1d95);
+            background: linear-gradient(135deg, #32145C, #5926C8);
             color: white;
         }
 
@@ -356,7 +356,7 @@
         }
 
         .cta-box {
-            background: linear-gradient(135deg, #4c1d95, #d4af37);
+            background: linear-gradient(135deg, #5926C8, #F4C542);
             border-radius: 24px;
             padding: 60px 40px;
             text-align: center;
@@ -376,7 +376,7 @@
 
         /* Footer */
         footer {
-            background: #1a0b2e;
+            background: #32145C;
             color: rgba(255,255,255,0.6);
             padding: 40px 0 20px;
         }
@@ -388,7 +388,7 @@
         }
 
         footer .brand span {
-            color: #d4af37;
+            color: #F4C542;
         }
 
         footer a {
@@ -398,7 +398,7 @@
         }
 
         footer a:hover {
-            color: #d4af37;
+            color: #F4C542;
         }
 
         /* Responsive */
@@ -493,7 +493,7 @@
                     <div class="row g-3 mt-4">
                         <div class="col-4">
                             <div class="text-white">
-                                <div style="font-size:1.6rem; font-weight:800; color:#d4af37;">
+                                <div style="font-size:1.6rem; font-weight:800; color:#F4C542;">
                                     100%
                                 </div>
                                 <div style="font-size:0.78rem; opacity:0.6;">
@@ -503,7 +503,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-white">
-                                <div style="font-size:1.6rem; font-weight:800; color:#d4af37;">
+                                <div style="font-size:1.6rem; font-weight:800; color:#F4C542;">
                                     M-Pesa
                                 </div>
                                 <div style="font-size:0.78rem; opacity:0.6;">
@@ -513,7 +513,7 @@
                         </div>
                         <div class="col-4">
                             <div class="text-white">
-                                <div style="font-size:1.6rem; font-weight:800; color:#d4af37;">
+                                <div style="font-size:1.6rem; font-weight:800; color:#F4C542;">
                                     4 Roles
                                 </div>
                                 <div style="font-size:0.78rem; opacity:0.6;">
@@ -569,12 +569,12 @@
                                 <span style="color:rgba(255,255,255,0.7); font-size:0.82rem;">
                                     Occupancy Rate
                                 </span>
-                                <span style="color:#d4af37; font-weight:600; font-size:0.82rem;">
+                                <span style="color:#F4C542; font-weight:600; font-size:0.82rem;">
                                     75%
                                 </span>
                             </div>
                             <div style="background:rgba(255,255,255,0.1); border-radius:10px; height:8px;">
-                                <div style="background:linear-gradient(90deg,#d4af37,#7c3aed); width:75%; height:100%; border-radius:10px;"></div>
+                                <div style="background:linear-gradient(90deg,#F4C542,#5926C8); width:75%; height:100%; border-radius:10px;"></div>
                             </div>
                         </div>
 
@@ -588,7 +588,7 @@
                             <div class="d-flex align-items-center justify-content-between py-2"
                                  style="border-bottom:1px solid rgba(255,255,255,0.06);">
                                 <div class="d-flex align-items-center gap-2">
-                                    <div style="width:28px; height:28px; border-radius:50%; background:rgba(212,175,55,0.2); display:flex; align-items:center; justify-content:center; color:#d4af37; font-size:0.7rem; font-weight:700;">
+                                    <div style="width:28px; height:28px; border-radius:50%; background:rgba(244,197,66,0.2); display:flex; align-items:center; justify-content:center; color:#F4C542; font-size:0.7rem; font-weight:700;">
                                         {{ substr($item[0], 0, 1) }}
                                     </div>
                                     <span style="color:rgba(255,255,255,0.8); font-size:0.82rem;">
@@ -622,14 +622,14 @@
             <div class="row g-4">
                 @php
                     $features = [
-                        ['bi-buildings', '#efe7fb', '#4c1d95', 'Property Management', 'Add and manage multiple properties with photos, locations, and status tracking.'],
-                        ['bi-door-open', '#e6f9f0', '#198754', 'Unit Management', 'Create units, set rent amounts, and track vacancy status in real time.'],
-                        ['bi-people', '#fff3e0', '#fd7e14', 'Tenant Management', 'Add tenants, manage profiles, emergency contacts, and tenancy history.'],
-                        ['bi-phone', '#efe7fb', '#4c1d95', 'M-Pesa Payments', 'Collect rent via Safaricom M-Pesa STK Push with automatic confirmation.'],
-                        ['bi-tools', '#fbf3d5', '#b8860b', 'Maintenance Requests', 'Tenants report issues, caretakers get assigned, landlords track progress.'],
-                        ['bi-megaphone', '#fff3e0', '#fd7e14', 'Announcements', 'Post water, electricity, security, and maintenance notices instantly.'],
-                        ['bi-bar-chart', '#e6f9f0', '#198754', 'Reports & Analytics', 'Export rent collection, occupancy, and maintenance reports to PDF or Excel.'],
-                        ['bi-bell', '#efe7fb', '#4c1d95', 'SMS & Email Alerts', 'Automated reminders for rent due, overdue payments, and complaint updates.'],
+                        ['bi-buildings', 'rgba(89,38,200,0.08)', '#5926C8', 'Property Management', 'Add and manage multiple properties with photos, locations, and status tracking.'],
+                        ['bi-door-open', 'rgba(22,134,83,0.12)', '#168653', 'Unit Management', 'Create units, set rent amounts, and track vacancy status in real time.'],
+                        ['bi-people', 'rgba(233,155,32,0.14)', '#E99B20', 'Tenant Management', 'Add tenants, manage profiles, emergency contacts, and tenancy history.'],
+                        ['bi-phone', 'rgba(89,38,200,0.08)', '#5926C8', 'M-Pesa Payments', 'Collect rent via Safaricom M-Pesa STK Push with automatic confirmation.'],
+                        ['bi-tools', 'rgba(244,197,66,0.18)', '#b7791f', 'Maintenance Requests', 'Tenants report issues, caretakers get assigned, landlords track progress.'],
+                        ['bi-megaphone', 'rgba(233,155,32,0.14)', '#E99B20', 'Announcements', 'Post water, electricity, security, and maintenance notices instantly.'],
+                        ['bi-bar-chart', 'rgba(22,134,83,0.12)', '#168653', 'Reports & Analytics', 'Export rent collection, occupancy, and maintenance reports to PDF or Excel.'],
+                        ['bi-bell', 'rgba(89,38,200,0.08)', '#5926C8', 'SMS & Email Alerts', 'Automated reminders for rent due, overdue payments, and complaint updates.'],
                     ];
                 @endphp
 
@@ -665,7 +665,7 @@
             <div class="row g-4">
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="role-card"
-                         style="background:linear-gradient(135deg,#dc3545,#c82333);">
+                         style="background:linear-gradient(135deg,#DC4545,#c82333);">
                         <div class="mb-3">
                             <i class="bi bi-shield-check" style="font-size:2rem;"></i>
                         </div>
@@ -682,7 +682,7 @@
 
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="role-card"
-                         style="background:linear-gradient(135deg,#4c1d95,#1a5276);">
+                         style="background:linear-gradient(135deg,#5926C8,#4a1ea8);">
                         <div class="mb-3">
                             <i class="bi bi-person-badge" style="font-size:2rem;"></i>
                         </div>
@@ -699,7 +699,7 @@
 
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="role-card"
-                         style="background:linear-gradient(135deg,#198754,#157347);">
+                         style="background:linear-gradient(135deg,#168653,#157347);">
                         <div class="mb-3">
                             <i class="bi bi-person-gear" style="font-size:2rem;"></i>
                         </div>
@@ -716,7 +716,7 @@
 
                 <div class="col-12 col-md-6 col-lg-3">
                     <div class="role-card"
-                         style="background:linear-gradient(135deg,#d4af37,#4c1d95);">
+                         style="background:linear-gradient(135deg,#F4C542,#5926C8);">
                         <div class="mb-3">
                             <i class="bi bi-house-heart" style="font-size:2rem;"></i>
                         </div>
@@ -768,8 +768,8 @@
 
             <!-- M-Pesa Flow -->
             <div class="mt-5 p-4 rounded-4 text-center"
-                 style="background:#fff; border: 1px solid #efe7fb;">
-                <h6 class="fw-bold mb-4" style="color:#4c1d95;">
+                 style="background:#fff; border: 1px solid rgba(89,38,200,0.08);">
+                <h6 class="fw-bold mb-4" style="color:#5926C8;">
                     <i class="bi bi-phone me-2"></i>M-Pesa Payment Flow
                 </h6>
                 <div class="d-flex flex-wrap justify-content-center align-items-center gap-3">
@@ -792,7 +792,7 @@
                             <i class="bi {{ $f[0] }} text-muted d-none d-md-block"></i>
                         @else
                             <div class="text-center">
-                                <div style="width:48px; height:48px; background:#efe7fb; border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:1.2rem; color:#4c1d95;">
+                                <div style="width:48px; height:48px; background:rgba(89,38,200,0.08); border-radius:12px; display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:1.2rem; color:#5926C8;">
                                     <i class="bi {{ $f[0] }}"></i>
                                 </div>
                                 <small style="color:#555; font-size:0.75rem;">
@@ -812,8 +812,8 @@
             <div class="row align-items-center g-5">
                 <div class="col-lg-6 text-center text-lg-start">
                     <div class="section-badge"
-                         style="background:rgba(212,175,55,0.15);
-                                color:#d4af37; border:1px solid rgba(212,175,55,0.3);">
+                         style="background:rgba(244,197,66,0.15);
+                                color:#F4C542; border:1px solid rgba(244,197,66,0.3);">
                         Quick Access
                     </div>
                     <h2 style="font-size:2.2rem; font-weight:800; color:#fff; margin-bottom:15px;">
@@ -846,7 +846,7 @@
                             ->margin(1)
                             ->generate(config('app.url')) !!}
                         <p class="mt-3 mb-0"
-                           style="color:#4c1d95; font-weight:600; font-size:0.88rem;">
+                           style="color:#5926C8; font-weight:600; font-size:0.88rem;">
                             <i class="bi bi-qr-code me-1"></i> Scan to access KejaPad
                         </p>
                         <p style="color:#6c757d; font-size:0.78rem; margin-top:4px;">
@@ -870,7 +870,7 @@
                 <div class="d-flex gap-3 justify-content-center flex-wrap">
                     <a href="{{ route('register') }}"
                        class="btn btn-light fw-600 px-5 py-3 rounded-3"
-                       style="font-weight:600; color:#4c1d95;">
+                       style="font-weight:600; color:#5926C8;">
                         <i class="bi bi-rocket-takeoff me-2"></i>
                         Get Started Free
                     </a>

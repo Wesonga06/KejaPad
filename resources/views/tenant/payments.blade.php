@@ -2,26 +2,6 @@
 
 @section('page-title', 'Payment History')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link active">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -60,7 +40,7 @@
         </div>
         <div class="col-6 col-md-3">
             <div class="stat-card text-center">
-                <h4 class="fw-bold mb-0" style="color:#fd7e14;">KES {{ number_format($summary['arrears'], 2) }}</h4>
+                <h4 class="fw-bold mb-0" style="color:#E99B20;">KES {{ number_format($summary['arrears'], 2) }}</h4>
                 <small class="text-muted">Arrears</small>
             </div>
         </div>

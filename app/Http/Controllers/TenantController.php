@@ -43,13 +43,19 @@ class TenantController extends Controller
         $rentStatus = $status->summary($tenant);
         $behaviour = $behaviour->indicators($tenant, now()->subMonths(6));
 
+        // Tenancy lifecycle: security deposit and any open notice-to-vacate.
+        $deposit = $tenant->securityDeposit;
+        $activeMoveOut = $tenant->moveOutRequests()->whereNotIn('status', ['completed', 'rejected', 'cancelled'])->latest('submitted_at')->first();
+
         return view('tenant.dashboard', compact(
             'tenant',
             'currentRent',
             'recentPayments',
             'totalOutstanding',
             'rentStatus',
-            'behaviour'
+            'behaviour',
+            'deposit',
+            'activeMoveOut'
         ));
     }
 

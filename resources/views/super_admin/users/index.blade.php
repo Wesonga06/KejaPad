@@ -2,28 +2,6 @@
 
 @section('page-title', 'User Management')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('super_admin.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('super_admin.users.index') }}" class="nav-link active">
-        <i class="bi bi-people"></i> Users
-    </a>
-    <a href="#" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="#" class="nav-link">
-        <i class="bi bi-gear"></i> System Settings
-    </a>
-
-    <div class="nav-section-title">Reports</div>
-    <a href="#" class="nav-link">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -56,7 +34,7 @@
                         <td>{{ $users->firstItem() + $index }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div style="width:34px; height:34px; background:linear-gradient(135deg,#d4af37,#4c1d95); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600; font-size:0.8rem;">
+                                <div style="width:34px; height:34px; background:linear-gradient(135deg,#F4C542,#5926C8); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600; font-size:0.8rem;">
                                     {{ strtoupper(substr($user->name, 0, 2)) }}
                                 </div>
                                 <span>{{ $user->name }}</span>

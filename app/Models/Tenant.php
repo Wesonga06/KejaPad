@@ -66,6 +66,30 @@ class Tenant extends Model
         return $this->hasMany(RentNotice::class);
     }
 
+    // Security deposit held for this tenancy
+    public function securityDeposit()
+    {
+        return $this->hasOne(SecurityDeposit::class);
+    }
+
+    // Notice-to-vacate requests submitted by this tenant
+    public function moveOutRequests()
+    {
+        return $this->hasMany(MoveOutRequest::class);
+    }
+
+    // The tenant's current open notice-to-vacate request, if any.
+    public function activeMoveOutRequest()
+    {
+        return $this->hasOne(MoveOutRequest::class)
+            ->whereNotIn('status', [
+                MoveOutRequest::STATUS_COMPLETED,
+                MoveOutRequest::STATUS_REJECTED,
+                MoveOutRequest::STATUS_CANCELLED,
+            ])
+            ->latestOfMany();
+    }
+
     // Landlord / property owner (via property)
     public function landlord()
     {

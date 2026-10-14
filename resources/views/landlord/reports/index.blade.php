@@ -2,41 +2,13 @@
 
 @section('page-title', 'Reports')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('landlord.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('landlord.properties.index') }}" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="{{ route('landlord.tenants.index') }}" class="nav-link">
-        <i class="bi bi-people"></i> Tenants
-    </a>
-    <a href="{{ route('landlord.rent.index') }}" class="nav-link">
-        <i class="bi bi-cash-coin"></i> Rent
-    </a>
-
-    <div class="nav-section-title">Other</div>
-    <a href="{{ route('landlord.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('landlord.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('landlord.reports.index') }}" class="nav-link active">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
 
 @section('content')
-    <div class="mb-4">
-        <h5 class="fw-bold mb-1">Reports</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">
-            Generate and export reports for your properties.
-        </p>
+    <div class="kp-page-header">
+        <div>
+            <h1 class="kp-page-title">Reports</h1>
+            <p class="kp-page-subtitle">Generate and export reports for your properties.</p>
+        </div>
     </div>
 
     <div class="row g-4">
@@ -44,8 +16,8 @@
         <div class="col-12 col-md-6">
             <div class="stat-card h-100">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:#efe7fb;">
-                        <i class="bi bi-cash-stack" style="color:#4c1d95;"></i>
+                    <div class="stat-icon" style="background:rgba(89,38,200,0.08);">
+                        <i class="bi bi-cash-stack" style="color:#5926C8;"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0">Rent Collection Report</h6>
@@ -79,8 +51,8 @@
         <div class="col-12 col-md-6">
             <div class="stat-card h-100">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:#fbf3d5;">
-                        <i class="bi bi-exclamation-triangle" style="color:#b8860b;"></i>
+                    <div class="stat-icon" style="background:rgba(244,197,66,0.18);">
+                        <i class="bi bi-exclamation-triangle" style="color:#b7791f;"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0">Outstanding Balances</h6>
@@ -114,8 +86,8 @@
         <div class="col-12 col-md-6">
             <div class="stat-card h-100">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:#e6f9f0;">
-                        <i class="bi bi-door-open" style="color:#198754;"></i>
+                    <div class="stat-icon" style="background:rgba(22,134,83,0.12);">
+                        <i class="bi bi-door-open" style="color:#168653;"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0">Occupancy Report</h6>
@@ -149,8 +121,8 @@
         <div class="col-12 col-md-6">
             <div class="stat-card h-100">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="stat-icon" style="background:#fff3e0;">
-                        <i class="bi bi-tools" style="color:#fd7e14;"></i>
+                    <div class="stat-icon" style="background:rgba(233,155,32,0.14);">
+                        <i class="bi bi-tools" style="color:#E99B20;"></i>
                     </div>
                     <div>
                         <h6 class="fw-bold mb-0">Maintenance Report</h6>

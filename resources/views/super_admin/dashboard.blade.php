@@ -2,32 +2,10 @@
 
 @section('page-title', 'Super Admin Dashboard')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('super_admin.dashboard') }}" class="nav-link active">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('super_admin.users.index') }}" class="nav-link">
-        <i class="bi bi-people"></i> Users
-    </a>
-    <a href="#" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="#" class="nav-link">
-        <i class="bi bi-gear"></i> System Settings
-    </a>
-
-    <div class="nav-section-title">Reports</div>
-    <a href="#" class="nav-link">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
 
 @section('content')
     <!-- Welcome Banner -->
-    <div class="p-4 mb-4 rounded-3" style="background: linear-gradient(135deg, #1a0b2e, #4c1d95); color: white;">
+    <div class="p-4 mb-4 rounded-3" style="background: linear-gradient(135deg, #32145C, #5926C8); color: white;">
         <h4 class="fw-bold mb-1">Welcome back, {{ auth()->user()->name }} 👋</h4>
         <p class="mb-0 opacity-75">Here's what's happening on KejaPad today.</p>
     </div>
@@ -42,7 +20,7 @@
                         <h3 class="stat-value">{{ $totalUsers }}</h3>
                     </div>
                     <div class="stat-icon" style="background:#e8f4fd;">
-                        <i class="bi bi-people" style="color:#4c1d95;"></i>
+                        <i class="bi bi-people" style="color:#5926C8;"></i>
                     </div>
                 </div>
             </div>
@@ -55,8 +33,8 @@
                         <p class="stat-label">Landlords</p>
                         <h3 class="stat-value">{{ $totalLandlords }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#efe7fb;">
-                        <i class="bi bi-person-badge" style="color:#4c1d95;"></i>
+                    <div class="stat-icon" style="background:rgba(89,38,200,0.08);">
+                        <i class="bi bi-person-badge" style="color:#5926C8;"></i>
                     </div>
                 </div>
             </div>
@@ -69,8 +47,8 @@
                         <p class="stat-label">Caretakers</p>
                         <h3 class="stat-value">{{ $totalCaretakers }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#e6f9f0;">
-                        <i class="bi bi-person-gear" style="color:#198754;"></i>
+                    <div class="stat-icon" style="background:rgba(22,134,83,0.12);">
+                        <i class="bi bi-person-gear" style="color:#168653;"></i>
                     </div>
                 </div>
             </div>
@@ -83,8 +61,8 @@
                         <p class="stat-label">Tenants</p>
                         <h3 class="stat-value">{{ $totalTenants }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#fff3e0;">
-                        <i class="bi bi-house-heart" style="color:#fd7e14;"></i>
+                    <div class="stat-icon" style="background:rgba(233,155,32,0.14);">
+                        <i class="bi bi-house-heart" style="color:#E99B20;"></i>
                     </div>
                 </div>
             </div>
@@ -115,7 +93,7 @@
                         <td>{{ $index + 1 }}</td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div class="user-avatar" style="width:32px; height:32px; font-size:0.75rem; background: linear-gradient(135deg, #d4af37, #4c1d95); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600;">
+                                <div class="user-avatar" style="width:32px; height:32px; font-size:0.75rem; background: linear-gradient(135deg, #F4C542, #5926C8); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:600;">
                                     {{ strtoupper(substr($user->name, 0, 2)) }}
                                 </div>
                                 {{ $user->name }}

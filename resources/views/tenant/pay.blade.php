@@ -2,26 +2,6 @@
 
 @section('page-title', 'Pay Rent')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link active">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -91,10 +71,10 @@
             <!-- M-Pesa Payment Form -->
             <div class="stat-card">
                 <div class="text-center mb-4">
-                    <div style="width:70px; height:70px; background:#efe7fb;
+                    <div style="width:70px; height:70px; background:rgba(89,38,200,0.08);
                                 border-radius:50%; display:flex; align-items:center;
                                 justify-content:center; margin:0 auto 12px;">
-                        <i class="bi bi-phone" style="font-size:1.8rem; color:#4c1d95;"></i>
+                        <i class="bi bi-phone" style="font-size:1.8rem; color:#5926C8;"></i>
                     </div>
                     <h6 class="fw-bold">Pay with M-Pesa</h6>
                     <p class="text-muted mb-0" style="font-size:0.85rem;">
@@ -150,8 +130,8 @@
 
                     <!-- M-Pesa Steps -->
                     <div class="p-3 rounded-3 mb-4"
-                         style="background:#f8f9ff; border:1px solid #efe7fb;">
-                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#4c1d95;">
+                         style="background:#f8f9ff; border:1px solid rgba(89,38,200,0.08);">
+                        <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#5926C8;">
                             <i class="bi bi-info-circle me-1"></i> How it works:
                         </p>
                         <ol style="font-size:0.82rem; color:#555; margin:0; padding-left:18px;">

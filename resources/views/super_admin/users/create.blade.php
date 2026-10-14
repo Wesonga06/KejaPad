@@ -2,28 +2,6 @@
 
 @section('page-title', 'Add New User')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('super_admin.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('super_admin.users.index') }}" class="nav-link active">
-        <i class="bi bi-people"></i> Users
-    </a>
-    <a href="{{ route('landlord.properties.index') }}" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="{{ route('super_admin.settings.index') }}" class="nav-link">
-        <i class="bi bi-gear"></i> System Settings
-    </a>
-
-    <div class="nav-section-title">Reports</div>
-    <a href="{{ route('super_admin.reports.index') }}" class="nav-link">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">

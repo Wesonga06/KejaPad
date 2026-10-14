@@ -2,26 +2,6 @@
 
 @section('page-title', 'Announcements')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="mb-4">
@@ -44,9 +24,9 @@
                 <div class="d-flex align-items-start gap-3">
                     <div style="width:44px; height:44px; border-radius:10px; flex-shrink:0;
                                 display:flex; align-items:center; justify-content:center;
-                                background:#efe7fb;">
+                                background:rgba(89,38,200,0.08);">
                         <i class="bi {{ $ann->categoryIcon() }}"
-                           style="font-size:1.2rem; color:#4c1d95;"></i>
+                           style="font-size:1.2rem; color:#5926C8;"></i>
                     </div>
                     <div class="flex-fill">
                         <div class="d-flex align-items-center gap-2 mb-1">

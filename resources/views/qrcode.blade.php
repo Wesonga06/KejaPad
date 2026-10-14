@@ -11,7 +11,7 @@
         * { font-family: 'Inter', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, #1a0b2e, #4c1d95);
+            background: linear-gradient(135deg, #32145C, #5926C8);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -32,23 +32,23 @@
         .brand {
             font-size: 1.8rem;
             font-weight: 800;
-            color: #1a0b2e;
+            color: #32145C;
             margin-bottom: 4px;
         }
 
-        .brand span { color: #b8860b; }
+        .brand span { color: #b7791f; }
 
         .qr-wrapper {
             background: #f8f9ff;
             border-radius: 16px;
             padding: 20px;
             margin: 25px 0;
-            border: 2px dashed #efe7fb;
+            border: 2px dashed rgba(89,38,200,0.08);
         }
 
         .url-badge {
-            background: #efe7fb;
-            color: #4c1d95;
+            background: rgba(89,38,200,0.08);
+            color: #5926C8;
             padding: 8px 20px;
             border-radius: 50px;
             font-size: 0.82rem;
@@ -75,7 +75,7 @@
         .steps p {
             font-size: 0.8rem;
             font-weight: 600;
-            color: #4c1d95;
+            color: #5926C8;
             margin-bottom: 8px;
         }
 
@@ -91,7 +91,7 @@
         }
 
         .btn-primary-custom {
-            background: linear-gradient(135deg, #4c1d95, #1a5276);
+            background: linear-gradient(135deg, #5926C8, #4a1ea8);
             color: white;
             border: none;
             border-radius: 10px;
@@ -106,13 +106,13 @@
         }
 
         .btn-primary-custom:hover {
-            background: linear-gradient(135deg, #d4af37, #4c1d95);
+            background: linear-gradient(135deg, #F4C542, #5926C8);
             color: white;
             transform: translateY(-1px);
         }
 
         .network-info {
-            background: #fff3e0;
+            background: rgba(233,155,32,0.14);
             border: 1px solid #ffe0b2;
             border-radius: 10px;
             padding: 12px;
@@ -178,7 +178,7 @@
             </a>
             <a href="{{ $url }}/register"
                class="btn flex-fill btn-sm py-2"
-               style="background:#d4af37; color:#1a0b2e; font-weight:600;">
+               style="background:#F4C542; color:#32145C; font-weight:600;">
                 <i class="bi bi-person-plus me-1"></i> Register
             </a>
         </div>

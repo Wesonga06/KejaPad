@@ -2,26 +2,6 @@
 
 @section('page-title', 'Payment Pending')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link active">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="row justify-content-center">
@@ -30,11 +10,11 @@
 
                 @if($payment->status === 'confirmed')
                     <!-- Confirmed -->
-                    <div style="width:80px; height:80px; background:#e6f9f0;
+                    <div style="width:80px; height:80px; background:rgba(22,134,83,0.12);
                                 border-radius:50%; display:flex; align-items:center;
                                 justify-content:center; margin:0 auto 20px;">
                         <i class="bi bi-check-circle-fill"
-                           style="font-size:2.5rem; color:#198754;"></i>
+                           style="font-size:2.5rem; color:#168653;"></i>
                     </div>
                     <h5 class="fw-bold text-success">Payment Confirmed!</h5>
                     <p class="text-muted mb-1">
@@ -53,11 +33,11 @@
 
                 @elseif($payment->status === 'failed')
                     <!-- Failed -->
-                    <div style="width:80px; height:80px; background:#fbf3d5;
+                    <div style="width:80px; height:80px; background:rgba(244,197,66,0.18);
                                 border-radius:50%; display:flex; align-items:center;
                                 justify-content:center; margin:0 auto 20px;">
                         <i class="bi bi-x-circle-fill"
-                           style="font-size:2.5rem; color:#dc3545;"></i>
+                           style="font-size:2.5rem; color:#DC4545;"></i>
                     </div>
                     <h5 class="fw-bold text-danger">Payment Failed</h5>
                     <p class="text-muted">
@@ -70,12 +50,12 @@
 
                 @else
                     <!-- Pending -->
-                    <div style="width:80px; height:80px; background:#fff3e0;
+                    <div style="width:80px; height:80px; background:rgba(233,155,32,0.14);
                                 border-radius:50%; display:flex; align-items:center;
                                 justify-content:center; margin:0 auto 20px;"
                          id="pendingIcon">
                         <i class="bi bi-hourglass-split"
-                           style="font-size:2.5rem; color:#fd7e14;"></i>
+                           style="font-size:2.5rem; color:#E99B20;"></i>
                     </div>
                     <h5 class="fw-bold" id="statusTitle">Waiting for Payment</h5>
                     <p class="text-muted mb-1" id="statusDesc">
@@ -129,8 +109,8 @@
 
                 if (data.status === 'confirmed') {
                     document.getElementById('pendingIcon').innerHTML =
-                        '<i class="bi bi-check-circle-fill" style="font-size:2.5rem; color:#198754;"></i>';
-                    document.getElementById('pendingIcon').style.background = '#e6f9f0';
+                        '<i class="bi bi-check-circle-fill" style="font-size:2.5rem; color:#168653;"></i>';
+                    document.getElementById('pendingIcon').style.background = 'rgba(22,134,83,0.12)';
                     document.getElementById('statusTitle').textContent = 'Payment Confirmed!';
                     document.getElementById('statusTitle').className = 'fw-bold text-success';
                     document.getElementById('statusDesc').innerHTML =
@@ -142,8 +122,8 @@
 
                 } else if (data.status === 'failed') {
                     document.getElementById('pendingIcon').innerHTML =
-                        '<i class="bi bi-x-circle-fill" style="font-size:2.5rem; color:#dc3545;"></i>';
-                    document.getElementById('pendingIcon').style.background = '#fbf3d5';
+                        '<i class="bi bi-x-circle-fill" style="font-size:2.5rem; color:#DC4545;"></i>';
+                    document.getElementById('pendingIcon').style.background = 'rgba(244,197,66,0.18)';
                     document.getElementById('statusTitle').textContent = 'Payment Failed';
                     document.getElementById('statusTitle').className = 'fw-bold text-danger';
                     document.getElementById('statusDesc').textContent =

@@ -2,26 +2,6 @@
 
 @section('page-title', 'Maintenance Requests')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link active">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">

@@ -2,26 +2,6 @@
 
 @section('page-title', 'My Profile')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link">
-    <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link active">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="mb-4">
@@ -39,7 +19,7 @@
                 <div class="text-center mb-3">
                     <div class="mx-auto mb-3"
                          style="width:65px; height:65px;
-                                background:linear-gradient(135deg,#d4af37,#4c1d95);
+                                background:linear-gradient(135deg,#F4C542,#5926C8);
                                 border-radius:50%; display:flex;
                                 align-items:center; justify-content:center;
                                 color:white; font-weight:700; font-size:1.4rem;">

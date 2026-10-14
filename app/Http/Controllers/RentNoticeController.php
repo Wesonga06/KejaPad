@@ -11,6 +11,42 @@ use Illuminate\Validation\Rule;
 
 class RentNoticeController extends Controller
 {
+    // List all notices issued across the landlord's tenants.
+    public function index(Request $request)
+    {
+        $type = $request->string('type')->toString();
+        $status = $request->string('status')->toString();
+
+        $notices = RentNotice::query()
+            ->whereHas('tenant.property', fn ($q) => $q->where('user_id', auth()->id()))
+            ->with(['tenant.property', 'tenant.unit', 'createdBy'])
+            ->when($type, fn ($q) => $q->where('type', $type))
+            ->when($status, fn ($q) => $q->where('delivery_status', $status))
+            ->latest('issued_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        $counts = RentNotice::query()
+            ->whereHas('tenant.property', fn ($q) => $q->where('user_id', auth()->id()))
+            ->get()
+            ->groupBy('delivery_status')
+            ->map->count();
+
+        return view('landlord.notices.index', compact('notices', 'type', 'status', 'counts'));
+    }
+
+    // Show the form to record a new notice.
+    public function create()
+    {
+        $tenants = Tenant::whereHas('property', fn ($q) => $q->where('user_id', auth()->id()))
+            ->where('is_active', true)
+            ->with(['property', 'unit'])
+            ->orderBy('full_name')
+            ->get();
+
+        return view('landlord.notices.create', compact('tenants'));
+    }
+
     // Record a reminder or formal notice against a tenant (Feature 5, stage 4).
     public function store(StoreRentNoticeRequest $request, Tenant $tenant)
     {

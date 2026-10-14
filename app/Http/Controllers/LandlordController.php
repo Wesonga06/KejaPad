@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Payment;
 use App\Models\Property;
 use App\Models\RentRecord;
 use App\Models\Tenant;
@@ -53,6 +54,29 @@ class LandlordController extends Controller
 
         $arrearsTotal = round($arrearsTotal, 2);
 
+        $occupancyRate = $totalUnits > 0
+            ? (int) round(($occupiedUnits / $totalUnits) * 100)
+            : 0;
+
+        $collectionRate = $totalExpected > 0
+            ? (int) round(($totalCollected / $totalExpected) * 100)
+            : 0;
+
+        $recentTenants = Tenant::whereIn('property_id', $propertyIds)
+            ->where('is_active', true)
+            ->with(['property', 'unit'])
+            ->latest()
+            ->take(5)
+            ->get();
+
+        $recentPayments = Payment::whereHas('tenant', function ($q) use ($propertyIds) {
+            $q->whereIn('property_id', $propertyIds);
+        })
+            ->with(['tenant.property'])
+            ->latest()
+            ->take(5)
+            ->get();
+
         return view('landlord.dashboard', compact(
             'totalProperties',
             'totalUnits',
@@ -63,7 +87,11 @@ class LandlordController extends Controller
             'totalCollected',
             'totalOutstanding',
             'arrearsTotal',
-            'statusCounts'
+            'statusCounts',
+            'occupancyRate',
+            'collectionRate',
+            'recentTenants',
+            'recentPayments'
         ));
     }
 }

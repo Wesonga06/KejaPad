@@ -2,37 +2,6 @@
 
 @section('page-title', 'Rent Record Detail')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('landlord.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('landlord.properties.index') }}" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="{{ route('landlord.tenants.index') }}" class="nav-link">
-        <i class="bi bi-people"></i> Tenants
-    </a>
-    <a href="{{ route('landlord.rent.index') }}" class="nav-link active">
-        <i class="bi bi-cash-coin"></i> Rent
-    </a>
-    <a href="{{ route('landlord.mpesa-payments') }}" class="nav-link">
-    <i class="bi bi-phone"></i> M-Pesa Payments
-</a>
-
-    <div class="nav-section-title">Other</div>
-    <a href="{{ route('landlord.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('landlord.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('landlord.reports.index') }}" class="nav-link">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -200,7 +169,7 @@
         <div class="col-md-7">
             <div class="stat-card text-center py-5">
                 <i class="bi bi-check-circle"
-                   style="font-size:3rem; color:#198754;"></i>
+                   style="font-size:3rem; color:#168653;"></i>
                 <h5 class="mt-3 fw-bold text-success">Fully Paid</h5>
                 <p class="text-muted">
                     Payment received on

@@ -2,20 +2,6 @@
 
 @section('page-title', 'Maintenance Requests')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('caretaker.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('caretaker.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">Tasks</div>
-    <a href="{{ route('caretaker.maintenance.index') }}" class="nav-link active">
-        <i class="bi bi-tools"></i> Maintenance Requests
-    </a>
-@endsection
 
 @section('content')
     <div class="mb-4">

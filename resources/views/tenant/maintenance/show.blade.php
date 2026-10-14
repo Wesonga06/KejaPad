@@ -2,26 +2,6 @@
 
 @section('page-title', 'Request Details')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('tenant.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('tenant.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">My Account</div>
-    <a href="{{ route('tenant.payments') }}" class="nav-link">
-        <i class="bi bi-receipt"></i> Payment History
-    </a>
-    <a href="{{ route('tenant.maintenance.index') }}" class="nav-link active">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('tenant.profile') }}" class="nav-link">
-        <i class="bi bi-person-circle"></i> My Profile
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -121,7 +101,7 @@
                     @endphp
                     <div class="d-flex align-items-center gap-3 mb-2">
                         <div style="width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.75rem; flex-shrink:0;
-                            background: {{ $isActive ? '#4c1d95' : ($isPast ? '#198754' : '#dee2e6') }};
+                            background: {{ $isActive ? '#5926C8' : ($isPast ? '#168653' : '#dee2e6') }};
                             color: {{ ($isActive || $isPast) ? 'white' : '#6c757d' }};">
                             @if($isPast)
                                 <i class="bi bi-check"></i>
@@ -131,7 +111,7 @@
                                 <i class="bi bi-circle" style="font-size:0.5rem;"></i>
                             @endif
                         </div>
-                        <span style="font-size:0.85rem; {{ $isActive ? 'font-weight:600;' : '' }} color: {{ $isPast ? '#198754' : ($isActive ? '#4c1d95' : '#adb5bd') }};">
+                        <span style="font-size:0.85rem; {{ $isActive ? 'font-weight:600;' : '' }} color: {{ $isPast ? '#168653' : ($isActive ? '#5926C8' : '#adb5bd') }};">
                             {{ ucfirst(str_replace('_', ' ', $s)) }}
                         </span>
                     </div>

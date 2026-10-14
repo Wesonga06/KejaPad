@@ -2,20 +2,6 @@
 
 @section('page-title', 'Announcements')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('caretaker.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('caretaker.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">Tasks</div>
-    <a href="{{ route('caretaker.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance Requests
-    </a>
-@endsection
 
 @section('content')
     <div class="mb-4">
@@ -38,9 +24,9 @@
                 <div class="d-flex align-items-start gap-3">
                     <div style="width:44px; height:44px; border-radius:10px; flex-shrink:0;
                                 display:flex; align-items:center; justify-content:center;
-                                background:#e6f9f0;">
+                                background:rgba(22,134,83,0.12);">
                         <i class="bi {{ $ann->categoryIcon() }}"
-                           style="font-size:1.2rem; color:#198754;"></i>
+                           style="font-size:1.2rem; color:#168653;"></i>
                     </div>
                     <div class="flex-fill">
                         <div class="d-flex align-items-center gap-2 mb-1">

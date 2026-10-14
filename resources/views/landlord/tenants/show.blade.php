@@ -2,38 +2,6 @@
 
 @section('page-title', 'Tenant Account')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('landlord.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-
-    <div class="nav-section-title">Management</div>
-    <a href="{{ route('landlord.properties.index') }}" class="nav-link">
-        <i class="bi bi-buildings"></i> Properties
-    </a>
-    <a href="{{ route('landlord.tenants.index') }}" class="nav-link active">
-        <i class="bi bi-people"></i> Tenants
-    </a>
-    <a href="{{ route('landlord.rent.index') }}" class="nav-link">
-        <i class="bi bi-cash-coin"></i> Rent
-    </a>
-    <a href="{{ route('landlord.arrears.index') }}" class="nav-link">
-        <i class="bi bi-exclamation-octagon"></i> Arrears
-    </a>
-
-    <div class="nav-section-title">Other</div>
-    <a href="{{ route('landlord.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance
-    </a>
-    <a href="{{ route('landlord.announcements.index') }}" class="nav-link">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-    <a href="{{ route('landlord.reports.index') }}" class="nav-link">
-        <i class="bi bi-bar-chart"></i> Reports
-    </a>
-@endsection
-
 @section('content')
     @php
         $statusMeta = $summary['status'];
@@ -149,6 +117,80 @@
                     <span class="text-muted">Arrears recovered</span>
                     <span class="fw-semibold text-success">KES {{ number_format($indicators['arrears_recovered'], 2) }}</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Tenancy: deposit + move-out --}}
+    <div class="row g-4 mb-4">
+        <div class="col-12 col-lg-6">
+            <div class="stat-card h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-shield-check me-2" style="color:#5926C8;"></i>Security Deposit</h6>
+                    @if($deposit)
+                        <a href="{{ route('landlord.deposits.show', $deposit) }}" class="btn btn-sm btn-outline-primary">Manage</a>
+                    @else
+                        <a href="{{ route('landlord.deposits.index') }}" class="btn btn-sm btn-outline-primary">Deposits</a>
+                    @endif
+                </div>
+                @if($deposit)
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status</span>
+                        <span class="badge kp-badge {{ $deposit->statusBadgeClass() }}">{{ $deposit->statusLabel() }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Required</span>
+                        <span class="fw-semibold">KES {{ number_format((float) $deposit->required_amount, 2) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Received</span>
+                        <span class="fw-semibold text-success">KES {{ number_format((float) $deposit->received_amount, 2) }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Outstanding</span>
+                        <span class="fw-semibold {{ $deposit->outstanding() > 0 ? 'text-danger' : 'text-success' }}">
+                            KES {{ number_format($deposit->outstanding(), 2) }}
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Net refundable</span>
+                        <span class="fw-semibold">KES {{ number_format($deposit->netRefundable(), 2) }}</span>
+                    </div>
+                @else
+                    <p class="text-muted mb-0">
+                        No security deposit on record. Generate deposit records from the
+                        <a href="{{ route('landlord.deposits.index') }}">Deposits</a> page.
+                    </p>
+                @endif
+            </div>
+        </div>
+        <div class="col-12 col-lg-6">
+            <div class="stat-card h-100">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h6 class="fw-bold mb-0"><i class="bi bi-box-arrow-right me-2" style="color:#5926C8;"></i>Notice to Vacate</h6>
+                    <a href="{{ $activeMoveOut ? route('landlord.move-outs.show', $activeMoveOut) : route('landlord.move-outs.index') }}"
+                       class="btn btn-sm btn-outline-primary">{{ $activeMoveOut ? 'Review' : 'Move-outs' }}</a>
+                </div>
+                @if($activeMoveOut)
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Status</span>
+                        <span class="badge kp-badge {{ $activeMoveOut->statusBadgeClass() }}">{{ $activeMoveOut->statusLabelText() }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Submitted</span>
+                        <span class="fw-semibold">{{ $activeMoveOut->submitted_at?->format('d M Y') ?? '—' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Proposed move-out</span>
+                        <span class="fw-semibold">{{ $activeMoveOut->proposed_move_out_date?->format('d M Y') ?? '—' }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Earliest permitted</span>
+                        <span class="fw-semibold">{{ $activeMoveOut->earliest_permitted_date?->format('d M Y') ?? '—' }}</span>
+                    </div>
+                @else
+                    <p class="text-muted mb-0">No active notice to vacate for this tenant.</p>
+                @endif
             </div>
         </div>
     </div>
@@ -435,7 +477,7 @@
     <div class="row g-4">
         <div class="col-md-4">
             <div class="stat-card text-center h-100">
-                <div class="mx-auto mb-3" style="width:70px; height:70px; background:linear-gradient(135deg,#d4af37,#4c1d95); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.5rem;">
+                <div class="mx-auto mb-3" style="width:70px; height:70px; background:linear-gradient(135deg,#32145C,#5926C8); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.5rem;">
                     {{ strtoupper(substr($tenant->full_name, 0, 2)) }}
                 </div>
                 <h5 class="fw-bold mb-1">{{ $tenant->full_name }}</h5>

@@ -2,20 +2,6 @@
 
 @section('page-title', 'Task Detail')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('caretaker.dashboard') }}" class="nav-link">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('caretaker.announcements.index') }}" class="nav-link active">
-        <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">Tasks</div>
-    <a href="{{ route('caretaker.maintenance.index') }}" class="nav-link active">
-        <i class="bi bi-tools"></i> Maintenance Requests
-    </a>
-@endsection
 
 @section('content')
     <div class="d-flex align-items-center justify-content-between mb-4">
@@ -96,7 +82,7 @@
             @else
             <div class="stat-card text-center py-4">
                 <i class="bi bi-check-circle"
-                   style="font-size:2.5rem; color:#198754;"></i>
+                   style="font-size:2.5rem; color:#168653;"></i>
                 <h6 class="mt-2 fw-bold text-success">Task Completed</h6>
                 @if($maintenance->resolution_notes)
                     <p class="text-muted mb-0" style="font-size:0.85rem;">

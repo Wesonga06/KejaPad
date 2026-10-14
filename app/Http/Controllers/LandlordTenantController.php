@@ -9,26 +9,53 @@ use App\Models\Property;
 use App\Models\Tenant;
 use App\Models\Unit;
 use App\Models\User;
+use App\Services\DepositService;
 use App\Services\PaymentBehaviourService;
 use App\Services\RentAllocationService;
 use App\Services\RentStatusService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class LandlordTenantController extends Controller
 {
     // List all tenants for this landlord
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('viewAny', Tenant::class);
 
-        $tenants = Tenant::whereHas('property', function ($q) {
+        $query = Tenant::whereHas('property', function ($q) {
             $q->where('user_id', auth()->id());
-        })
+        });
+
+        if ($search = $request->string('q')->trim()->toString()) {
+            $query->where(function ($q) use ($search) {
+                $q->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($propertyId = $request->integer('property_id')) {
+            $query->where('property_id', $propertyId);
+        }
+
+        if ($status = $request->string('status')->toString()) {
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $tenants = $query
             ->with(['property', 'unit'])
             ->latest()
-            ->paginate(15);
+            ->paginate(15)
+            ->withQueryString();
 
-        return view('landlord.tenants.index', compact('tenants'));
+        $properties = Property::where('user_id', auth()->id())->orderBy('name')->get();
+
+        return view('landlord.tenants.index', compact('tenants', 'properties'));
     }
 
     // Show create form
@@ -54,7 +81,7 @@ class LandlordTenantController extends Controller
     }
 
     // Store new tenant
-    public function store(StoreTenantRequest $request)
+    public function store(StoreTenantRequest $request, DepositService $deposits)
     {
         // Make sure landlord owns this property
         $property = Property::findOrFail($request->property_id);
@@ -92,7 +119,7 @@ class LandlordTenantController extends Controller
         }
 
         // Create tenant record
-        Tenant::create([
+        $tenant = Tenant::create([
             'user_id' => $userId,
             'property_id' => $request->property_id,
             'unit_id' => $request->unit_id,
@@ -105,6 +132,19 @@ class LandlordTenantController extends Controller
             'move_in_date' => $request->move_in_date,
             'is_active' => true,
         ]);
+
+        // Create the security deposit obligation for this tenancy.
+        $deposits->ensureForTenant($tenant, (float) $unit->rent_amount);
+
+        // A tenancy is only moved in once the deposit is received and verified.
+        if (config('tenancy.require_deposit_before_move_in', true)) {
+            $unit->update(['status' => 'reserved']);
+
+            return redirect()->route('landlord.tenants.index')
+                ->with('success', $tenant->full_name.' added. The unit is reserved pending '
+                    .'verification of the KES '.number_format($deposits->requiredAmount((float) $unit->rent_amount), 2)
+                    .' security deposit before move-in.');
+        }
 
         // Mark unit as occupied
         $unit->update(['status' => 'occupied']);
@@ -183,13 +223,18 @@ class LandlordTenantController extends Controller
         $notices = $tenant->rentNotices()->latest('issued_at')->latest('id')->get();
         $payments = $tenant->payments()->latest('payment_date')->latest('id')->take(50)->get();
 
+        $deposit = $tenant->securityDeposit;
+        $activeMoveOut = $tenant->moveOutRequests()->whereNotIn('status', ['completed', 'rejected', 'cancelled'])->latest('submitted_at')->first();
+
         return view('landlord.tenants.show', compact(
             'tenant',
             'summary',
             'breakdown',
             'indicators',
             'notices',
-            'payments'
+            'payments',
+            'deposit',
+            'activeMoveOut'
         ));
     }
 

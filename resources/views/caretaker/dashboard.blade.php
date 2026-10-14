@@ -2,24 +2,10 @@
 
 @section('page-title', 'Caretaker Dashboard')
 
-@section('sidebar-links')
-    <div class="nav-section-title">Main</div>
-    <a href="{{ route('caretaker.dashboard') }}" class="nav-link active">
-        <i class="bi bi-speedometer2"></i> Dashboard
-    </a>
-    <a href="{{ route('caretaker.announcements.index') }}" class="nav-link">
-    <i class="bi bi-megaphone"></i> Announcements
-    </a>
-
-    <div class="nav-section-title">Tasks</div>
-    <a href="{{ route('caretaker.maintenance.index') }}" class="nav-link">
-        <i class="bi bi-tools"></i> Maintenance Requests
-    </a>
-@endsection
 
 @section('content')
     <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #198754, #d4af37); color: white;">
+         style="background: linear-gradient(135deg, #168653, #F4C542); color: white;">
         <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} 👋</h4>
         <p class="mb-0 opacity-75">Here are the maintenance requests for your properties.</p>
     </div>
@@ -46,8 +32,8 @@
                         <p class="stat-label">In Progress</p>
                         <h3 class="stat-value">{{ $inProgressCount }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#fff3e0;">
-                        <i class="bi bi-tools" style="color:#fd7e14;"></i>
+                    <div class="stat-icon" style="background:rgba(233,155,32,0.14);">
+                        <i class="bi bi-tools" style="color:#E99B20;"></i>
                     </div>
                 </div>
             </div>
@@ -60,8 +46,8 @@
                         <p class="stat-label">Resolved</p>
                         <h3 class="stat-value">{{ $resolvedCount }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#e6f9f0;">
-                        <i class="bi bi-check-circle" style="color:#198754;"></i>
+                    <div class="stat-icon" style="background:rgba(22,134,83,0.12);">
+                        <i class="bi bi-check-circle" style="color:#168653;"></i>
                     </div>
                 </div>
             </div>
@@ -74,8 +60,8 @@
                         <p class="stat-label">Total</p>
                         <h3 class="stat-value">{{ $totalCount }}</h3>
                     </div>
-                    <div class="stat-icon" style="background:#efe7fb;">
-                        <i class="bi bi-clipboard-check" style="color:#4c1d95;"></i>
+                    <div class="stat-icon" style="background:rgba(89,38,200,0.08);">
+                        <i class="bi bi-clipboard-check" style="color:#5926C8;"></i>
                     </div>
                 </div>
             </div>
