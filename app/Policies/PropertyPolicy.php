@@ -31,4 +31,10 @@ class PropertyPolicy
     {
         return $property->user_id === $user->id;
     }
+
+    // Detach a caretaker from this property (revoking access while keeping history).
+    public function revokeAccess(User $user, Property $property): bool
+    {
+        return $user->isLandlord() && $property->user_id === $user->id;
+    }
 }

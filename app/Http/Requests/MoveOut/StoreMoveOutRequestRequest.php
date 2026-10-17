@@ -17,6 +17,14 @@ class StoreMoveOutRequestRequest extends FormRequest
         return [
             'proposed_move_out_date' => 'required|date|after_or_equal:today',
             'reason' => 'nullable|string|max:1000',
+            'acknowledged' => ['required', 'accepted'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'acknowledged.accepted' => 'Please confirm that you have read and understood the notice.',
         ];
     }
 }

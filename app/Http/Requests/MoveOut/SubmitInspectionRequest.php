@@ -24,6 +24,8 @@ class SubmitInspectionRequest extends FormRequest
             'water_meter' => 'nullable|string|max:100',
             'cleanliness' => ['nullable', Rule::in(['clean', 'average', 'dirty'])],
             'general_notes' => 'nullable|string|max:2000',
+            'photos' => 'nullable|array|max:6',
+            'photos.*' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
             'recommendation' => ['required', Rule::in(['recommend_clearance', 'further_action'])],
             'items' => 'nullable|array',
             'items.*.condition' => ['nullable', Rule::in($conditions)],

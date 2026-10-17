@@ -7,6 +7,7 @@ use App\Models\MoveOutRequest;
 use App\Services\MoveOutService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\Feature\Concerns\CreatesMoveOutScenario;
 use Tests\TestCase;
 
@@ -42,6 +43,7 @@ class MoveOutWorkflowTest extends TestCase
             ->post(route('tenant.move-out.store'), [
                 'proposed_move_out_date' => now()->addMonthsNoOverflow(1)->toDateString(),
                 'reason' => 'Relocating',
+                'acknowledged' => '1',
             ])
             ->assertRedirect();
 
@@ -49,6 +51,22 @@ class MoveOutWorkflowTest extends TestCase
             'tenant_id' => $tenant->id,
             'status' => MoveOutRequest::STATUS_SUBMITTED,
         ]);
+
+        $this->assertNotNull(MoveOutRequest::where('tenant_id', $tenant->id)->first()->acknowledged_at);
+    }
+
+    public function test_notice_requires_acknowledgement(): void
+    {
+        [$owner, $user, $property, $unit, $tenant] = $this->scenario();
+
+        $this->actingAs($user)
+            ->post(route('tenant.move-out.store'), [
+                'proposed_move_out_date' => now()->addMonthsNoOverflow(1)->toDateString(),
+                'reason' => 'Relocating',
+            ])
+            ->assertSessionHasErrors('acknowledged');
+
+        $this->assertDatabaseCount('move_out_requests', 0);
     }
 
     public function test_tenant_cannot_submit_notice_that_breaches_notice_period(): void
@@ -58,6 +76,7 @@ class MoveOutWorkflowTest extends TestCase
         $this->actingAs($user)
             ->post(route('tenant.move-out.store'), [
                 'proposed_move_out_date' => now()->addDays(3)->toDateString(),
+                'acknowledged' => '1',
             ])
             ->assertSessionHasErrors('proposed_move_out_date');
 
@@ -75,6 +94,7 @@ class MoveOutWorkflowTest extends TestCase
         $this->actingAs($user)
             ->post(route('tenant.move-out.store'), [
                 'proposed_move_out_date' => now()->addMonthsNoOverflow(2)->toDateString(),
+                'acknowledged' => '1',
             ])
             ->assertSessionHasErrors('proposed_move_out_date');
 
@@ -159,6 +179,36 @@ class MoveOutWorkflowTest extends TestCase
 
         $this->assertSame(MoveOutInspection::STATUS_SUBMITTED, $inspection->fresh()->status);
         $this->assertSame(MoveOutRequest::STATUS_INSPECTION_COMPLETED, $moveOut->fresh()->status);
+    }
+
+    public function test_inspection_can_store_photos(): void
+    {
+        [$owner, $user, $property, $unit, $tenant] = $this->scenario();
+        $caretaker = $this->makeCaretaker();
+        $property->caretakers()->attach($caretaker->id);
+
+        $service = app(MoveOutService::class);
+        $moveOut = $service->createRequest($tenant, [
+            'proposed_move_out_date' => now()->addMonthsNoOverflow(1)->toDateString(),
+        ], $user);
+        $service->transition($moveOut, MoveOutRequest::STATUS_APPROVED, $owner);
+        $inspection = $service->assignInspection($moveOut, $caretaker, null, $owner);
+
+        $this->actingAs($caretaker)
+            ->post(route('caretaker.inspections.submit', $inspection), [
+                'recommendation' => 'recommend_clearance',
+                'keys_returned' => 1,
+                'cleanliness' => 'clean',
+                'photos' => [
+                    UploadedFile::fake()->image('room1.jpg'),
+                    UploadedFile::fake()->image('room2.jpg'),
+                ],
+            ])
+            ->assertRedirect();
+
+        $inspection->refresh();
+        $this->assertNotNull($inspection->photos);
+        $this->assertCount(2, $inspection->photos);
     }
 
     public function test_clearance_closes_tenancy_and_vacates_unit(): void

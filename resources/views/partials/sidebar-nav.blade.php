@@ -46,6 +46,10 @@
        class="nav-link {{ request()->routeIs('landlord.maintenance.*') ? 'active' : '' }}">
         <i class="bi bi-tools"></i> Maintenance
     </a>
+    <a href="{{ route('landlord.caretaker-invitations.index') }}"
+       class="nav-link {{ request()->routeIs('landlord.caretaker-invitations.*') ? 'active' : '' }}">
+        <i class="bi bi-person-plus"></i> Caretaker Invitations
+    </a>
     <a href="{{ route('landlord.announcements.index') }}"
        class="nav-link {{ request()->routeIs('landlord.announcements.*') ? 'active' : '' }}">
         <i class="bi bi-megaphone"></i> Announcements
@@ -118,5 +122,9 @@
     <a href="{{ route('super_admin.users.index') }}"
        class="nav-link {{ request()->routeIs('super_admin.users.*') ? 'active' : '' }}">
         <i class="bi bi-people"></i> Users
+    </a>
+    <a href="{{ route('super_admin.landlord-applications.index') }}"
+       class="nav-link {{ request()->routeIs('super_admin.landlord-applications.*') ? 'active' : '' }}">
+        <i class="bi bi-person-badge"></i> Landlord Applications
     </a>
 @endif

@@ -50,7 +50,10 @@ class TenantMoveOutController extends Controller
     {
         $tenant = $this->tenant();
 
-        $moveOut = $service->createRequest($tenant, $request->validated(), auth()->user());
+        $data = $request->validated();
+        $data['acknowledged_at'] = now();
+
+        $moveOut = $service->createRequest($tenant, $data, auth()->user());
 
         return redirect()->route('tenant.move-out.show', $moveOut)
             ->with('success', 'Your Notice to Vacate has been submitted.');

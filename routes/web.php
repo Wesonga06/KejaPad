@@ -7,6 +7,8 @@ use App\Http\Controllers\CaretakerInspectionController;
 use App\Http\Controllers\CaretakerMaintenanceController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LandlordAnnouncementController;
+use App\Http\Controllers\LandlordApplicationController;
+use App\Http\Controllers\LandlordCaretakerInvitationController;
 use App\Http\Controllers\LandlordController;
 use App\Http\Controllers\LandlordDepositController;
 use App\Http\Controllers\LandlordMaintenanceController;
@@ -59,10 +61,23 @@ Route::middleware(array_merge(['auth', 'role:super_admin'], $verified))->prefix(
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
     Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
     Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Landlord applications (approval workflow)
+    Route::get('/landlord-applications', [LandlordApplicationController::class, 'index'])->name('landlord-applications.index');
+    Route::get('/landlord-applications/{landlord}', [LandlordApplicationController::class, 'show'])->name('landlord-applications.show');
+    Route::post('/landlord-applications/{landlord}/approve', [LandlordApplicationController::class, 'approve'])->name('landlord-applications.approve');
+    Route::post('/landlord-applications/{landlord}/reject', [LandlordApplicationController::class, 'reject'])->name('landlord-applications.reject');
+    Route::post('/landlord-applications/{landlord}/suspend', [LandlordApplicationController::class, 'suspend'])->name('landlord-applications.suspend');
+    Route::post('/landlord-applications/{landlord}/reinstate', [LandlordApplicationController::class, 'reinstate'])->name('landlord-applications.reinstate');
+});
+
+// Landlord approval status page (reachable while awaiting review).
+Route::middleware(array_merge(['auth', 'role:landlord'], $verified))->prefix('landlord')->name('landlord.')->group(function () {
+    Route::get('/pending-approval', [LandlordController::class, 'pending'])->name('pending');
 });
 
 // Landlord Routes
-Route::middleware(array_merge(['auth', 'role:landlord'], $verified))->prefix('landlord')->name('landlord.')->group(function () {
+Route::middleware(array_merge(['auth', 'role:landlord', 'landlord.approved'], $verified))->prefix('landlord')->name('landlord.')->group(function () {
     Route::get('/dashboard', [LandlordController::class, 'dashboard'])->name('dashboard');
 
     // Reports
@@ -127,6 +142,14 @@ Route::middleware(array_merge(['auth', 'role:landlord'], $verified))->prefix('la
     Route::post('/deposits/{deposit}/deductions', [LandlordDepositController::class, 'proposeDeduction'])->name('deposits.deductions.store');
     Route::post('/deposits/{deposit}/deductions/{transaction}/approve', [LandlordDepositController::class, 'approveDeduction'])->name('deposits.deductions.approve');
     Route::post('/deposits/{deposit}/refunds', [LandlordDepositController::class, 'refund'])->name('deposits.refunds.store');
+    Route::post('/deposits/{deposit}/exception', [LandlordDepositController::class, 'exception'])->name('deposits.exception');
+
+    // Caretaker invitations & assignments
+    Route::get('/caretaker-invitations', [LandlordCaretakerInvitationController::class, 'index'])->name('caretaker-invitations.index');
+    Route::get('/caretaker-invitations/create', [LandlordCaretakerInvitationController::class, 'create'])->name('caretaker-invitations.create');
+    Route::post('/caretaker-invitations', [LandlordCaretakerInvitationController::class, 'store'])->name('caretaker-invitations.store');
+    Route::post('/caretaker-invitations/{invitation}/revoke', [LandlordCaretakerInvitationController::class, 'revoke'])->name('caretaker-invitations.revoke');
+    Route::delete('/caretakers/{caretaker}/properties/{property}', [LandlordCaretakerInvitationController::class, 'revokeCaretakerAccess'])->name('caretakers.revoke-access');
 
     // M-Pesa Payments
     Route::get('/mpesa-payments', [MpesaController::class, 'landlordPayments'])->name('mpesa-payments');

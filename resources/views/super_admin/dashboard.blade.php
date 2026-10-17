@@ -69,11 +69,35 @@
         </div>
     </div>
 
+    <!-- Landlord Applications -->
+    <div class="stat-card mb-4" style="border-left: 4px solid #E99B20;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background:rgba(233,155,32,0.14);">
+                    <i class="bi bi-person-badge" style="color:#E99B20;"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0">Landlord Applications</h6>
+                    <p class="mb-0 text-muted" style="font-size:0.85rem;">
+                        @if($pendingLandlords > 0)
+                            {{ $pendingLandlords }} application{{ $pendingLandlords === 1 ? '' : 's' }} awaiting review.
+                        @else
+                            No applications awaiting review.
+                        @endif
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('super_admin.landlord-applications.index') }}" class="btn btn-sm btn-outline-primary">
+                Review applications
+            </a>
+        </div>
+    </div>
+
     <!-- Recent Users Table -->
     <div class="stat-card">
         <div class="d-flex align-items-center justify-content-between mb-3">
             <h6 class="fw-bold mb-0">Recent Users</h6>
-            <a href="#" class="btn btn-sm btn-outline-primary">View All</a>
+            <a href="{{ route('super_admin.users.index') }}" class="btn btn-sm btn-outline-primary">View All</a>
         </div>
         <div class="table-responsive">
             <table class="table table-hover align-middle">

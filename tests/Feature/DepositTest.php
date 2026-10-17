@@ -155,4 +155,40 @@ class DepositTest extends TestCase
         $this->assertNotNull($tenant->fresh()->securityDeposit);
         $this->assertEquals(8000, (float) $tenant->fresh()->securityDeposit->required_amount);
     }
+
+    public function test_authorized_exception_permits_move_in_without_full_deposit(): void
+    {
+        $deposit = $this->ctx['deposit'];
+        $unit = $this->ctx['unit'];
+        $owner = $this->ctx['owner'];
+
+        $this->assertFalse(app(DepositService::class)->isMoveInEligible($deposit));
+
+        $this->actingAs($owner)
+            ->post(route('landlord.deposits.exception', $deposit), [
+                'exception_reason' => 'Deposit waived by written landlord agreement.',
+            ])
+            ->assertRedirect();
+
+        $deposit->refresh();
+
+        $this->assertTrue($deposit->hasException());
+        $this->assertSame($owner->id, $deposit->exception_approved_by);
+        $this->assertTrue(app(DepositService::class)->isMoveInEligible($deposit));
+        $this->assertSame('occupied', $unit->fresh()->status);
+    }
+
+    public function test_exception_requires_a_reason(): void
+    {
+        $deposit = $this->ctx['deposit'];
+        $owner = $this->ctx['owner'];
+
+        $this->actingAs($owner)
+            ->post(route('landlord.deposits.exception', $deposit), [
+                'exception_reason' => '',
+            ])
+            ->assertSessionHasErrors('exception_reason');
+
+        $this->assertFalse($deposit->fresh()->hasException());
+    }
 }

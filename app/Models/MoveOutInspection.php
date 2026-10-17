@@ -35,6 +35,7 @@ class MoveOutInspection extends Model
         'water_meter',
         'cleanliness',
         'general_notes',
+        'photos',
         'recommendation',
         'submitted_by',
     ];
@@ -43,6 +44,7 @@ class MoveOutInspection extends Model
         'scheduled_at' => 'datetime',
         'completed_at' => 'datetime',
         'keys_returned' => 'boolean',
+        'photos' => 'array',
     ];
 
     /**
@@ -145,6 +147,15 @@ class MoveOutInspection extends Model
     public function moveOutRequest()
     {
         return $this->belongsTo(MoveOutRequest::class);
+    }
+
+    // Browser-facing URLs for the stored inspection photographs.
+    public function photoUrls(): array
+    {
+        return collect($this->photos ?? [])
+            ->map(fn ($path) => asset('storage/'.ltrim($path, '/')))
+            ->values()
+            ->all();
     }
 
     public function caretaker()

@@ -66,10 +66,36 @@ class DepositService
         return $created;
     }
 
-    // A tenancy may only be moved in once the deposit is fully received and verified.
+    // A tenancy may only be moved in once the deposit is fully received and
+    // verified, unless an authorized exception has been recorded.
     public function isMoveInEligible(SecurityDeposit $deposit): bool
     {
+        if ($deposit->hasException()) {
+            return true;
+        }
+
         return $deposit->isSatisfied() && $deposit->isVerified();
+    }
+
+    // Record an authorized exception that waives the outstanding deposit
+    // requirement for move-in, together with its reason and approver.
+    public function recordException(SecurityDeposit $deposit, string $reason, User $approvedBy): SecurityDeposit
+    {
+        if (blank($reason)) {
+            abort(422, 'An authorized exception requires a reason.');
+        }
+
+        return DB::transaction(function () use ($deposit, $reason, $approvedBy) {
+            $deposit->update([
+                'exception_reason' => $reason,
+                'exception_approved_at' => now(),
+                'exception_approved_by' => $approvedBy->id,
+            ]);
+
+            $this->syncUnitOccupancy($deposit);
+
+            return $deposit->fresh();
+        });
     }
 
     // Recalculate the received amount + persisted status from the receipts ledger.

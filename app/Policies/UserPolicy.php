@@ -30,4 +30,10 @@ class UserPolicy
     {
         return $user->isSuperAdmin();
     }
+
+    // Review an application (approve / reject / suspend) for a landlord account.
+    public function review(User $user, User $model): bool
+    {
+        return $user->isSuperAdmin() && $model->isLandlord();
+    }
 }

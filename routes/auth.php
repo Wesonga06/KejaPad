@@ -17,6 +17,10 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    Route::post('register/verify-invitation-code', [RegisteredUserController::class, 'verifyInvitationCode'])
+        ->middleware('throttle:10,1')
+        ->name('register.verify-invitation-code');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 

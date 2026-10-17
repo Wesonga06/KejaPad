@@ -46,6 +46,11 @@ class CaretakerInspectionController extends Controller
 
     public function submit(SubmitInspectionRequest $request, MoveOutInspection $inspection, MoveOutService $service)
     {
+        $photos = [];
+        foreach ($request->file('photos', []) as $file) {
+            $photos[] = $file->store('inspections', 'public');
+        }
+
         $service->submitInspection($inspection, [
             'keys_returned' => $request->boolean('keys_returned'),
             'keys_notes' => $request->keys_notes,
@@ -53,6 +58,7 @@ class CaretakerInspectionController extends Controller
             'water_meter' => $request->water_meter,
             'cleanliness' => $request->cleanliness,
             'general_notes' => $request->general_notes,
+            'photos' => $photos,
             'recommendation' => $request->recommendation,
             'items' => $request->input('items', []),
         ], auth()->user());

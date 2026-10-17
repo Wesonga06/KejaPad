@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->enum('role', ['super_admin', 'landlord', 'caretaker', 'tenant'])
-                  ->default('tenant')
-                  ->after('email');
+                ->default('tenant')
+                ->after('email');
             $table->boolean('is_active')->default(true)->after('role');
         });
     }

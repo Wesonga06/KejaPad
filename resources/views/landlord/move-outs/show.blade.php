@@ -138,6 +138,19 @@
                             @if($inspection->general_notes)
                                 <div class="col-12"><span class="text-muted small">Notes:</span> {{ $inspection->general_notes }}</div>
                             @endif
+                            @if(! empty($inspection->photoUrls()))
+                                <div class="col-12">
+                                    <span class="text-muted small">Photos:</span>
+                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                        @foreach($inspection->photoUrls() as $url)
+                                            <a href="{{ $url }}" target="_blank" rel="noopener">
+                                                <img src="{{ $url }}" alt="Inspection photo" class="rounded"
+                                                     style="width:72px;height:72px;object-fit:cover;">
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     @endif
 

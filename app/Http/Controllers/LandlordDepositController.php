@@ -77,6 +77,7 @@ class LandlordDepositController extends Controller
             'tenant',
             'property',
             'unit',
+            'exceptionApprovedBy',
             'transactions.recordedBy',
             'transactions.verifiedBy',
             'transactions.approvedBy',
@@ -148,6 +149,19 @@ class LandlordDepositController extends Controller
         ], auth()->user());
 
         return back()->with('success', 'Deposit refund recorded.');
+    }
+
+    public function exception(Request $request, SecurityDeposit $deposit, DepositService $service)
+    {
+        $this->authorize('manage', $deposit);
+
+        $validated = $request->validate([
+            'exception_reason' => 'required|string|min:3|max:1000',
+        ]);
+
+        $service->recordException($deposit, $validated['exception_reason'], $request->user());
+
+        return back()->with('success', 'Authorized exception recorded. The tenancy may now be moved in.');
     }
 
     protected function ensureTransactionBelongsToDeposit(SecurityDeposit $deposit, DepositTransaction $transaction): void

@@ -11,6 +11,18 @@ use App\Services\RentStatusService;
 
 class LandlordController extends Controller
 {
+    // Status page shown to landlords who cannot yet access landlord features.
+    public function pending()
+    {
+        $user = auth()->user();
+
+        if ($user->canAccessLandlordFeatures()) {
+            return redirect()->route('landlord.dashboard');
+        }
+
+        return view('landlord.pending', ['user' => $user]);
+    }
+
     public function dashboard(RentStatusService $status)
     {
         $properties = Property::where('user_id', auth()->id())->get();

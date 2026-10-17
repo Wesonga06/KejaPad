@@ -84,6 +84,7 @@ class MoveOutService
                 'notice_period_months' => $months,
                 'earliest_permitted_date' => $earliest->toDateString(),
                 'reason' => $data['reason'] ?? null,
+                'acknowledged_at' => $data['acknowledged_at'] ?? now(),
             ]);
 
             RentAudit::record('move_out_requested', $request, [
@@ -222,6 +223,10 @@ class MoveOutService
                 'water_meter' => $data['water_meter'] ?? null,
                 'cleanliness' => $data['cleanliness'] ?? null,
                 'general_notes' => $data['general_notes'] ?? null,
+                'photos' => array_values(array_merge(
+                    $inspection->photos ?? [],
+                    $data['photos'] ?? [],
+                )),
                 'recommendation' => $data['recommendation'] ?? null,
                 'submitted_by' => $submittedBy->id,
             ]);

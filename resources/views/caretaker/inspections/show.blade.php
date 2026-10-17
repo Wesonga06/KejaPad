@@ -33,7 +33,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('caretaker.inspections.submit', $inspection) }}">
+    <form method="POST" action="{{ route('caretaker.inspections.submit', $inspection) }}" enctype="multipart/form-data">
         @csrf
         <div class="row g-4">
             <div class="col-12 col-xl-8">
@@ -122,6 +122,27 @@
                         <label class="form-label" for="general_notes">General notes</label>
                         <textarea name="general_notes" id="general_notes" rows="3" class="form-control"
                                   @disabled($inspection->isSubmitted())>{{ old('general_notes', $inspection->general_notes) }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="photos">Photos</label>
+                        @if(! $inspection->isSubmitted())
+                            <input type="file" name="photos[]" id="photos" class="form-control" accept="image/*" multiple>
+                            <div class="form-text">Up to 6 images (JPG, PNG, WEBP), 5&nbsp;MB each.</div>
+                            @error('photos')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                            @error('photos.*')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                        @endif
+                        @if(! empty($inspection->photoUrls()))
+                            <div class="d-flex flex-wrap gap-2 {{ $inspection->isSubmitted() ? '' : 'mt-2' }}">
+                                @foreach($inspection->photoUrls() as $url)
+                                    <a href="{{ $url }}" target="_blank" rel="noopener">
+                                        <img src="{{ $url }}" alt="Inspection photo" class="rounded"
+                                             style="width:72px;height:72px;object-fit:cover;">
+                                    </a>
+                                @endforeach
+                            </div>
+                        @elseif($inspection->isSubmitted())
+                            <p class="text-muted small mb-0">No photos were attached.</p>
+                        @endif
                     </div>
                     <div class="mb-3">
                         <label class="form-label" for="recommendation">Recommendation</label>

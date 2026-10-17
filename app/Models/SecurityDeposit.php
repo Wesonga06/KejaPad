@@ -32,6 +32,9 @@ class SecurityDeposit extends Model
         'verified_at',
         'verified_by',
         'note',
+        'exception_reason',
+        'exception_approved_at',
+        'exception_approved_by',
     ];
 
     protected $casts = [
@@ -39,6 +42,7 @@ class SecurityDeposit extends Model
         'received_amount' => 'decimal:2',
         'policy_months' => 'decimal:2',
         'verified_at' => 'datetime',
+        'exception_approved_at' => 'datetime',
     ];
 
     public function tenant()
@@ -95,6 +99,17 @@ class SecurityDeposit extends Model
     public function isVerified(): bool
     {
         return $this->verified_at !== null;
+    }
+
+    // An authorized, reasoned exception waives the outstanding deposit for move-in.
+    public function hasException(): bool
+    {
+        return $this->exception_approved_at !== null && filled($this->exception_reason);
+    }
+
+    public function exceptionApprovedBy()
+    {
+        return $this->belongsTo(User::class, 'exception_approved_by');
     }
 
     // Total confirmed (approved or completed) deductions.

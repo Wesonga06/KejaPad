@@ -341,6 +341,29 @@
                 @enderror
             </div>
 
+            <!-- Caretaker invitation code (only for caretaker registrations) -->
+            <div class="mb-3 d-none" id="caretakerInvitationBlock">
+                <label class="form-label" for="invitationCode">Caretaker Invitation Code</label>
+                <input type="text" name="invitation_code" id="invitationCode"
+                       class="form-control @error('invitation_code') is-invalid @enderror"
+                       value="{{ old('invitation_code', $prefillCode) }}"
+                       placeholder="Paste the code your landlord sent you"
+                       autocomplete="off">
+                @error('invitation_code')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <button type="button"
+                        class="btn btn-sm mt-2"
+                        style="border:1.5px solid var(--kp-royal); color:var(--kp-royal); border-radius:8px; font-weight:600;"
+                        onclick="verifyInvitationCode()">
+                    <i class="bi bi-patch-check me-1"></i> Verify Code
+                </button>
+                <div id="invitationResult" class="small mt-2"></div>
+                <div class="form-text" style="font-size:0.76rem;">
+                    A caretaker account can only be created with a valid invitation from an active landlord.
+                </div>
+            </div>
+
             <!-- Password -->
             <div class="mb-3">
                 <label class="form-label" for="passwordField">Password</label>
@@ -404,7 +427,68 @@
         });
         const selected = document.getElementById('label-' + role);
         if (selected) selected.classList.add('selected');
+
+        const block = document.getElementById('caretakerInvitationBlock');
+        if (block) block.classList.toggle('d-none', role !== 'caretaker');
     }
+
+    function verifyInvitationCode() {
+        const input  = document.getElementById('invitationCode');
+        const email  = document.getElementById('email');
+        const result = document.getElementById('invitationResult');
+
+        result.style.color = 'var(--kp-muted)';
+        result.textContent = 'Checking invitation…';
+
+        fetch("{{ route('register.verify-invitation-code') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+            },
+            body: JSON.stringify({
+                invitation_code: input ? input.value : '',
+                email: email ? email.value : '',
+            }),
+        })
+        .then(function (response) {
+            return response.json().then(function (body) {
+                return { ok: response.ok, body: body };
+            });
+        })
+        .then(function (res) {
+            const body = res.body || {};
+            if (res.ok && body.valid) {
+                result.style.color = 'var(--kp-success)';
+                result.textContent = 'Valid invitation'
+                    + (body.property ? ' for ' + body.property : '')
+                    + (body.landlord ? ' (landlord: ' + body.landlord + ')' : '') + '.';
+            } else {
+                result.style.color = 'var(--kp-danger)';
+                result.textContent = body.error
+                    || (body.errors && body.errors.invitation_code && body.errors.invitation_code[0])
+                    || 'This invitation code is not valid.';
+            }
+        })
+        .catch(function () {
+            result.style.color = 'var(--kp-danger)';
+            result.textContent = 'Could not verify the code. Please try again.';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let checked = document.querySelector('input[name="role"]:checked');
+        const codeField = document.getElementById('invitationCode');
+
+        if (!checked && codeField && codeField.value) {
+            const caretaker = document.querySelector('input[name="role"][value="caretaker"]');
+            if (caretaker) caretaker.checked = true;
+            checked = caretaker;
+        }
+
+        if (checked) selectRole(checked.value);
+    });
 </script>
 </body>
 </html>

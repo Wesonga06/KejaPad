@@ -37,6 +37,12 @@ class Property extends Model
         return $this->belongsToMany(User::class, 'caretaker_property');
     }
 
+    // Invitations issued for caretakers of this property.
+    public function caretakerInvitations()
+    {
+        return $this->hasMany(CaretakerInvitation::class);
+    }
+
     // Count vacant units
     public function vacantUnits()
     {

@@ -57,7 +57,9 @@
         /* ============ Sidebar ============ */
         .sidebar {
             width: var(--kp-sidebar-w);
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
             background: var(--kp-deep);
             position: fixed;
             top: 0;
@@ -71,6 +73,7 @@
 
         .sidebar-brand {
             padding: 22px 20px;
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -99,7 +102,9 @@
         .sidebar-nav {
             padding: 14px 12px 24px;
             flex: 1 1 auto;
+            min-height: 0;
             overflow-y: auto;
+            overscroll-behavior: contain;
         }
 
         .nav-section-title {
@@ -144,6 +149,7 @@
         .sidebar-user {
             border-top: 1px solid rgba(255,255,255,0.08);
             padding: 14px 16px;
+            flex: 0 0 auto;
             display: flex;
             align-items: center;
             gap: 10px;

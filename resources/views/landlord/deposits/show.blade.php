@@ -134,6 +134,35 @@
             @endif
 
             <div class="kp-card mb-4">
+                <div class="kp-card-header"><h2 class="kp-card-title">Authorized exception</h2></div>
+                @if($deposit->hasException())
+                    <div class="alert alert-warning mb-2" style="font-size:0.85rem;">
+                        <i class="bi bi-shield-exclamation me-1"></i> Move-in is permitted without the full deposit under an authorized exception.
+                    </div>
+                    <p class="mb-1" style="font-size:0.88rem;">
+                        <span class="text-muted small">Reason:</span> {{ $deposit->exception_reason }}
+                    </p>
+                    <p class="mb-0" style="font-size:0.85rem;">
+                        <span class="text-muted small">Authorized by:</span> {{ $deposit->exceptionApprovedBy->name ?? '—' }}
+                        on {{ optional($deposit->exception_approved_at)->format('d M Y H:i') }}
+                    </p>
+                @else
+                    <p class="text-muted" style="font-size:0.85rem;">
+                        If the deposit cannot be collected, record an authorized exception with a reason to allow move-in.
+                    </p>
+                    <form method="POST" action="{{ route('landlord.deposits.exception', $deposit) }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="form-label" for="exception_reason">Reason <span class="text-danger">*</span></label>
+                            <textarea name="exception_reason" id="exception_reason" rows="3" class="form-control" required>{{ old('exception_reason') }}</textarea>
+                            @error('exception_reason')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+                        </div>
+                        <button class="btn btn-outline-warning w-100">Record Exception</button>
+                    </form>
+                @endif
+            </div>
+
+            <div class="kp-card mb-4">
                 <div class="kp-card-header"><h2 class="kp-card-title">Record deposit received</h2></div>
                 <form method="POST" action="{{ route('landlord.deposits.receipts.store', $deposit) }}">
                     @csrf

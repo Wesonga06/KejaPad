@@ -35,6 +35,7 @@ class MoveOutRequest extends Model
         'unit_id',
         'status',
         'submitted_at',
+        'acknowledged_at',
         'proposed_move_out_date',
         'notice_period_months',
         'earliest_permitted_date',
@@ -52,6 +53,7 @@ class MoveOutRequest extends Model
 
     protected $casts = [
         'submitted_at' => 'datetime',
+        'acknowledged_at' => 'datetime',
         'proposed_move_out_date' => 'date',
         'earliest_permitted_date' => 'date',
         'notice_period_months' => 'decimal:2',
