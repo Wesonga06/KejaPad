@@ -24,6 +24,7 @@ class StoreTenantRequest extends FormRequest
             'property_id' => 'required|exists:properties,id',
             'unit_id' => 'required|exists:units,id',
             'move_in_date' => 'required|date',
+            'lease_end_date' => 'nullable|date|after:move_in_date',
         ];
     }
 }

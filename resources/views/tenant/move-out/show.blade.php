@@ -16,6 +16,11 @@
             </p>
         </div>
         <div class="kp-page-actions">
+            @if($moveOut->settlement && $moveOut->settlement->isVisibleToTenant())
+                <a href="{{ route('tenant.settlement.show', $moveOut->settlement) }}" class="btn btn-outline-primary">
+                    <i class="bi bi-file-earmark-text me-2"></i> Deposit Settlement
+                </a>
+            @endif
             <a href="{{ route('tenant.move-out.index') }}" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-2"></i> Back
             </a>

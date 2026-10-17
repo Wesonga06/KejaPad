@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Rent;
 
+use App\Rules\PaymentMethodEnabled;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,7 +19,7 @@ class RecordTenantPaymentRequest extends FormRequest
             'amount_paid' => 'required|numeric|min:0.01',
             'payment_date' => 'required|date',
             'reference' => 'nullable|string|max:50',
-            'method' => ['nullable', Rule::in(['mpesa', 'cash', 'bank_transfer', 'cheque', 'other'])],
+            'method' => ['nullable', Rule::in(['mpesa', 'cash', 'bank_transfer', 'cheque', 'other']), new PaymentMethodEnabled],
             'policy' => ['nullable', Rule::in(['oldest', 'current', 'manual'])],
             'rent_record_id' => 'nullable|integer|exists:rent_records,id',
             'notes' => 'nullable|string|max:500',

@@ -8,6 +8,7 @@
         $tenant = $request->tenant;
         $checklist = \App\Models\MoveOutInspection::checklist();
         $conditions = \App\Models\MoveOutInspection::conditions();
+        $natures = \App\Models\MoveOutInspectionItem::natures();
     @endphp
 
     <div class="kp-page-header">
@@ -46,7 +47,7 @@
                             <div class="table-responsive">
                                 <table class="table align-middle mb-0">
                                     <thead>
-                                        <tr><th style="width:35%;">Item</th><th style="width:30%;">Condition</th><th>Notes</th></tr>
+                                        <tr><th style="width:28%;">Item</th><th style="width:22%;">Condition</th><th style="width:28%;">Classification</th><th>Notes</th></tr>
                                     </thead>
                                     <tbody>
                                         @foreach($inspection->items->where('category', $category) as $item)
@@ -60,6 +61,18 @@
                                                             <option value="">Select...</option>
                                                             @foreach($conditions as $value => $label)
                                                                 <option value="{{ $value }}" @selected($item->condition === $value)>{{ $label }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($inspection->isSubmitted())
+                                                        {{ $item->natureLabel() }}
+                                                    @else
+                                                        <select name="items[{{ $item->id }}][nature]" class="form-select form-select-sm">
+                                                            <option value="">Not classified</option>
+                                                            @foreach($natures as $value => $label)
+                                                                <option value="{{ $value }}" @selected($item->nature === $value)>{{ $label }}</option>
                                                             @endforeach
                                                         </select>
                                                     @endif

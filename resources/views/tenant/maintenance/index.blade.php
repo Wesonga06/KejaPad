@@ -36,6 +36,7 @@
                             <th>Category</th>
                             <th>Priority</th>
                             <th>Status</th>
+                            <th>Due</th>
                             <th>Submitted</th>
                             <th>Action</th>
                         </tr>
@@ -60,6 +61,22 @@
                                 <span class="badge bg-{{ $req->statusColor() }}">
                                     {{ ucfirst(str_replace('_', ' ', $req->status)) }}
                                 </span>
+                                @if($req->isVerified())
+                                    <span class="kp-badge kp-badge-success">Verified</span>
+                                @elseif($req->isAwaitingVerification())
+                                    <span class="kp-badge kp-badge-warning">Awaiting confirmation</span>
+                                @elseif($req->isOverdue())
+                                    <span class="kp-badge kp-badge-danger">Overdue</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($req->due_date)
+                                    <span class="{{ $req->isOverdue() ? 'text-danger fw-semibold' : '' }}">
+                                        {{ $req->due_date->format('d M Y') }}
+                                    </span>
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
                             </td>
                             <td>{{ $req->created_at->format('d M Y') }}</td>
                             <td>

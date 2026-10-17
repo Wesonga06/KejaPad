@@ -13,6 +13,7 @@ class RentReminderService
 {
     public function __construct(
         protected RentStatusService $status,
+        protected SmsService $sms,
     ) {}
 
     /**
@@ -112,6 +113,21 @@ class RentReminderService
         if (config('rent.notify_landlord', true) && $tenant->property?->landlord) {
             $tenant->property->landlord->notify(new ArrearsEscalationNotification($tenant, $summary, $notice));
         }
+
+        // Optional SMS channel (skipped automatically when no provider is set).
+        $this->sms->sendTemplate(
+            $type === 'escalation' ? 'arrears_notice' : 'rent_reminder',
+            (string) $tenant->phone,
+            [
+                'name' => $tenant->full_name,
+                'amount' => number_format((float) $summary['arrears'], 2),
+                'due_date' => $summary['oldest_overdue']
+                    ? $summary['oldest_overdue']->format('d M Y')
+                    : $date->format('d M Y'),
+                'days' => (string) ($summary['max_overdue_days'] ?? 0),
+            ],
+            ['related' => $notice, 'sent_by' => $userId],
+        );
 
         return $notice;
     }

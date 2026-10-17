@@ -46,6 +46,24 @@ class MaintenanceRequestPolicy
         return $request->property->user_id === $user->id;
     }
 
+    // Only the landlord who owns the property may verify or reject a completion.
+    public function verify(User $user, MaintenanceRequest $request): bool
+    {
+        return $request->property->user_id === $user->id;
+    }
+
+    public function returnTask(User $user, MaintenanceRequest $request): bool
+    {
+        return $request->property->user_id === $user->id;
+    }
+
+    // Any authorised viewer (owner, assigned caretaker, property caretaker,
+    // or the reporting tenant) may stream the task's supporting files.
+    public function viewEvidence(User $user, MaintenanceRequest $request): bool
+    {
+        return $this->view($user, $request);
+    }
+
     public function delete(User $user, MaintenanceRequest $request): bool
     {
         return $request->property->user_id === $user->id;

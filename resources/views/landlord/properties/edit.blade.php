@@ -95,4 +95,16 @@
             </button>
         </form>
     </div>
+
+    <div class="stat-card mt-4" style="max-width:650px;">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h6 class="fw-bold mb-1"><i class="bi bi-bell me-2"></i>Early-Warning Settings</h5>
+                <p class="text-muted mb-0" style="font-size:0.85rem;">Customise warning thresholds for this property. Leave blank to use platform defaults.</p>
+            </div>
+            <a href="{{ route('landlord.properties.alerts.settings', $property) }}" class="btn btn-outline-primary">
+                Configure
+            </a>
+        </div>
+    </div>
 @endsection

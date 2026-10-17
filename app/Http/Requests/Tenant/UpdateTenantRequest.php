@@ -22,6 +22,7 @@ class UpdateTenantRequest extends FormRequest
             'emergency_contact_phone' => 'nullable|string|max:20',
             'move_in_date' => 'required|date',
             'move_out_date' => 'nullable|date|after:move_in_date',
+            'lease_end_date' => 'nullable|date|after:move_in_date',
         ];
     }
 }

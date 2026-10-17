@@ -22,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'role',
         'is_active',
@@ -90,6 +91,32 @@ class User extends Authenticatable implements MustVerifyEmail
         };
     }
 
+    public function statusBadgeClass(): string
+    {
+        return match ($this->status) {
+            self::STATUS_APPROVED => 'kp-badge-success',
+            self::STATUS_SUSPENDED => 'kp-badge-danger',
+            self::STATUS_REJECTED => 'kp-badge-muted',
+            default => 'kp-badge-warning',
+        };
+    }
+
+    // Bootstrap badge for the account (active / inactive) flag.
+    public function activeBadgeClass(): string
+    {
+        return $this->is_active ? 'kp-badge-success' : 'kp-badge-muted';
+    }
+
+    public function activeLabel(): string
+    {
+        return $this->is_active ? 'Active' : 'Inactive';
+    }
+
+    public function hasPhone(): bool
+    {
+        return filled($this->phone);
+    }
+
     public function landlordApprovalActions()
     {
         return $this->hasMany(LandlordApprovalAction::class, 'user_id')->latest();
@@ -133,9 +160,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsToMany(Property::class, 'caretaker_property');
     }
 
+    // Maintenance tasks assigned to this user (caretaker work history). The
+    // link is retained even after the caretaker leaves a property.
+    public function maintenanceTasks()
+    {
+        return $this->hasMany(MaintenanceRequest::class, 'assigned_to');
+    }
+
     // Invitations this landlord has issued to prospective caretakers.
     public function caretakerInvitations()
     {
         return $this->hasMany(CaretakerInvitation::class, 'landlord_id');
+    }
+
+    // Administrative audit trail entries for this account.
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class)->latest();
     }
 }

@@ -128,10 +128,30 @@ class SecurityDeposit extends Model
             ->sum('amount');
     }
 
+    // Refunds that have been proposed or approved but not yet paid out.
+    public function pendingRefunds(): float
+    {
+        return (float) $this->refunds()
+            ->whereIn('status', [DepositTransaction::STATUS_PROPOSED, DepositTransaction::STATUS_APPROVED])
+            ->sum('amount');
+    }
+
     // Net refundable after approved deductions.
     public function netRefundable(): float
     {
         return max(0.0, (float) $this->received_amount - $this->approvedDeductions() - $this->completedRefunds());
+    }
+
+    // Amount that may still be refunded, taking pending (unpaid) refunds into
+    // account so the same balance cannot be proposed twice.
+    public function availableForRefund(): float
+    {
+        return max(0.0, $this->netRefundable() - $this->pendingRefunds());
+    }
+
+    public function settlement()
+    {
+        return $this->hasOne(DepositSettlement::class);
     }
 
     public function derivedStatus(): string

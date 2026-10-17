@@ -112,6 +112,19 @@ class MoveOutInspection extends Model
         return self::conditions()[$condition] ?? '—';
     }
 
+    /**
+     * @return array<string, string>
+     */
+    public static function natures(): array
+    {
+        return MoveOutInspectionItem::natures();
+    }
+
+    public function natureLabel(?string $nature): string
+    {
+        return self::natures()[$nature] ?? '—';
+    }
+
     public function statusLabel(): string
     {
         return match ($this->status) {

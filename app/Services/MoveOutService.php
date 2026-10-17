@@ -18,6 +18,12 @@ use Illuminate\Validation\ValidationException;
 
 class MoveOutService
 {
+    public function __construct(
+        protected SmsService $sms,
+        protected AuditService $audit,
+        protected TurnoverService $turnovers,
+    ) {}
+
     // Earliest date a tenant may move out given the submission date and notice period
     // (calendar months, not a fixed 30-day month).
     public function earliestPermittedDate(CarbonInterface $submittedAt, float $months): Carbon
@@ -92,8 +98,17 @@ class MoveOutService
                 'notice_period_months' => $months,
             ], [], $submittedBy->id);
 
+            // A move-out notice opens the coordinated turnover workspace. The
+            // unit is never vacated or the tenant deactivated at this point.
+            $this->turnovers->open($request, $submittedBy);
+
             $landlord = $request->property?->landlord;
             $landlord?->notify(new MoveOutRequestSubmittedNotification($request));
+
+            $this->sms->sendTemplate('move_out_update', (string) $tenant->phone, [
+                'name' => $tenant->full_name,
+                'status' => MoveOutRequest::statusLabel(MoveOutRequest::STATUS_SUBMITTED),
+            ], ['related' => $request]);
 
             return $request;
         });
@@ -153,9 +168,18 @@ class MoveOutService
                 'to' => $status,
             ], [], $actor->id);
 
+            // Keep the turnover workspace consistent with the move-out outcome
+            // (including cancellations and rejections).
+            $this->turnovers->syncForMoveOut($request->fresh(), $actor);
+
             if ($request->tenant?->user) {
                 $request->tenant->user->notify(new MoveOutStatusChangedNotification($request->fresh(), $old));
             }
+
+            $this->sms->sendTemplate('move_out_update', (string) $request->tenant?->phone, [
+                'name' => $request->tenant?->full_name,
+                'status' => MoveOutRequest::statusLabel($status),
+            ], ['related' => $request->fresh()]);
 
             return $request->fresh();
         });
@@ -236,6 +260,7 @@ class MoveOutService
                 if ($item) {
                     $item->update([
                         'condition' => $values['condition'] ?? null,
+                        'nature' => $values['nature'] ?? null,
                         'comment' => $values['comment'] ?? null,
                     ]);
                 }
@@ -245,6 +270,8 @@ class MoveOutService
             if ($request->canTransitionTo(MoveOutRequest::STATUS_INSPECTION_COMPLETED)) {
                 $request->update(['status' => MoveOutRequest::STATUS_INSPECTION_COMPLETED]);
             }
+
+            $this->turnovers->syncForMoveOut($request->fresh(), $submittedBy);
 
             $landlord = $request->property?->landlord;
             $landlord?->notify(new InspectionCompletedNotification($inspection->fresh(['items'])));
@@ -272,6 +299,17 @@ class MoveOutService
             ]);
         }
 
+        // When a deposit settlement has been started for this move-out, it must
+        // be settled before the tenancy is closed. Existing move-outs without a
+        // settlement keep their original clearance flow.
+        $settlement = $request->settlement()->first();
+
+        if ($settlement && ! $settlement->isSettled()) {
+            throw ValidationException::withMessages([
+                'clearance_decision' => 'The deposit settlement must be settled before the tenancy can be cleared.',
+            ]);
+        }
+
         if ($request->status !== MoveOutRequest::STATUS_AWAITING_CLEARANCE
             && $request->canTransitionTo(MoveOutRequest::STATUS_AWAITING_CLEARANCE)) {
             $request->update(['status' => MoveOutRequest::STATUS_AWAITING_CLEARANCE]);
@@ -294,6 +332,16 @@ class MoveOutService
         ]);
 
         $request->unit?->update(['status' => 'vacant']);
+
+        if ($request->unit) {
+            $this->audit->record(
+                'unit_status_changed',
+                'Unit '.$request->unit->unit_number.' status changed to Vacant on move-out clearance.',
+                [],
+                ['status' => 'vacant'],
+                $request->unit
+            );
+        }
 
         if ($request->tenant?->user_id) {
             $request->tenant->user->update(['is_active' => false]);

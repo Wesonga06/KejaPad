@@ -36,6 +36,10 @@ class DepositTransaction extends Model
         'status',
         'reason',
         'evidence',
+        'tenant_comment',
+        'disputed',
+        'responded_at',
+        'requires_authorisation',
         'move_out_request_id',
         'recorded_by',
         'verified_at',
@@ -47,6 +51,9 @@ class DepositTransaction extends Model
 
     protected $casts = [
         'amount' => 'decimal:2',
+        'disputed' => 'boolean',
+        'requires_authorisation' => 'boolean',
+        'responded_at' => 'datetime',
         'verified_at' => 'datetime',
         'approved_at' => 'datetime',
         'completed_at' => 'datetime',
@@ -85,6 +92,18 @@ class DepositTransaction extends Model
             self::TYPE_REFUND => 'Refund',
             default => ucfirst($this->type),
         };
+    }
+
+    public function isDisputed(): bool
+    {
+        return (bool) $this->disputed;
+    }
+
+    // A refund that has been proposed or approved but not yet paid.
+    public function isPendingRefund(): bool
+    {
+        return $this->type === self::TYPE_REFUND
+            && in_array($this->status, [self::STATUS_PROPOSED, self::STATUS_APPROVED], true);
     }
 
     public function statusLabel(): string

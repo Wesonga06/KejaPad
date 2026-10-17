@@ -216,4 +216,16 @@ class MoveOutRequest extends Model
     {
         return $this->hasMany(DepositTransaction::class);
     }
+
+    // The deposit settlement statement assembled for this move-out.
+    public function settlement()
+    {
+        return $this->hasOne(DepositSettlement::class);
+    }
+
+    // The coordinated turnover workspace opened for this move-out.
+    public function turnover()
+    {
+        return $this->hasOne(Turnover::class);
+    }
 }

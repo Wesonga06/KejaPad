@@ -92,6 +92,15 @@
                 </div>
             </div>
 
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Lease End Date <span class="text-muted fw-normal">(optional)</span></label>
+                <input type="date" name="lease_end_date"
+                       class="form-control @error('lease_end_date') is-invalid @enderror"
+                       value="{{ old('lease_end_date', $tenant->lease_end_date?->format('Y-m-d')) }}">
+                @error('lease_end_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                <div class="form-text">Only used to warn you before the tenancy term ends.</div>
+            </div>
+
             <!-- Current Unit Info (read-only) -->
             <div class="alert alert-light border mt-2">
                 <small class="text-muted">

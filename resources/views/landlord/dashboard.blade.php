@@ -255,6 +255,168 @@
         </div>
     </div>
 
+    <!-- Turnovers -->
+    <div class="kp-card mb-4">
+        <div class="kp-card-header">
+            <div>
+                <h2 class="kp-card-title">Turnovers &amp; Vacancy Recovery</h2>
+                <p class="kp-card-subtitle">Units moving between tenancies</p>
+            </div>
+            <a href="{{ route('landlord.turnovers.index') }}" class="btn btn-sm btn-outline-primary">
+                Open Turnovers
+            </a>
+        </div>
+        <div class="row g-3 text-center mb-3">
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(89,38,200,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-royal);">{{ $turnoverSummary['in_progress'] }}</div>
+                    <small class="text-muted">In progress</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(220,69,69,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-danger);">{{ $turnoverSummary['tasks_overdue'] }}</div>
+                    <small class="text-muted">Overdue tasks</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(233,155,32,0.08);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:#b7791f;">{{ $turnoverSummary['awaiting_verification'] ?? $turnoverSummary['repairs_awaiting_verification'] }}</div>
+                    <small class="text-muted">Awaiting verification</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(22,134,83,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-success);">{{ $turnoverSummary['ready'] }}</div>
+                    <small class="text-muted">Ready for letting</small>
+                </div>
+            </div>
+        </div>
+
+        @if($activeTurnovers->isEmpty())
+            <div class="text-center text-muted py-3" style="font-size:0.85rem;">No turnovers in progress.</div>
+        @else
+            @foreach($activeTurnovers as $turnover)
+                <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--kp-border);">
+                    <div class="kp-kpi-icon purple" style="width:38px;height:38px;font-size:1rem;"><i class="bi bi-arrow-repeat"></i></div>
+                    <div class="flex-1" style="flex:1;">
+                        <div class="fw-semibold" style="font-size:0.88rem;">
+                            {{ $turnover->property->name ?? '—' }} &bull; {{ $turnover->unit->unit_number ?? '—' }}
+                        </div>
+                        <div class="text-muted" style="font-size:0.78rem;">
+                            Outgoing: {{ $turnover->outgoingTenant->full_name ?? '—' }}
+                        </div>
+                    </div>
+                    <span class="kp-badge {{ $turnover->statusBadgeClass() }}">{{ $turnover->statusLabel() }}</span>
+                    <a href="{{ route('landlord.turnovers.show', $turnover) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </div>
+            @endforeach
+        @endif
+    </div>
+
+    <!-- Early Warnings -->
+    <div class="kp-card mb-4">
+        <div class="kp-card-header">
+            <div>
+                <h2 class="kp-card-title">Early Warnings</h2>
+                <p class="kp-card-subtitle">Conditions that may need your attention</p>
+            </div>
+            <a href="{{ route('landlord.alerts.index') }}" class="btn btn-sm btn-outline-primary">
+                View All
+            </a>
+        </div>
+        <div class="row g-3 text-center mb-3">
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(89,38,200,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-royal);">{{ $alertSummary['open'] }}</div>
+                    <small class="text-muted">Open warnings</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(220,69,69,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-danger);">{{ $alertSummary['critical'] }}</div>
+                    <small class="text-muted">Critical</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-3 rounded-3" style="background: rgba(233,155,32,0.08);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:#b7791f;">{{ $alertSummary['warning'] }}</div>
+                    <small class="text-muted">Need attention</small>
+                </div>
+            </div>
+        </div>
+
+        @if($recentAlerts->isEmpty())
+            <div class="text-center text-muted py-3" style="font-size:0.85rem;">No warnings right now — everything looks on track.</div>
+        @else
+            @foreach($recentAlerts as $alert)
+                <div class="d-flex align-items-center gap-3 py-2" style="border-bottom:1px solid var(--kp-border);">
+                    <span class="kp-badge {{ $alert->severityBadgeClass() }}">{{ $alert->severityLabel() }}</span>
+                    <div style="flex:1;">
+                        <div class="fw-semibold" style="font-size:0.88rem;">{{ $alert->title }}</div>
+                        <div class="text-muted" style="font-size:0.78rem;">
+                            {{ $alert->property->name ?? '—' }}@if($alert->unit) &bull; Unit {{ $alert->unit->unit_number }}@endif
+                        </div>
+                    </div>
+                    <a href="{{ route('landlord.alerts.show', $alert) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </div>
+            @endforeach
+        @endif
+    </div>
+
+    <!-- Caretaker Accountability -->
+    <div class="kp-card mb-4">
+        <div class="kp-card-header">
+            <div>
+                <h2 class="kp-card-title">Caretaker Accountability</h2>
+                <p class="kp-card-subtitle">Work quality and task follow-through</p>
+            </div>
+            <a href="{{ route('landlord.caretakers.index') }}" class="btn btn-sm btn-outline-primary">
+                View Caretakers
+            </a>
+        </div>
+        <div class="row g-3 text-center mb-3">
+            <div class="col-6 col-md-3 col-xl">
+                <div class="p-3 rounded-3" style="background: rgba(220,69,69,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-danger);">{{ $accountability['overdue'] }}</div>
+                    <small class="text-muted">Overdue tasks</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 col-xl">
+                <div class="p-3 rounded-3" style="background: rgba(220,69,69,0.12);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-danger);">{{ $accountability['escalated'] }}</div>
+                    <small class="text-muted">Escalated</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 col-xl">
+                <div class="p-3 rounded-3" style="background: rgba(233,155,32,0.08);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:#b7791f;">{{ $accountability['awaiting_verification'] }}</div>
+                    <small class="text-muted">Awaiting verification</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 col-xl">
+                <div class="p-3 rounded-3" style="background: rgba(89,38,200,0.06);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:var(--kp-royal);">{{ $accountability['unassigned'] }}</div>
+                    <small class="text-muted">Unassigned</small>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 col-xl">
+                <div class="p-3 rounded-3" style="background: rgba(244,197,66,0.14);">
+                    <div class="fw-bold" style="font-size:1.6rem; color:#8a6a00;">{{ $accountability['returned_for_rework'] }}</div>
+                    <small class="text-muted">Returned for rework</small>
+                </div>
+            </div>
+        </div>
+        <p class="mb-0" style="font-size:0.85rem; color:var(--kp-muted);">
+            These are neutral, evidence-based operational signals. They are never
+            used to automatically rank, penalise, suspend or dismiss a caretaker.
+        </p>
+    </div>
+
     <!-- Quick Actions -->
     <div class="kp-card">
         <div class="kp-card-header">

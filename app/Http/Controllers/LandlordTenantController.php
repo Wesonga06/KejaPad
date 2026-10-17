@@ -13,6 +13,7 @@ use App\Services\DepositService;
 use App\Services\PaymentBehaviourService;
 use App\Services\RentAllocationService;
 use App\Services\RentStatusService;
+use App\Services\TurnoverService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -81,7 +82,7 @@ class LandlordTenantController extends Controller
     }
 
     // Store new tenant
-    public function store(StoreTenantRequest $request, DepositService $deposits)
+    public function store(StoreTenantRequest $request, DepositService $deposits, TurnoverService $turnovers)
     {
         // Make sure landlord owns this property
         $property = Property::findOrFail($request->property_id);
@@ -130,6 +131,7 @@ class LandlordTenantController extends Controller
             'emergency_contact_name' => $request->emergency_contact_name,
             'emergency_contact_phone' => $request->emergency_contact_phone,
             'move_in_date' => $request->move_in_date,
+            'lease_end_date' => $request->lease_end_date,
             'is_active' => true,
         ]);
 
@@ -140,6 +142,9 @@ class LandlordTenantController extends Controller
         if (config('tenancy.require_deposit_before_move_in', true)) {
             $unit->update(['status' => 'reserved']);
 
+            // Link this incoming tenancy to any ready turnover for the unit.
+            $turnovers->linkIncomingTenant($unit->fresh(), $tenant, auth()->user());
+
             return redirect()->route('landlord.tenants.index')
                 ->with('success', $tenant->full_name.' added. The unit is reserved pending '
                     .'verification of the KES '.number_format($deposits->requiredAmount((float) $unit->rent_amount), 2)
@@ -148,6 +153,10 @@ class LandlordTenantController extends Controller
 
         // Mark unit as occupied
         $unit->update(['status' => 'occupied']);
+
+        // Link this incoming tenancy to any ready turnover for the unit; the
+        // unit is already occupied so the turnover completes immediately.
+        $turnovers->linkIncomingTenant($unit->fresh(), $tenant, auth()->user());
 
         return redirect()->route('landlord.tenants.index')
             ->with('success', 'Tenant added successfully.');
@@ -183,6 +192,7 @@ class LandlordTenantController extends Controller
             'emergency_contact_phone' => $request->emergency_contact_phone,
             'move_in_date' => $request->move_in_date,
             'move_out_date' => $request->move_out_date,
+            'lease_end_date' => $request->lease_end_date,
         ]);
 
         return redirect()->route('landlord.tenants.index')

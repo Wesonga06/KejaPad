@@ -33,6 +33,13 @@
             </div>
 
             <div class="mb-3">
+                <label class="form-label fw-500">Phone Number</label>
+                <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                       value="{{ old('phone') }}" placeholder="e.g. 0712 345 678">
+                @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label fw-500">Role</label>
                 <select name="role" class="form-select @error('role') is-invalid @enderror">
                     <option value="">-- Select Role --</option>

@@ -12,6 +12,8 @@ use Illuminate\Validation\ValidationException;
 
 class LandlordApprovalService
 {
+    public function __construct(protected SmsService $sms) {}
+
     // Record the initial submission when a landlord registers.
     public function recordSubmission(User $landlord): LandlordApprovalAction
     {
@@ -40,6 +42,10 @@ class LandlordApprovalService
 
             $landlord->notify(new LandlordApprovedNotification($landlord));
 
+            $this->sms->sendTemplate('landlord_approved', (string) $landlord->phone, [
+                'name' => $landlord->name,
+            ], ['related' => $landlord]);
+
             return $landlord->fresh();
         });
     }
@@ -60,6 +66,11 @@ class LandlordApprovalService
             $this->log($landlord, LandlordApprovalAction::ACTION_REJECTED, $reason, $admin);
 
             $landlord->notify(new LandlordRejectedNotification($landlord, $reason));
+
+            $this->sms->sendTemplate('landlord_rejected', (string) $landlord->phone, [
+                'name' => $landlord->name,
+                'reason' => $reason,
+            ], ['related' => $landlord]);
 
             return $landlord->fresh();
         });
@@ -101,6 +112,10 @@ class LandlordApprovalService
             $this->log($landlord, LandlordApprovalAction::ACTION_REINSTATED, null, $admin);
 
             $landlord->notify(new LandlordApprovedNotification($landlord));
+
+            $this->sms->sendTemplate('landlord_approved', (string) $landlord->phone, [
+                'name' => $landlord->name,
+            ], ['related' => $landlord]);
 
             return $landlord->fresh();
         });

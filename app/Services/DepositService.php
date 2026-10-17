@@ -188,6 +188,10 @@ class DepositService
 
         if ($unit && $unit->status === 'reserved' && $this->isMoveInEligible($deposit)) {
             $unit->update(['status' => 'occupied']);
+
+            // The incoming tenancy has now moved in; complete any turnover that
+            // was awaiting this unit.
+            app(TurnoverService::class)->completeIncomingTenancy($unit->fresh());
         }
     }
 
@@ -235,11 +239,13 @@ class DepositService
     // Record an actual deposit refund payout to the tenant.
     public function recordRefund(SecurityDeposit $deposit, array $data, User $recordedBy): DepositTransaction
     {
-        $available = $deposit->netRefundable();
+        $available = $deposit->availableForRefund();
 
         if ((float) $data['amount'] > $available) {
-            abort(422, 'Refund exceeds the net refundable balance.');
+            abort(422, 'Refund exceeds the available refundable balance.');
         }
+
+        $this->assertReferenceNotAlreadyRefunded($deposit, $data['reference'] ?? null);
 
         return DB::transaction(function () use ($deposit, $data, $recordedBy) {
             $transaction = $deposit->transactions()->create([
@@ -265,5 +271,100 @@ class DepositService
 
             return $transaction;
         });
+    }
+
+    // A refund that has been proposed but not yet approved or paid. Proposing
+    // reserves the balance so the same funds cannot be promised twice.
+    public function proposeRefund(SecurityDeposit $deposit, array $data, User $recordedBy): DepositTransaction
+    {
+        if ((float) $data['amount'] > $deposit->availableForRefund()) {
+            abort(422, 'Refund exceeds the available refundable balance.');
+        }
+
+        return DB::transaction(function () use ($deposit, $data, $recordedBy) {
+            return $deposit->transactions()->create([
+                'type' => DepositTransaction::TYPE_REFUND,
+                'amount' => round((float) $data['amount'], 2),
+                'status' => DepositTransaction::STATUS_PROPOSED,
+                'reason' => $data['reason'] ?? null,
+                'move_out_request_id' => $data['move_out_request_id'] ?? null,
+                'recorded_by' => $recordedBy->id,
+            ]);
+        });
+    }
+
+    public function approveRefund(DepositTransaction $transaction, User $approvedBy): DepositTransaction
+    {
+        if ($transaction->type !== DepositTransaction::TYPE_REFUND) {
+            abort(422, 'Only refunds can be approved.');
+        }
+
+        if ($transaction->status !== DepositTransaction::STATUS_PROPOSED) {
+            abort(422, 'Only a proposed refund can be approved.');
+        }
+
+        $transaction->update([
+            'status' => DepositTransaction::STATUS_APPROVED,
+            'approved_at' => now(),
+            'approved_by' => $approvedBy->id,
+        ]);
+
+        return $transaction->fresh();
+    }
+
+    // Complete an approved refund once payment has actually been made.
+    public function completeRefund(DepositTransaction $transaction, array $data, User $recordedBy): DepositTransaction
+    {
+        if ($transaction->type !== DepositTransaction::TYPE_REFUND) {
+            abort(422, 'Only refunds can be completed.');
+        }
+
+        if ($transaction->status === DepositTransaction::STATUS_COMPLETED) {
+            abort(422, 'This refund has already been completed.');
+        }
+
+        if ($transaction->status !== DepositTransaction::STATUS_APPROVED) {
+            abort(422, 'A refund must be approved before it can be completed.');
+        }
+
+        $this->assertReferenceNotAlreadyRefunded($transaction->securityDeposit, $data['reference'] ?? null, $transaction->id);
+
+        return DB::transaction(function () use ($transaction, $data) {
+            $transaction->update([
+                'status' => DepositTransaction::STATUS_COMPLETED,
+                'method' => $data['method'] ?? $transaction->method,
+                'reference' => $data['reference'] ?? $transaction->reference,
+                'completed_at' => now(),
+            ]);
+
+            $deposit = $transaction->securityDeposit;
+            $this->recompute($deposit);
+
+            if ($deposit->tenant?->user) {
+                $deposit->tenant->user->notify(
+                    new DepositRefundRecordedNotification($deposit, $transaction->fresh())
+                );
+            }
+
+            return $transaction->fresh();
+        });
+    }
+
+    // Guard against recording the same external payment reference twice.
+    protected function assertReferenceNotAlreadyRefunded(SecurityDeposit $deposit, ?string $reference, ?int $exceptId = null): void
+    {
+        if (blank($reference)) {
+            return;
+        }
+
+        $exists = $deposit->refunds()
+            ->where('status', DepositTransaction::STATUS_COMPLETED)
+            ->where('reference', $reference)
+            ->when($exceptId !== null, fn ($q) => $q->whereKeyNot($exceptId))
+            ->exists();
+
+        if ($exists) {
+            abort(422, 'A refund with this reference has already been recorded.');
+        }
     }
 }

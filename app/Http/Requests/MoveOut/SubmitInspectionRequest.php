@@ -3,6 +3,7 @@
 namespace App\Http\Requests\MoveOut;
 
 use App\Models\MoveOutInspection;
+use App\Models\MoveOutInspectionItem;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,6 +17,7 @@ class SubmitInspectionRequest extends FormRequest
     public function rules(): array
     {
         $conditions = array_keys(MoveOutInspection::conditions());
+        $natures = array_keys(MoveOutInspectionItem::natures());
 
         return [
             'keys_returned' => 'nullable|boolean',
@@ -29,6 +31,7 @@ class SubmitInspectionRequest extends FormRequest
             'recommendation' => ['required', Rule::in(['recommend_clearance', 'further_action'])],
             'items' => 'nullable|array',
             'items.*.condition' => ['nullable', Rule::in($conditions)],
+            'items.*.nature' => ['nullable', Rule::in($natures)],
             'items.*.comment' => 'nullable|string|max:500',
         ];
     }

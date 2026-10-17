@@ -17,6 +17,11 @@ class Property extends Model
         'total_units',
         'photo',
         'status',
+        'alert_settings',
+    ];
+
+    protected $casts = [
+        'alert_settings' => 'array',
     ];
 
     // Property belongs to a landlord
@@ -35,6 +40,12 @@ class Property extends Model
     public function caretakers()
     {
         return $this->belongsToMany(User::class, 'caretaker_property');
+    }
+
+    // Early-warning alerts raised across this property.
+    public function alerts()
+    {
+        return $this->hasMany(PropertyAlert::class);
     }
 
     // Invitations issued for caretakers of this property.

@@ -6,9 +6,12 @@ use App\Http\Requests\Unit\StoreUnitRequest;
 use App\Http\Requests\Unit\UpdateUnitRequest;
 use App\Models\Property;
 use App\Models\Unit;
+use App\Services\AuditService;
 
 class UnitController extends Controller
 {
+    public function __construct(protected AuditService $audit) {}
+
     // List all units for a property
     public function index(Property $property)
     {
@@ -85,12 +88,25 @@ class UnitController extends Controller
             return back()->withErrors(['unit_number' => 'This unit number already exists in this property.'])->withInput();
         }
 
+        $oldStatus = $unit->status;
+
         $unit->update([
             'unit_number' => $request->unit_number,
             'rent_amount' => $request->rent_amount,
             'status' => $request->status,
             'description' => $request->description,
         ]);
+
+        // Record an authorised unit-status change in the passport timeline.
+        if ($oldStatus !== $unit->status) {
+            $this->audit->record(
+                'unit_status_changed',
+                'Unit '.$unit->unit_number.' status changed from '.ucfirst($oldStatus).' to '.ucfirst($unit->status).'.',
+                ['status' => $oldStatus],
+                ['status' => $unit->status],
+                $unit
+            );
+        }
 
         return redirect()->route('landlord.units.index', $property)
             ->with('success', 'Unit updated successfully.');

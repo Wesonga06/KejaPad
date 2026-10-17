@@ -161,24 +161,31 @@ class MpesaController extends Controller
                     ]);
                 }
 
+                // When payment verification is required the transaction is only
+                // acknowledged here - the landlord still has to confirm it before
+                // rent is credited.
+                $requiresVerification = (bool) config('payments.require_verification', false);
+
                 $payment->update([
-                    'status' => 'confirmed',
+                    'status' => $requiresVerification ? 'pending' : 'confirmed',
                     'mpesa_receipt_number' => $receiptNumber,
                     'result_code' => $resultCode,
                     'result_desc' => $resultDesc,
                 ]);
 
-                $this->rentAllocations->recordPayment(
-                    $payment->rentRecord->tenant,
-                    (float) $payment->amount,
-                    [
-                        'payment_date' => now()->toDateString(),
-                        'reference' => $receiptNumber,
-                        'method' => 'mpesa',
-                        'source' => 'tenant',
-                        'mpesa_payment_id' => $payment->id,
-                    ],
-                );
+                if (! $requiresVerification) {
+                    $this->rentAllocations->recordPayment(
+                        $payment->rentRecord->tenant,
+                        (float) $payment->amount,
+                        [
+                            'payment_date' => now()->toDateString(),
+                            'reference' => $receiptNumber,
+                            'method' => 'mpesa',
+                            'source' => 'tenant',
+                            'mpesa_payment_id' => $payment->id,
+                        ],
+                    );
+                }
             } else {
                 $payment->update([
                     'status' => 'failed',

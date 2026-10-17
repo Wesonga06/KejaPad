@@ -21,9 +21,14 @@
                 <i class="bi bi-geo-alt me-1"></i>{{ $property->location }}
             </p>
         </div>
-        <a href="{{ route('landlord.units.create', $property) }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i> Add Unit
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('landlord.passport.index', $property) }}" class="btn btn-outline-primary">
+                <i class="bi bi-journal-text me-2"></i> Property Passports
+            </a>
+            <a href="{{ route('landlord.units.create', $property) }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> Add Unit
+            </a>
+        </div>
     </div>
 
     <!-- Summary Cards -->

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Maintenance\StoreMaintenanceRequest;
 use App\Models\MaintenanceRequest;
+use App\Models\MaintenanceRequestEvent;
 use App\Models\Tenant;
 
 class TenantMaintenanceController extends Controller
@@ -52,6 +53,25 @@ class TenantMaintenanceController extends Controller
     {
         $this->authorize('view', $maintenance);
 
-        return view('tenant.maintenance.show', compact('maintenance'));
+        $maintenance->load(['events.user', 'evidence.user', 'assignedTo', 'verifiedBy', 'property', 'unit']);
+
+        // Tenants see the accountable progress of their own request, but not
+        // internal caretaker-to-landlord requests (e.g. correction requests).
+        $timeline = $maintenance->events
+            ->whereIn('event', [
+                MaintenanceRequestEvent::EVENT_ASSIGNED,
+                MaintenanceRequestEvent::EVENT_REASSIGNED,
+                MaintenanceRequestEvent::EVENT_UNASSIGNED,
+                MaintenanceRequestEvent::EVENT_STARTED,
+                MaintenanceRequestEvent::EVENT_DEADLINE_CHANGED,
+                MaintenanceRequestEvent::EVENT_EVIDENCE_ADDED,
+                MaintenanceRequestEvent::EVENT_COMPLETION_SUBMITTED,
+                MaintenanceRequestEvent::EVENT_VERIFIED,
+                MaintenanceRequestEvent::EVENT_RETURNED,
+                MaintenanceRequestEvent::EVENT_ESCALATED,
+            ])
+            ->values();
+
+        return view('tenant.maintenance.show', compact('maintenance', 'timeline'));
     }
 }

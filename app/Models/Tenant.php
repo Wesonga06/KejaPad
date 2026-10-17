@@ -21,12 +21,14 @@ class Tenant extends Model
         'emergency_contact_phone',
         'move_in_date',
         'move_out_date',
+        'lease_end_date',
         'is_active',
     ];
 
     protected $casts = [
         'move_in_date' => 'date',
         'move_out_date' => 'date',
+        'lease_end_date' => 'date',
         'is_active' => 'boolean',
     ];
 

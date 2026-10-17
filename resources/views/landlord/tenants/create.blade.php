@@ -103,12 +103,22 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label fw-semibold">Move-in Date</label>
-                <input type="date" name="move_in_date"
-                       class="form-control @error('move_in_date') is-invalid @enderror"
-                       value="{{ old('move_in_date', date('Y-m-d')) }}">
-                @error('move_in_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Move-in Date</label>
+                    <input type="date" name="move_in_date"
+                           class="form-control @error('move_in_date') is-invalid @enderror"
+                           value="{{ old('move_in_date', date('Y-m-d')) }}">
+                    @error('move_in_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Lease End Date <span class="text-muted fw-normal">(optional)</span></label>
+                    <input type="date" name="lease_end_date"
+                           class="form-control @error('lease_end_date') is-invalid @enderror"
+                           value="{{ old('lease_end_date') }}">
+                    @error('lease_end_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="form-text">Only used to warn you before the tenancy term ends.</div>
+                </div>
             </div>
 
             {{-- Login Account --}}
