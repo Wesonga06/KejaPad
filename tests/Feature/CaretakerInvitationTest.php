@@ -56,8 +56,21 @@ class CaretakerInvitationTest extends TestCase
         $this->assertSame($landlord->id, $invitation->landlord_id);
         $this->assertSame($property->id, $invitation->property_id);
         $this->assertNotEmpty($invitation->code);
-        $this->assertSame(hash('sha256', $invitation->code), $invitation->code_hash);
+        $this->assertSame(CaretakerInvitation::hashCode($invitation->code), $invitation->code_hash);
         $this->assertTrue($invitation->expires_at->isFuture());
+        $this->assertMatchesRegularExpression('/^KEJA-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}-[ABCDEFGHJKLMNPQRSTUVWXYZ23456789]{4}$/', $invitation->code);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'caretaker_invitation.created']);
+    }
+
+    public function test_generated_codes_are_unique_and_case_and_spacing_normalized(): void
+    {
+        $landlord = $this->landlord();
+        $first = $this->makeInvitation($landlord);
+        $second = $this->makeInvitation($landlord);
+
+        $this->assertNotSame($first->code, $second->code);
+        $formatted = strtolower(str_replace('-', ' ', $first->code));
+        $this->assertTrue($this->service()->validate('  '.$formatted.'  ')['ok']);
     }
 
     public function test_landlord_cannot_invite_for_another_landlords_property(): void
@@ -81,6 +94,18 @@ class CaretakerInvitationTest extends TestCase
 
         $this->assertTrue($result['ok']);
         $this->assertSame($invitation->id, $result['invitation']->id);
+    }
+
+    public function test_existing_opaque_invitation_codes_remain_valid_during_their_expiry_period(): void
+    {
+        $invitation = $this->makeInvitation($this->landlord());
+        $legacyCode = 'aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890';
+        $invitation->update([
+            'code' => $legacyCode,
+            'code_hash' => hash('sha256', $legacyCode),
+        ]);
+
+        $this->assertTrue($this->service()->validate($legacyCode)['ok']);
     }
 
     public function test_expired_revoked_and_redeemed_codes_are_rejected(): void
@@ -144,6 +169,24 @@ class CaretakerInvitationTest extends TestCase
         $this->assertSame(CaretakerInvitation::STATUS_REDEEMED, $fresh->status);
         $this->assertSame($caretaker->id, $fresh->redeemed_by);
         $this->assertNotNull($fresh->redeemed_at);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'caretaker_invitation.redeemed']);
+    }
+
+    public function test_invitation_code_cannot_be_submitted_for_another_registration_role(): void
+    {
+        $invitation = $this->makeInvitation($this->landlord());
+
+        $this->post('/register', [
+            'name' => 'Not a caretaker',
+            'email' => 'not-caretaker@example.com',
+            'role' => 'landlord',
+            'invitation_code' => $invitation->code,
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])->assertSessionHasErrors('invitation_code');
+
+        $this->assertDatabaseMissing('users', ['email' => 'not-caretaker@example.com']);
+        $this->assertSame(CaretakerInvitation::STATUS_PENDING, $invitation->fresh()->status);
     }
 
     public function test_redeemed_code_cannot_be_used_again(): void
@@ -190,6 +233,7 @@ class CaretakerInvitationTest extends TestCase
 
         $this->assertSame(CaretakerInvitation::STATUS_REVOKED, $invitation->fresh()->status);
         $this->assertFalse($this->service()->validate($invitation->code)['ok']);
+        $this->assertDatabaseHas('audit_logs', ['action' => 'caretaker_invitation.revoked']);
     }
 
     public function test_landlord_cannot_revoke_another_landlords_invitation(): void

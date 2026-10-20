@@ -47,8 +47,15 @@
                                 <i class="bi bi-geo-alt me-1"></i>{{ $property->location }}
                             </p>
                             <p class="text-muted mb-2" style="font-size:0.85rem;">
-                                <i class="bi bi-door-open me-1"></i>{{ $property->total_units }} Units
+                                <i class="bi bi-door-open me-1"></i>Registered units: {{ $property->units_count }} of {{ $property->total_units }}
                             </p>
+                            @if($property->units_count > $property->total_units)
+                                <p class="text-danger fw-semibold mb-2" style="font-size:0.8rem;">Over listed capacity. Additional units are blocked.</p>
+                            @else
+                                <p class="text-muted mb-2" style="font-size:0.8rem;">
+                                    {{ max(0, $property->total_units - $property->units_count) }} {{ \Illuminate\Support\Str::plural('unit', max(0, $property->total_units - $property->units_count)) }} remaining
+                                </p>
+                            @endif
                         </div>
                         <span class="badge {{ $property->status === 'active' ? 'kp-badge-success' : 'kp-badge-muted' }}">
                             {{ ucfirst($property->status) }}

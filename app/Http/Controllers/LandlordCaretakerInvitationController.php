@@ -52,7 +52,7 @@ class LandlordCaretakerInvitationController extends Controller
         $invitation = $this->invitations->create($request->user(), $request->validated());
 
         return redirect()->route('landlord.caretaker-invitations.index')
-            ->with('success', 'Invitation created. Share the link below with your caretaker.')
+            ->with('success', 'Invitation created. Share the code with your caretaker.')
             ->with('new_invitation_id', $invitation->id);
     }
 

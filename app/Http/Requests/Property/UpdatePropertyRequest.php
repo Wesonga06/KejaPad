@@ -4,6 +4,7 @@ namespace App\Http\Requests\Property;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class UpdatePropertyRequest extends FormRequest
 {
@@ -27,5 +28,25 @@ class UpdatePropertyRequest extends FormRequest
                 Rule::exists('users', 'id')->where('role', 'caretaker'),
             ],
         ];
+    }
+
+    public function after(): array
+    {
+        return [function (Validator $validator) {
+            if ($validator->errors()->has('total_units') || ! $this->has('total_units')) {
+                return;
+            }
+
+            $property = $this->route('property');
+            $registeredUnits = $property->units()->count();
+            $capacity = (int) $this->input('total_units');
+
+            if ($capacity < $registeredUnits) {
+                $validator->errors()->add(
+                    'total_units',
+                    "The listed capacity cannot be reduced to {$capacity} because {$registeredUnits} units are already registered. Set capacity to at least {$registeredUnits} units."
+                );
+            }
+        }];
     }
 }

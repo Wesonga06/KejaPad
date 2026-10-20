@@ -343,12 +343,12 @@
 
             <!-- Caretaker invitation code (only for caretaker registrations) -->
             <div class="mb-3 d-none" id="caretakerInvitationBlock">
-                <label class="form-label" for="invitationCode">Caretaker Invitation Code</label>
+                <label class="form-label" for="invitationCode">Invitation Code <span class="text-danger">*</span></label>
                 <input type="text" name="invitation_code" id="invitationCode"
                        class="form-control @error('invitation_code') is-invalid @enderror"
                        value="{{ old('invitation_code', $prefillCode) }}"
-                       placeholder="Paste the code your landlord sent you"
-                       autocomplete="off">
+                       placeholder="KEJA-7X9P-2KLM"
+                       autocomplete="off" autocapitalize="characters" spellcheck="false">
                 @error('invitation_code')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -360,7 +360,7 @@
                 </button>
                 <div id="invitationResult" class="small mt-2"></div>
                 <div class="form-text" style="font-size:0.76rem;">
-                    A caretaker account can only be created with a valid invitation from an active landlord.
+                    Enter the code your landlord shared. A caretaker account can only be created with a valid invitation from an active landlord.
                 </div>
             </div>
 

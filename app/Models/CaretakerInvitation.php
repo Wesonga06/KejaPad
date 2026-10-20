@@ -76,7 +76,7 @@ class CaretakerInvitation extends Model
             return false;
         }
 
-        return $this->expires_at !== null && $this->expires_at->isPast();
+        return $this->expires_at === null || $this->expires_at->isPast();
     }
 
     public function isRedeemable(): bool
@@ -103,6 +103,11 @@ class CaretakerInvitation extends Model
         return ucfirst($this->displayStatus());
     }
 
+    public function maskedCode(): string
+    {
+        return self::maskCode((string) $this->code);
+    }
+
     // True when this invitation is restricted to a specific caretaker email.
     public function isEmailRestricted(): bool
     {
@@ -116,11 +121,32 @@ class CaretakerInvitation extends Model
 
     public static function generateCode(): string
     {
-        return Str::random(48);
+        $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        $secret = '';
+
+        for ($index = 0; $index < 8; $index++) {
+            $secret .= $alphabet[random_int(0, strlen($alphabet) - 1)];
+        }
+
+        return 'KEJA-'.substr($secret, 0, 4).'-'.substr($secret, 4, 4);
     }
 
     public static function hashCode(string $code): string
     {
-        return hash('sha256', trim($code));
+        return hash('sha256', self::normalizeCode($code));
+    }
+
+    public static function normalizeCode(string $code): string
+    {
+        return strtoupper((string) preg_replace('/[\s-]+/u', '', trim($code)));
+    }
+
+    public static function maskCode(string $code): string
+    {
+        if (str_starts_with(strtoupper($code), 'KEJA-') && strlen($code) >= 14) {
+            return 'KEJA-••••-••••';
+        }
+
+        return '••••••••••••';
     }
 }

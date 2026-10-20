@@ -6,6 +6,8 @@ use App\Http\Requests\Property\StorePropertyRequest;
 use App\Http\Requests\Property\UpdatePropertyRequest;
 use App\Models\Property;
 use App\Models\User;
+use App\Services\UnitCapacityService;
+use Illuminate\Support\Facades\DB;
 
 class PropertyController extends Controller
 {
@@ -15,6 +17,7 @@ class PropertyController extends Controller
         $this->authorize('viewAny', Property::class);
 
         $properties = Property::where('user_id', auth()->id())
+            ->withCount('units')
             ->latest()
             ->paginate(12);
 
@@ -59,6 +62,7 @@ class PropertyController extends Controller
     public function edit(Property $property)
     {
         $this->authorize('update', $property);
+        $property->loadCount('units');
 
         $caretakers = User::where('role', 'caretaker')->where('is_active', true)->orderBy('name')->get();
 
@@ -66,23 +70,28 @@ class PropertyController extends Controller
     }
 
     // Update property
-    public function update(UpdatePropertyRequest $request, Property $property)
+    public function update(UpdatePropertyRequest $request, Property $property, UnitCapacityService $capacity)
     {
-        $photoPath = $property->photo;
-        if ($request->hasFile('photo')) {
-            $photoPath = $request->file('photo')->store('properties', 'public');
-        }
+        DB::transaction(function () use ($request, $property, $capacity) {
+            $lockedProperty = Property::query()->whereKey($property->id)->lockForUpdate()->firstOrFail();
+            $capacity->ensureCapacityCanBeSet($lockedProperty, (int) $request->total_units);
+            $photoPath = $lockedProperty->photo;
 
-        $property->update([
-            'name' => $request->name,
-            'location' => $request->location,
-            'description' => $request->description,
-            'total_units' => $request->total_units,
-            'status' => $request->status,
-            'photo' => $photoPath,
-        ]);
+            if ($request->hasFile('photo')) {
+                $photoPath = $request->file('photo')->store('properties', 'public');
+            }
 
-        $property->caretakers()->sync($request->input('caretakers', []));
+            $lockedProperty->update([
+                'name' => $request->name,
+                'location' => $request->location,
+                'description' => $request->description,
+                'total_units' => $request->total_units,
+                'status' => $request->status,
+                'photo' => $photoPath,
+            ]);
+
+            $lockedProperty->caretakers()->sync($request->input('caretakers', []));
+        });
 
         return redirect()->route('landlord.properties.index')
             ->with('success', 'Property updated successfully.');

@@ -5,29 +5,57 @@ namespace App\Services;
 use App\Models\CaretakerInvitation;
 use App\Models\Property;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class CaretakerInvitationService
 {
+    public function __construct(protected AuditService $audit) {}
+
     // Issue a new invitation for a caretaker to manage a specific property.
     public function create(User $landlord, array $data): CaretakerInvitation
     {
-        $code = CaretakerInvitation::generateCode();
         $expiryDays = (int) config('tenancy.invitation_expiry_days', 7);
 
-        return CaretakerInvitation::create([
-            'landlord_id' => $landlord->id,
-            'property_id' => $data['property_id'],
-            'email' => $data['email'] ?? null,
-            'name' => $data['name'] ?? null,
-            'code' => $code,
-            'code_hash' => CaretakerInvitation::hashCode($code),
-            'status' => CaretakerInvitation::STATUS_PENDING,
-            'expires_at' => Carbon::now()->addDays($expiryDays),
-            'created_by' => $landlord->id,
-        ]);
+        for ($attempt = 0; $attempt < 5; $attempt++) {
+            $code = CaretakerInvitation::generateCode();
+            $codeHash = CaretakerInvitation::hashCode($code);
+
+            if (CaretakerInvitation::where('code_hash', $codeHash)->exists()) {
+                continue;
+            }
+
+            try {
+                return DB::transaction(function () use ($landlord, $data, $code, $codeHash, $expiryDays) {
+                    $invitation = CaretakerInvitation::create([
+                        'landlord_id' => $landlord->id,
+                        'property_id' => $data['property_id'],
+                        'email' => $data['email'] ?? null,
+                        'name' => $data['name'] ?? null,
+                        'code' => $code,
+                        'code_hash' => $codeHash,
+                        'status' => CaretakerInvitation::STATUS_PENDING,
+                        'expires_at' => Carbon::now()->addDays($expiryDays),
+                        'created_by' => $landlord->id,
+                    ]);
+
+                    $this->audit->record('caretaker_invitation.created', 'Caretaker invitation created.', [], [
+                        'property_id' => $invitation->property_id,
+                        'expires_at' => $invitation->expires_at?->toIso8601String(),
+                    ], $invitation, $landlord);
+
+                    return $invitation;
+                });
+            } catch (QueryException $exception) {
+                if (! $this->isUniqueConstraintViolation($exception)) {
+                    throw $exception;
+                }
+            }
+        }
+
+        throw new \RuntimeException('Unable to generate a unique caretaker invitation code.');
     }
 
     // Validate a code without consuming it. Safe to call from the registration
@@ -42,8 +70,13 @@ class CaretakerInvitationService
             return $this->invalid('Please enter an invitation code.');
         }
 
+        $hashes = array_unique([
+            CaretakerInvitation::hashCode($code),
+            hash('sha256', $code), // Accept existing mixed-case URL tokens during their expiry period.
+        ]);
+
         $invitation = CaretakerInvitation::with(['property', 'landlord'])
-            ->where('code_hash', CaretakerInvitation::hashCode($code))
+            ->whereIn('code_hash', $hashes)
             ->first();
 
         if (! $invitation) {
@@ -102,6 +135,12 @@ class CaretakerInvitationService
                 ]);
             }
 
+            if (! $locked->matchesEmail($caretaker->email) || ! $locked->landlord?->canAccessLandlordFeatures()) {
+                throw ValidationException::withMessages([
+                    'invitation_code' => 'This invitation is no longer valid for this account.',
+                ]);
+            }
+
             $property = $locked->property;
             if (! $property) {
                 throw ValidationException::withMessages([
@@ -117,24 +156,37 @@ class CaretakerInvitationService
                 'redeemed_by' => $caretaker->id,
             ]);
 
+            $this->audit->record('caretaker_invitation.redeemed', 'Caretaker invitation redeemed.', [], [
+                'property_id' => $locked->property_id,
+                'caretaker_id' => $caretaker->id,
+            ], $locked, $caretaker);
+
             return $locked->fresh();
         });
     }
 
     public function revoke(CaretakerInvitation $invitation, User $actor): CaretakerInvitation
     {
-        if ($invitation->isRedeemed()) {
-            throw ValidationException::withMessages([
-                'invitation' => 'Redeemed invitations cannot be revoked. Revoke the caretaker\'s property access instead.',
+        return DB::transaction(function () use ($invitation, $actor) {
+            $locked = CaretakerInvitation::whereKey($invitation->id)->lockForUpdate()->first();
+
+            if (! $locked || $locked->isRedeemed()) {
+                throw ValidationException::withMessages([
+                    'invitation' => 'Redeemed invitations cannot be revoked. Revoke the caretaker\'s property access instead.',
+                ]);
+            }
+
+            $locked->update([
+                'status' => CaretakerInvitation::STATUS_REVOKED,
+                'revoked_at' => now(),
             ]);
-        }
 
-        $invitation->update([
-            'status' => CaretakerInvitation::STATUS_REVOKED,
-            'revoked_at' => now(),
-        ]);
+            $this->audit->record('caretaker_invitation.revoked', 'Caretaker invitation revoked.', [], [
+                'property_id' => $locked->property_id,
+            ], $locked, $actor);
 
-        return $invitation->fresh();
+            return $locked->fresh();
+        });
     }
 
     // Detach a caretaker from a property while preserving all historical records.
@@ -148,5 +200,17 @@ class CaretakerInvitationService
     protected function invalid(string $message): array
     {
         return ['ok' => false, 'invitation' => null, 'error' => $message];
+    }
+
+    protected function isUniqueConstraintViolation(QueryException $exception): bool
+    {
+        $sqlState = (string) ($exception->errorInfo[0] ?? '');
+        $driverCode = (int) ($exception->errorInfo[1] ?? 0);
+        $message = strtolower($exception->getMessage());
+
+        return $sqlState === '23505'
+            || $driverCode === 1062
+            || str_contains($message, 'unique constraint')
+            || str_contains($message, 'duplicate entry');
     }
 }

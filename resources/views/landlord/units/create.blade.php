@@ -26,7 +26,23 @@
         </a>
     </div>
 
+    <div class="kp-card mb-4" style="max-width:600px;" role="status">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <strong>Registered units: {{ $registeredUnits }} of {{ $property->total_units }}</strong>
+            @if($remainingCapacity > 0)
+                <span class="text-muted">{{ $remainingCapacity }} {{ \Illuminate\Support\Str::plural('unit', $remainingCapacity) }} remaining</span>
+            @elseif($registeredUnits > $property->total_units)
+                <span class="text-danger fw-semibold">This property is over its listed capacity. No more units can be added.</span>
+            @else
+                <span class="text-danger fw-semibold">Listed unit capacity reached. No more units can be added.</span>
+            @endif
+        </div>
+    </div>
+
     <div class="stat-card" style="max-width:600px;">
+        @error('capacity')
+            <div class="alert alert-danger" role="alert">{{ $message }}</div>
+        @enderror
         <form method="POST" action="{{ route('landlord.units.store', $property) }}">
             @csrf
 
@@ -64,7 +80,7 @@
                 @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">
+            <button type="submit" class="btn btn-primary w-100" @disabled($remainingCapacity === 0)>
                 <i class="bi bi-door-open me-2"></i> Save Unit
             </button>
         </form>

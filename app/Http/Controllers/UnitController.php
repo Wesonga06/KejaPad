@@ -7,10 +7,14 @@ use App\Http\Requests\Unit\UpdateUnitRequest;
 use App\Models\Property;
 use App\Models\Unit;
 use App\Services\AuditService;
+use App\Services\UnitCapacityService;
 
 class UnitController extends Controller
 {
-    public function __construct(protected AuditService $audit) {}
+    public function __construct(
+        protected AuditService $audit,
+        protected UnitCapacityService $capacity,
+    ) {}
 
     // List all units for a property
     public function index(Property $property)
@@ -23,6 +27,7 @@ class UnitController extends Controller
         $vacantCount = (clone $base)->where('status', 'vacant')->count();
         $occupiedCount = (clone $base)->where('status', 'occupied')->count();
         $reservedCount = (clone $base)->where('status', 'reserved')->count();
+        $remainingCapacity = max(0, (int) $property->total_units - $totalUnits);
 
         $units = $base->latest()->paginate(12);
 
@@ -32,7 +37,8 @@ class UnitController extends Controller
             'totalUnits',
             'vacantCount',
             'occupiedCount',
-            'reservedCount'
+            'reservedCount',
+            'remainingCapacity',
         ));
     }
 
@@ -41,19 +47,16 @@ class UnitController extends Controller
     {
         $this->authorize('create', [Unit::class, $property]);
 
-        return view('landlord.units.create', compact('property'));
+        $registeredUnits = $property->units()->count();
+        $remainingCapacity = max(0, (int) $property->total_units - $registeredUnits);
+
+        return view('landlord.units.create', compact('property', 'registeredUnits', 'remainingCapacity'));
     }
 
     // Store new unit
     public function store(StoreUnitRequest $request, Property $property)
     {
-        // Check for duplicate unit number in same property
-        $exists = $property->units()->where('unit_number', $request->unit_number)->exists();
-        if ($exists) {
-            return back()->withErrors(['unit_number' => 'This unit number already exists in this property.'])->withInput();
-        }
-
-        $property->units()->create([
+        $this->capacity->createUnit($property, [
             'unit_number' => $request->unit_number,
             'rent_amount' => $request->rent_amount,
             'status' => $request->status,

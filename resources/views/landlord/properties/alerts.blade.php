@@ -8,7 +8,7 @@
             <h1 class="kp-page-title">Early-Warning Settings</h1>
             <p class="kp-page-subtitle">Fine-tune the warning thresholds for <strong>{{ $property->name }}</strong>. Leave a field blank to use the platform default.</p>
         </div>
-        <a href="{{ route('landlord.properties.show', $property) }}" class="btn btn-outline-secondary">
+        <a href="{{ route('landlord.properties.edit', $property) }}" class="btn btn-outline-secondary">
             <i class="bi bi-arrow-left me-2"></i> Back to property
         </a>
     </div>

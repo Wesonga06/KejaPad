@@ -47,6 +47,12 @@ class RegisteredUserController extends Controller
         $role = $request->input('role');
         $invitation = null;
 
+        if ($request->filled('invitation_code') && $role !== 'caretaker') {
+            throw ValidationException::withMessages([
+                'invitation_code' => 'Caretaker invitation codes can only be used for caretaker registration.',
+            ]);
+        }
+
         if ($role === 'caretaker') {
             $result = $this->invitations->validate(
                 (string) $request->input('invitation_code'),

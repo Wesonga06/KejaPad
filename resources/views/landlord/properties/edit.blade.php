@@ -42,8 +42,9 @@
                 <div class="col-md-6">
                     <label class="form-label fw-semibold">Total Units</label>
                     <input type="number" name="total_units" class="form-control @error('total_units') is-invalid @enderror"
-                           value="{{ old('total_units', $property->total_units) }}" min="1">
+                           value="{{ old('total_units', $property->total_units) }}" min="{{ max(1, $property->units_count) }}">
                     @error('total_units') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    <div class="form-text">{{ $property->units_count }} units are already registered. Capacity cannot be reduced below this count.</div>
                 </div>
 
                 <div class="col-md-6">

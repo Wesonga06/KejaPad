@@ -25,9 +25,28 @@
             <a href="{{ route('landlord.passport.index', $property) }}" class="btn btn-outline-primary">
                 <i class="bi bi-journal-text me-2"></i> Property Passports
             </a>
-            <a href="{{ route('landlord.units.create', $property) }}" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i> Add Unit
-            </a>
+            @if($remainingCapacity > 0)
+                <a href="{{ route('landlord.units.create', $property) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i> Add Unit
+                </a>
+            @endif
+        </div>
+    </div>
+
+    <div class="kp-card mb-4" role="status">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+            <strong>Registered units: {{ $totalUnits }} of {{ $property->total_units }}</strong>
+            @if($remainingCapacity > 0)
+                <span class="text-muted">{{ $remainingCapacity }} {{ \Illuminate\Support\Str::plural('unit', $remainingCapacity) }} remaining</span>
+            @else
+                <span class="text-danger fw-semibold">
+                    @if($totalUnits > $property->total_units)
+                        This property is over its listed capacity. No more units can be added.
+                    @else
+                        Listed unit capacity reached. No more units can be added.
+                    @endif
+                </span>
+            @endif
         </div>
     </div>
 
@@ -63,9 +82,11 @@
         <div class="stat-card text-center py-5">
             <i class="bi bi-door-open" style="font-size:3rem; color:#dee2e6;"></i>
             <p class="mt-3 text-muted">No units added yet. Start by adding a unit.</p>
-            <a href="{{ route('landlord.units.create', $property) }}" class="btn btn-primary mt-2">
-                <i class="bi bi-plus-circle me-2"></i> Add Unit
-            </a>
+            @if($remainingCapacity > 0)
+                <a href="{{ route('landlord.units.create', $property) }}" class="btn btn-primary mt-2">
+                    <i class="bi bi-plus-circle me-2"></i> Add Unit
+                </a>
+            @endif
         </div>
     @else
         <div class="stat-card">
