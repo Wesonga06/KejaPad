@@ -6,7 +6,7 @@
 @section('content')
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="stat-card text-center py-5" id="statusCard">
+            <div class="stat-card kp-payment-state text-center py-5" id="statusCard">
 
                 @if($payment->status === 'confirmed')
                     <!-- Confirmed -->
@@ -58,7 +58,7 @@
                            style="font-size:2.5rem; color:#E99B20;"></i>
                     </div>
                     <h5 class="fw-bold" id="statusTitle">Waiting for Payment</h5>
-                    <p class="text-muted mb-1" id="statusDesc">
+                    <p class="text-muted mb-1" id="statusDesc" aria-live="polite">
                         An M-Pesa prompt has been sent to
                         <strong>{{ $payment->phone_number }}</strong>.
                     </p>

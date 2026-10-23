@@ -4,16 +4,18 @@
 
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">My Maintenance Requests</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">My Maintenance Requests</h1>
+            <p class="kp-page-subtitle">
                 Track the status of your submitted requests.
             </p>
         </div>
-        <a href="{{ route('tenant.maintenance.create') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle me-2"></i> New Request
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('tenant.maintenance.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i> New Request
+            </a>
+        </div>
     </div>
 
     @if($requests->isEmpty())

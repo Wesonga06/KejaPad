@@ -31,12 +31,10 @@
                     @if($property->photo)
                         <img src="{{ asset('storage/' . $property->photo) }}"
                              alt="{{ $property->name }}"
-                             class="w-100 rounded-3 mb-3"
-                             style="height:160px; object-fit:cover;">
+                             class="kp-property-image rounded-3 mb-3">
                     @else
-                        <div class="w-100 rounded-3 mb-3 d-flex align-items-center justify-content-center"
-                             style="height:160px; background:linear-gradient(135deg, #f3eefe, #ece6f9);">
-                            <i class="bi bi-buildings" style="font-size:2.5rem; color:var(--kp-royal); opacity:.6;"></i>
+                        <div class="kp-property-image kp-property-placeholder rounded-3 mb-3 d-flex align-items-center justify-content-center">
+                            <i class="bi bi-buildings" style="font-size:2.5rem; opacity:.6;"></i>
                         </div>
                     @endif
 

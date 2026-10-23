@@ -62,6 +62,7 @@
         .auth-brand .word { font-weight: 800; font-size: 1.3rem; color: var(--kp-deep); line-height: 1; }
         .auth-brand .word span { color: var(--kp-royal); }
 
+        .auth-card h1,
         .auth-card h4 {
             font-weight: 800;
             color: var(--kp-deep);
@@ -110,10 +111,11 @@
         .auth-links a { color: var(--kp-royal); font-weight: 600; text-decoration: none; }
         .auth-links a:hover { color: var(--kp-deep); }
     </style>
+    <link href="{{ asset('css/kejapad-design.css') }}" rel="stylesheet">
 </head>
 <body>
 
-<div class="auth-card">
+<main class="auth-card">
 
     <a href="{{ route('landing') }}" class="d-block text-center mb-3"
        style="color:var(--kp-muted); font-size:0.8rem; text-decoration:none;">
@@ -131,11 +133,11 @@
         <span class="word">Keja<span>Pad</span></span>
     </div>
 
-    <h4>@yield('heading')</h4>
+    <h1>@yield('heading')</h1>
     <p class="subtitle">@yield('subtitle')</p>
 
     @yield('content')
-</div>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

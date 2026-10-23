@@ -8,8 +8,8 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::command('rent:generate')->monthlyOn(1, '00:30');
-Schedule::command('rent:mark-overdue')->dailyAt('01:00');
-Schedule::command('rent:send-reminders')->dailyAt('08:00');
-Schedule::command('alerts:generate')->dailyAt('02:00');
-Schedule::command('maintenance:escalate-overdue')->dailyAt('02:30');
+Schedule::command('rent:generate')->monthlyOn(1, '00:30')->withoutOverlapping(60)->onOneServer();
+Schedule::command('rent:mark-overdue')->dailyAt('01:00')->withoutOverlapping(60)->onOneServer();
+Schedule::command('rent:send-reminders')->dailyAt('08:00')->withoutOverlapping(60)->onOneServer();
+Schedule::command('alerts:generate')->dailyAt('02:00')->withoutOverlapping(60)->onOneServer();
+Schedule::command('maintenance:escalate-overdue')->dailyAt('02:30')->withoutOverlapping(60)->onOneServer();

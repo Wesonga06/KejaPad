@@ -8,6 +8,7 @@ use App\Services\MoveOutService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Validation\ValidationException;
 use Tests\Feature\Concerns\CreatesMoveOutScenario;
 use Tests\TestCase;
 
@@ -99,6 +100,27 @@ class MoveOutWorkflowTest extends TestCase
             ->assertSessionHasErrors('proposed_move_out_date');
 
         $this->assertDatabaseCount('move_out_requests', 1);
+    }
+
+    public function test_stale_move_out_transition_cannot_overwrite_a_newer_decision(): void
+    {
+        [$owner, $user, $property, $unit, $tenant] = $this->scenario();
+        $service = app(MoveOutService::class);
+        $moveOut = $service->createRequest($tenant, [
+            'proposed_move_out_date' => now()->addMonthsNoOverflow(1)->toDateString(),
+        ], $user);
+        $staleMoveOut = MoveOutRequest::findOrFail($moveOut->id);
+
+        $service->transition($moveOut, MoveOutRequest::STATUS_APPROVED, $owner);
+
+        try {
+            $service->transition($staleMoveOut, MoveOutRequest::STATUS_REJECTED, $owner);
+            $this->fail('A stale request must not overwrite a transition that has already been applied.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('status', $exception->errors());
+        }
+
+        $this->assertSame(MoveOutRequest::STATUS_APPROVED, $moveOut->fresh()->status);
     }
 
     public function test_landlord_can_approve_request(): void
@@ -230,5 +252,29 @@ class MoveOutWorkflowTest extends TestCase
         $this->assertSame(MoveOutRequest::STATUS_COMPLETED, $moveOut->fresh()->status);
         $this->assertFalse($tenant->fresh()->is_active);
         $this->assertSame('vacant', $unit->fresh()->status);
+    }
+
+    public function test_move_out_clearance_keeps_unit_occupied_when_another_active_tenancy_remains(): void
+    {
+        [$owner, $user, $property, $unit, $tenant] = $this->scenario();
+        $remainingUser = $this->makeTenantUser();
+        $remainingTenant = $this->makeTenant($property, $unit, $remainingUser, 'Remaining Tenant');
+        $service = app(MoveOutService::class);
+        $moveOut = $service->createRequest($tenant, [
+            'proposed_move_out_date' => now()->addMonthsNoOverflow(1)->toDateString(),
+        ], $user);
+
+        $service->transition($moveOut, MoveOutRequest::STATUS_APPROVED, $owner);
+        $service->clear($moveOut->fresh(), $owner, [
+            'clearance_decision' => 'cleared',
+            'actual_move_out_date' => now()->addMonthsNoOverflow(1)->toDateString(),
+        ]);
+
+        $this->assertSame(MoveOutRequest::STATUS_COMPLETED, $moveOut->fresh()->status);
+        $this->assertFalse($tenant->fresh()->is_active);
+        $this->assertTrue($remainingTenant->fresh()->is_active);
+        $this->assertSame('occupied', $unit->fresh()->status);
+        $this->assertFalse($user->fresh()->is_active);
+        $this->assertTrue($remainingUser->fresh()->is_active);
     }
 }

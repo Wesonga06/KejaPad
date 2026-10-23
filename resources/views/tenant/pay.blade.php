@@ -4,17 +4,19 @@
 
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Pay Rent via M-Pesa</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">Pay Rent via M-Pesa</h1>
+            <p class="kp-page-subtitle">
                 {{ $rent->monthName() }} {{ $rent->year }} —
                 {{ $tenant->property->name }} Unit {{ $tenant->unit->unit_number }}
             </p>
         </div>
-        <a href="{{ route('tenant.dashboard') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-1"></i> Back
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('tenant.dashboard') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back
+            </a>
+        </div>
     </div>
 
     <div class="row g-4 justify-content-center">
@@ -129,7 +131,7 @@
                     </div>
 
                     <!-- M-Pesa Steps -->
-                    <div class="p-3 rounded-3 mb-4"
+            <div class="kp-payment-instructions p-3 rounded-3 mb-4"
                          style="background:#f8f9ff; border:1px solid rgba(89,38,200,0.08);">
                         <p class="fw-semibold mb-2" style="font-size:0.85rem; color:#5926C8;">
                             <i class="bi bi-info-circle me-1"></i> How it works:

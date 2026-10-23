@@ -14,14 +14,14 @@
         </ol>
     </nav>
 
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">{{ $property->name }} — Units</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">{{ $property->name }} — Units</h1>
+            <p class="kp-page-subtitle">
                 <i class="bi bi-geo-alt me-1"></i>{{ $property->location }}
             </p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="kp-page-actions">
             <a href="{{ route('landlord.passport.index', $property) }}" class="btn btn-outline-primary">
                 <i class="bi bi-journal-text me-2"></i> Property Passports
             </a>
@@ -33,7 +33,7 @@
         </div>
     </div>
 
-    <div class="kp-card mb-4" role="status">
+    <div class="kp-card kp-capacity-indicator mb-4" role="status">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
             <strong>Registered units: {{ $totalUnits }} of {{ $property->total_units }}</strong>
             @if($remainingCapacity > 0)

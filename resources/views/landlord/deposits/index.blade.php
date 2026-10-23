@@ -24,7 +24,7 @@
             <div class="stat-card kp-kpi h-100">
                 <div class="kp-kpi-top"><div class="kp-kpi-icon purple"><i class="bi bi-shield-check"></i></div></div>
                 <div class="kp-kpi-value" style="font-size:1.35rem;">KES {{ number_format($stats['held'], 0) }}</div>
-                <p class="kp-kpi-label">Deposits Held</p>
+                <p class="kp-kpi-label">Total Received</p>
             </div>
         </div>
         <div class="col-6 col-xl-3">

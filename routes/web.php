@@ -24,6 +24,7 @@ use App\Http\Controllers\LandlordTurnoverController;
 use App\Http\Controllers\MaintenanceEvidenceController;
 use App\Http\Controllers\MpesaController;
 use App\Http\Controllers\PassportFileController;
+use App\Http\Controllers\PaymentReversalController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PropertyAlertSettingController;
 use App\Http\Controllers\PropertyController;
@@ -93,6 +94,10 @@ Route::middleware(array_merge(['auth', 'role:super_admin'], $verified))->prefix(
     Route::post('/payments', [PaymentSettingController::class, 'update'])->name('payments.update');
     Route::get('/payments/transactions', [PaymentSettingController::class, 'transactions'])->name('payments.transactions');
     Route::get('/payments/transactions/export', [PaymentSettingController::class, 'export'])->name('payments.export');
+    Route::get('/payment-reversals', [PaymentReversalController::class, 'index'])->name('payment-reversals.index');
+    Route::post('/payment-reversals/{reversal}/approve', [PaymentReversalController::class, 'approve'])->name('payment-reversals.approve');
+    Route::post('/payment-reversals/{reversal}/reject', [PaymentReversalController::class, 'reject'])->name('payment-reversals.reject');
+    Route::post('/payment-reversals/{reversal}/external-refund', [PaymentReversalController::class, 'externalRefund'])->name('payment-reversals.external-refund');
 
     // SMS settings
     Route::get('/sms', [SmsSettingController::class, 'index'])->name('sms.index');
@@ -187,6 +192,8 @@ Route::middleware(array_merge(['auth', 'role:landlord', 'landlord.approved'], $v
 
     // Tenant rent account: payments + notices
     Route::post('/tenants/{tenant}/payments', [LandlordTenantController::class, 'recordPayment'])->name('tenants.payments.store');
+    Route::get('/payments/{payment}/reversal', [PaymentReversalController::class, 'create'])->name('payments.reversals.create');
+    Route::post('/payments/{payment}/reversal', [PaymentReversalController::class, 'store'])->name('payments.reversals.store');
     Route::post('/tenants/{tenant}/notices', [RentNoticeController::class, 'store'])->name('tenants.notices.store');
     Route::get('/notices', [RentNoticeController::class, 'index'])->name('notices.index');
     Route::get('/notices/create', [RentNoticeController::class, 'create'])->name('notices.create');

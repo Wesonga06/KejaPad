@@ -3,16 +3,18 @@
 @section('page-title', 'Maintenance Requests')
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Maintenance Requests</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">Maintenance Requests</h1>
+            <p class="kp-page-subtitle">
                 Requests for the properties you manage.
             </p>
         </div>
-        <a href="{{ route('caretaker.history.index') }}" class="btn btn-outline-primary btn-sm">
-            <i class="bi bi-clipboard-data me-1"></i> My Work History
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('caretaker.history.index') }}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-clipboard-data me-1"></i> My Work History
+            </a>
+        </div>
     </div>
 
     <!-- Summary -->

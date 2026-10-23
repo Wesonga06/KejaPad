@@ -9,7 +9,7 @@
     @endphp
 
     <!-- Welcome Banner -->
-    <div class="kp-card mb-4" style="background: linear-gradient(120deg, var(--kp-deep) 0%, #47218a 100%); border: none;">
+    <div class="kp-card kp-welcome-banner">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div>
                 <h2 class="fw-bold mb-1" style="color:#fff; font-size:1.4rem;">

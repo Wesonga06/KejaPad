@@ -15,7 +15,9 @@ use App\Services\RentAllocationService;
 use App\Services\RentStatusService;
 use App\Services\TurnoverService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 
 class LandlordTenantController extends Controller
 {
@@ -84,82 +86,83 @@ class LandlordTenantController extends Controller
     // Store new tenant
     public function store(StoreTenantRequest $request, DepositService $deposits, TurnoverService $turnovers)
     {
-        // Make sure landlord owns this property
         $property = Property::findOrFail($request->property_id);
         $this->authorize('view', $property);
 
-        // Make sure unit is vacant
-        $unit = Unit::findOrFail($request->unit_id);
-        if ($unit->status !== 'vacant') {
-            return back()->withErrors(['unit_id' => 'This unit is not vacant.'])
-                ->withInput();
-        }
-
-        $userId = null;
-
-        // Create login account if requested
         if ($request->filled('create_account') && $request->filled('email')) {
             $request->validate([
                 'password' => 'required|min:8|confirmed',
             ]);
+        }
 
-            if (User::where('email', $request->email)->exists()) {
-                return back()->withErrors(['email' => 'This email is already registered.'])
-                    ->withInput();
+        return DB::transaction(function () use ($request, $property, $deposits, $turnovers) {
+            $unit = Unit::query()->whereKey($request->unit_id)->lockForUpdate()->firstOrFail();
+
+            if ((int) $unit->property_id !== (int) $property->id) {
+                throw ValidationException::withMessages([
+                    'unit_id' => 'The selected unit does not belong to the selected property.',
+                ]);
             }
 
-            $user = User::create([
-                'name' => $request->full_name,
+            if ($unit->status !== 'vacant' || Tenant::where('unit_id', $unit->id)->where('is_active', true)->exists()) {
+                throw ValidationException::withMessages([
+                    'unit_id' => 'This unit is not vacant.',
+                ]);
+            }
+
+            $userId = null;
+
+            if ($request->filled('create_account') && $request->filled('email')) {
+                if (User::where('email', $request->email)->exists()) {
+                    throw ValidationException::withMessages([
+                        'email' => 'This email is already registered.',
+                    ]);
+                }
+
+                $user = User::create([
+                    'name' => $request->full_name,
+                    'email' => $request->email,
+                    'password' => Hash::make($request->password),
+                    'role' => 'tenant',
+                    'is_active' => true,
+                ]);
+
+                $userId = $user->id;
+            }
+
+            $tenant = Tenant::create([
+                'user_id' => $userId,
+                'property_id' => $property->id,
+                'unit_id' => $unit->id,
+                'full_name' => $request->full_name,
+                'phone' => $request->phone,
                 'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => 'tenant',
+                'national_id' => $request->national_id,
+                'emergency_contact_name' => $request->emergency_contact_name,
+                'emergency_contact_phone' => $request->emergency_contact_phone,
+                'move_in_date' => $request->move_in_date,
+                'lease_end_date' => $request->lease_end_date,
                 'is_active' => true,
             ]);
 
-            $userId = $user->id;
-        }
+            $deposits->ensureForTenant($tenant, (float) $unit->rent_amount);
 
-        // Create tenant record
-        $tenant = Tenant::create([
-            'user_id' => $userId,
-            'property_id' => $request->property_id,
-            'unit_id' => $request->unit_id,
-            'full_name' => $request->full_name,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'national_id' => $request->national_id,
-            'emergency_contact_name' => $request->emergency_contact_name,
-            'emergency_contact_phone' => $request->emergency_contact_phone,
-            'move_in_date' => $request->move_in_date,
-            'lease_end_date' => $request->lease_end_date,
-            'is_active' => true,
-        ]);
+            if (config('tenancy.require_deposit_before_move_in', true)) {
+                $unit->update(['status' => 'reserved']);
+                $turnovers->linkIncomingTenant($unit->fresh(), $tenant, auth()->user());
 
-        // Create the security deposit obligation for this tenancy.
-        $deposits->ensureForTenant($tenant, (float) $unit->rent_amount);
+                return redirect()->route('landlord.tenants.index')
+                    ->with('success', $tenant->full_name.' added. The unit is reserved pending '
+                        .'verification of the KES '.number_format($deposits->requiredAmount((float) $unit->rent_amount), 2)
+                        .' security deposit before move-in.');
+            }
 
-        // A tenancy is only moved in once the deposit is received and verified.
-        if (config('tenancy.require_deposit_before_move_in', true)) {
-            $unit->update(['status' => 'reserved']);
-
-            // Link this incoming tenancy to any ready turnover for the unit.
+            $unit->update(['status' => 'occupied']);
             $turnovers->linkIncomingTenant($unit->fresh(), $tenant, auth()->user());
 
             return redirect()->route('landlord.tenants.index')
-                ->with('success', $tenant->full_name.' added. The unit is reserved pending '
-                    .'verification of the KES '.number_format($deposits->requiredAmount((float) $unit->rent_amount), 2)
-                    .' security deposit before move-in.');
-        }
-
-        // Mark unit as occupied
-        $unit->update(['status' => 'occupied']);
-
-        // Link this incoming tenancy to any ready turnover for the unit; the
-        // unit is already occupied so the turnover completes immediately.
-        $turnovers->linkIncomingTenant($unit->fresh(), $tenant, auth()->user());
-
-        return redirect()->route('landlord.tenants.index')
-            ->with('success', 'Tenant added successfully.');
+                ->with('success', 'Tenant added successfully.');
+        });
     }
 
     // Show edit form
@@ -204,20 +207,40 @@ class LandlordTenantController extends Controller
     {
         $this->authorize('deactivate', $tenant);
 
-        $tenant->update([
-            'is_active' => false,
-            'move_out_date' => now()->toDateString(),
-        ]);
+        $unitVacant = false;
 
-        // Free up the unit
-        $tenant->unit->update(['status' => 'vacant']);
+        DB::transaction(function () use ($tenant, &$unitVacant) {
+            $tenant = Tenant::query()->whereKey($tenant->id)->lockForUpdate()->firstOrFail();
+            $unit = Unit::query()->whereKey($tenant->unit_id)->lockForUpdate()->firstOrFail();
 
-        // Deactivate user account if linked
-        if ($tenant->user_id) {
-            $tenant->user->update(['is_active' => false]);
-        }
+            $tenant->update([
+                'is_active' => false,
+                'move_out_date' => now()->toDateString(),
+            ]);
 
-        return back()->with('success', 'Tenant deactivated and unit marked as vacant.');
+            $anotherActiveTenant = Tenant::where('unit_id', $unit->id)
+                ->where('is_active', true)
+                ->exists();
+
+            if (! $anotherActiveTenant) {
+                $unit->update(['status' => 'vacant']);
+                $unitVacant = true;
+            }
+
+            if ($tenant->user_id) {
+                $hasOtherActiveTenancy = Tenant::where('user_id', $tenant->user_id)
+                    ->where('is_active', true)
+                    ->exists();
+
+                if (! $hasOtherActiveTenancy) {
+                    User::query()->whereKey($tenant->user_id)->lockForUpdate()->first()?->update(['is_active' => false]);
+                }
+            }
+        });
+
+        return back()->with('success', $unitVacant
+            ? 'Tenant deactivated and unit marked as vacant.'
+            : 'Tenant deactivated. The unit remains assigned to another active tenancy.');
     }
 
     // Show tenant details, rent ledger, arrears breakdown, behaviour + notices
@@ -231,7 +254,7 @@ class LandlordTenantController extends Controller
         $breakdown = $status->breakdown($tenant);
         $indicators = $behaviour->indicators($tenant, now()->subMonths(6));
         $notices = $tenant->rentNotices()->latest('issued_at')->latest('id')->get();
-        $payments = $tenant->payments()->latest('payment_date')->latest('id')->take(50)->get();
+        $payments = $tenant->payments()->with(['allocations.rentRecord', 'reversals'])->latest('payment_date')->latest('id')->take(50)->get();
 
         $deposit = $tenant->securityDeposit;
         $activeMoveOut = $tenant->moveOutRequests()->whereNotIn('status', ['completed', 'rejected', 'cancelled'])->latest('submitted_at')->first();

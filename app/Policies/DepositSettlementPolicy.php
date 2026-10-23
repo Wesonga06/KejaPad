@@ -47,6 +47,7 @@ class DepositSettlementPolicy
     {
         return $user->isTenant()
             && $settlement->isVisibleToTenant()
+            && ! $settlement->isApproved()
             && ! $settlement->isSettled()
             && $settlement->moveOutRequest?->tenant?->user_id === $user->id;
     }

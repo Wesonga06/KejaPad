@@ -3,10 +3,10 @@
 @section('page-title', 'My Work History')
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">My Work History</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">My Work History</h1>
+            <p class="kp-page-subtitle">
                 An evidence-based summary of your maintenance work: {{ $summary['period_label'] }}.
             </p>
         </div>
@@ -14,7 +14,7 @@
     </div>
 
     <!-- Period filter -->
-    <div class="stat-card mb-4">
+    <div class="kp-card mb-4">
         <form method="GET" action="{{ route('caretaker.history.index') }}" class="row g-3 align-items-end">
             <div class="col-6 col-md-4">
                 <label class="form-label fw-semibold">From</label>
@@ -142,7 +142,7 @@
     @endif
 
     <!-- Task list -->
-    <div class="stat-card">
+        <div class="kp-card">
         <h6 class="fw-bold mb-3 pb-2 border-bottom">Tasks</h6>
         @if($tasks->isEmpty())
             <div class="text-center py-5">

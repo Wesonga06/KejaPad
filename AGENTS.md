@@ -11,7 +11,7 @@ collection. See `README.md` for the full overview. Roles: `super_admin`, `landlo
 ## Commands
 
 ```sh
-php artisan test           # run the suite (39 tests) — always run before finishing
+php artisan test           # run the test suite
 vendor/bin/pint            # format code; run on the files you touch
 php artisan migrate        # migrations (MySQL in dev; SQLite for tests)
 php artisan rent:mark-overdue

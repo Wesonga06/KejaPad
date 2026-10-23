@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Payment;
 use App\Models\PaymentAllocation;
+use App\Models\PaymentReversal;
+use App\Models\PaymentReversalAllocation;
 use App\Models\RentAudit;
 use App\Models\RentRecord;
 use App\Models\Tenant;
@@ -85,7 +87,7 @@ class RentAllocationService
             ]);
 
             return $payment->fresh(['allocations.rentRecord']);
-        });
+        }, 3);
     }
 
     /**
@@ -106,21 +108,31 @@ class RentAllocationService
                 ->get();
 
             foreach ($payments as $payment) {
-                $remaining = (float) $payment->unallocated_amount;
-                $before = $remaining;
+                $reserved = (float) $payment->reversals()->where('status', PaymentReversal::STATUS_PENDING)->sum('reversed_credit');
+                $remaining = max(0, (float) $payment->unallocated_amount - $reserved);
+                $availableBefore = $remaining;
 
                 if ($remaining <= 0) {
                     continue;
                 }
 
-                $targets = RentRecord::where('tenant_id', $tenant->id)
-                    ->get()
-                    ->filter(fn (RentRecord $r) => $r->outstanding() > 0)
-                    ->sortBy([['due_date', 'asc'], ['id', 'asc']]);
+                // Lock each rent row before reading its balance. Other allocation
+                // paths serialize on this row, so a held credit cannot use a stale
+                // amount_paid value and over-allocate a period.
+                $targetIds = RentRecord::where('tenant_id', $tenant->id)
+                    ->orderBy('due_date')
+                    ->orderBy('id')
+                    ->pluck('id');
 
-                foreach ($targets as $rent) {
+                foreach ($targetIds as $rentId) {
                     if ($remaining <= 0) {
                         break;
+                    }
+
+                    $rent = RentRecord::whereKey($rentId)->lockForUpdate()->first();
+
+                    if (! $rent || $rent->tenant_id !== $tenant->id) {
+                        continue;
                     }
 
                     $balance = $rent->outstanding();
@@ -136,19 +148,20 @@ class RentAllocationService
                     $applied += $take;
                 }
 
-                if (round($remaining, 2) !== round($before, 2)) {
-                    $payment->update(['unallocated_amount' => round(max(0.0, $remaining), 2)]);
+                if (round($remaining, 2) !== round($availableBefore, 2)) {
+                    $unallocatedAfter = round($reserved + max(0.0, $remaining), 2);
+                    $payment->update(['unallocated_amount' => $unallocatedAfter]);
 
                     RentAudit::record(RentAudit::ACTION_CREDIT_APPLIED, $payment, [
                         'tenant_id' => $tenant->id,
-                        'credit_applied' => round($before - $remaining, 2),
-                        'unallocated_amount' => round(max(0.0, $remaining), 2),
+                        'credit_applied' => round($availableBefore - $remaining, 2),
+                        'unallocated_amount' => $unallocatedAfter,
                     ]);
                 }
             }
 
             return round($applied, 2);
-        });
+        }, 3);
     }
 
     /**
@@ -160,6 +173,10 @@ class RentAllocationService
     {
         return DB::transaction(function () use ($payment, $newAllocations, $userId) {
             $payment = Payment::whereKey($payment->id)->lockForUpdate()->firstOrFail();
+
+            if ($payment->reversals()->exists()) {
+                throw ValidationException::withMessages(['payment' => 'This payment has reversal history and can no longer be reallocated.']);
+            }
 
             $old = $payment->allocations()->get(['rent_record_id', 'amount'])->toArray();
 
@@ -218,7 +235,7 @@ class RentAllocationService
             );
 
             return $payment->fresh(['allocations.rentRecord']);
-        });
+        }, 3);
     }
 
     /**
@@ -281,7 +298,11 @@ class RentAllocationService
      */
     public function syncRecord(RentRecord $rent): RentRecord
     {
-        $paid = (float) $rent->allocations()->sum('amount');
+        $grossPaid = (float) $rent->allocations()->sum('amount');
+        $reversed = (float) PaymentReversalAllocation::whereHas('reversal', fn ($query) => $query->where('status', PaymentReversal::STATUS_APPROVED))
+            ->whereHas('paymentAllocation', fn ($query) => $query->where('rent_record_id', $rent->id))
+            ->sum('amount');
+        $paid = max(0, $grossPaid - $reversed);
         $rent->amount_paid = min($paid, (float) $rent->amount_due);
 
         $rent->status = $this->deriveStatus($rent);

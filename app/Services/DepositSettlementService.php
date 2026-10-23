@@ -6,6 +6,7 @@ use App\Models\DepositSettlement;
 use App\Models\DepositSettlementEvent;
 use App\Models\DepositTransaction;
 use App\Models\MoveOutRequest;
+use App\Models\SecurityDeposit;
 use App\Models\User;
 use App\Notifications\DepositSettlementNotification;
 use Illuminate\Support\Facades\DB;
@@ -78,11 +79,13 @@ class DepositSettlementService
     // Send the statement to the tenant for review.
     public function sendToTenant(DepositSettlement $settlement, User $actor): DepositSettlement
     {
-        if ($settlement->isSettled()) {
-            abort(422, 'A settled statement cannot be re-sent.');
-        }
-
         return DB::transaction(function () use ($settlement, $actor) {
+            $settlement = $this->lockSettlement($settlement);
+
+            if ($settlement->isSettled()) {
+                abort(422, 'A settled statement cannot be re-sent.');
+            }
+
             $this->refreshFigures($settlement);
 
             $settlement->update([
@@ -104,15 +107,21 @@ class DepositSettlementService
     // append-only events; a decision never erases what the tenant said.
     public function recordTenantResponse(DepositSettlement $settlement, User $actor, array $data): DepositSettlement
     {
-        if (! $settlement->isVisibleToTenant()) {
-            abort(422, 'This statement has not been sent to the tenant yet.');
-        }
-
-        if ($settlement->isSettled()) {
-            abort(422, 'A settled statement cannot be changed.');
-        }
-
         return DB::transaction(function () use ($settlement, $actor, $data) {
+            $settlement = $this->lockSettlement($settlement);
+
+            if (! $settlement->isVisibleToTenant()) {
+                abort(422, 'This statement has not been sent to the tenant yet.');
+            }
+
+            if ($settlement->isApproved()) {
+                abort(422, 'A decision has already been recorded for this statement.');
+            }
+
+            if ($settlement->isSettled()) {
+                abort(422, 'A settled statement cannot be changed.');
+            }
+
             $deposit = $settlement->securityDeposit;
             $comment = $data['tenant_comment'] ?? null;
             $disputes = array_filter((array) ($data['dispute'] ?? []));
@@ -179,16 +188,29 @@ class DepositSettlementService
     // and set the approved refund. The decision does not itself pay anyone.
     public function recordDecision(DepositSettlement $settlement, User $actor, array $data): DepositSettlement
     {
-        if ($settlement->isSettled()) {
-            abort(422, 'A settled statement cannot be changed.');
-        }
-
         return DB::transaction(function () use ($settlement, $actor, $data) {
+            $settlement = $this->lockSettlement($settlement);
+
+            if ($settlement->isSettled()) {
+                abort(422, 'A settled statement cannot be changed.');
+            }
+
             $deposit = $settlement->securityDeposit;
 
             if ($deposit === null) {
                 abort(422, 'No security deposit is held for this tenancy.');
             }
+
+            // Release this statement's previous refund reservation before
+            // recalculating its decision. A failed decision rolls this back.
+            $deposit->refunds()
+                ->where('move_out_request_id', $settlement->move_out_request_id)
+                ->whereIn('status', [DepositTransaction::STATUS_PROPOSED, DepositTransaction::STATUS_APPROVED])
+                ->lockForUpdate()
+                ->get()
+                ->each(fn (DepositTransaction $refund) => $refund->update([
+                    'status' => DepositTransaction::STATUS_REVERSED,
+                ]));
 
             $approveIds = array_filter((array) ($data['approve'] ?? []));
             $rejectIds = array_filter((array) ($data['reject'] ?? []));
@@ -203,7 +225,7 @@ class DepositSettlementService
             }
 
             foreach ($approveIds as $id) {
-                $transaction = $deposit->deductions()->whereKey($id)->first();
+                $transaction = $deposit->deductions()->whereKey($id)->lockForUpdate()->first();
 
                 if (! $transaction || $transaction->status !== DepositTransaction::STATUS_PROPOSED) {
                     continue;
@@ -223,23 +245,22 @@ class DepositSettlementService
             }
 
             foreach ($rejectIds as $id) {
-                $transaction = $deposit->deductions()->whereKey($id)->first();
+                $transaction = $deposit->deductions()->whereKey($id)->lockForUpdate()->first();
 
                 if ($transaction && $transaction->status === DepositTransaction::STATUS_PROPOSED) {
                     $transaction->update(['status' => DepositTransaction::STATUS_REVERSED]);
                 }
             }
 
-            $deposit->refresh();
-
-            $held = (float) $deposit->received_amount;
-            $approvedDeductions = $deposit->approvedDeductions();
+            $totals = $this->deposits->lockedFinancialTotals($deposit);
+            $held = $totals['received'];
+            $approvedDeductions = $totals['approved_deductions'];
 
             if (round($approvedDeductions, 2) > round($held, 2)) {
                 abort(422, 'Approved deductions cannot exceed the deposit received.');
             }
 
-            $maxRefund = round($held - $approvedDeductions - $deposit->completedRefunds(), 2);
+            $maxRefund = round($held - $approvedDeductions - $totals['completed_refunds'] - $totals['reserved_refunds'], 2);
 
             $approvedRefund = (isset($data['approved_refund']) && $data['approved_refund'] !== null)
                 ? round((float) $data['approved_refund'], 2)
@@ -255,12 +276,6 @@ class DepositSettlementService
             // balance is reserved and cannot be promised twice. Nothing is paid
             // until the payout is confirmed at settlement.
             if ($approvedRefund > 0) {
-                $deposit->refunds()
-                    ->where('move_out_request_id', $settlement->move_out_request_id)
-                    ->whereIn('status', [DepositTransaction::STATUS_PROPOSED, DepositTransaction::STATUS_APPROVED])
-                    ->get()
-                    ->each(fn (DepositTransaction $refund) => $refund->update(['status' => DepositTransaction::STATUS_REVERSED]));
-
                 $refund = $this->deposits->proposeRefund($deposit->fresh(), [
                     'amount' => $approvedRefund,
                     'reason' => $data['decision_reason'] ?? 'Approved deposit refund',
@@ -275,6 +290,7 @@ class DepositSettlementService
 
             $settlement->update([
                 'status' => DepositSettlement::STATUS_APPROVED,
+                'held_amount' => round($held, 2),
                 'approved_refund' => $approvedRefund,
                 'retained_amount' => $retained,
                 'landlord_findings' => $data['landlord_findings'] ?? null,
@@ -302,11 +318,13 @@ class DepositSettlementService
     // the existing verified refund flow, then marking the statement settled.
     public function settle(DepositSettlement $settlement, User $actor, array $data): DepositSettlement
     {
-        if (! $settlement->isApproved()) {
-            abort(422, 'Only an approved statement can be settled.');
-        }
-
         return DB::transaction(function () use ($settlement, $actor, $data) {
+            $settlement = $this->lockSettlement($settlement);
+
+            if (! $settlement->isApproved()) {
+                abort(422, 'Only an approved statement can be settled.');
+            }
+
             $deposit = $settlement->securityDeposit;
             $approvedRefund = (float) ($settlement->approved_refund ?? 0);
 
@@ -318,6 +336,7 @@ class DepositSettlementService
                 $refund = $deposit->refunds()
                     ->where('move_out_request_id', $settlement->move_out_request_id)
                     ->where('status', DepositTransaction::STATUS_APPROVED)
+                    ->lockForUpdate()
                     ->latest('id')
                     ->first();
 
@@ -354,6 +373,21 @@ class DepositSettlementService
 
             return $settlement->fresh();
         });
+    }
+
+    protected function lockSettlement(DepositSettlement $settlement): DepositSettlement
+    {
+        if ($settlement->security_deposit_id) {
+            SecurityDeposit::query()
+                ->whereKey($settlement->security_deposit_id)
+                ->lockForUpdate()
+                ->first();
+        }
+
+        return DepositSettlement::query()
+            ->whereKey($settlement->id)
+            ->lockForUpdate()
+            ->firstOrFail();
     }
 
     // Append an entry to the settlement history. Existing entries are never

@@ -169,6 +169,10 @@
        class="nav-link {{ request()->routeIs('super_admin.payments.*') ? 'active' : '' }}">
         <i class="bi bi-credit-card"></i> Payment Settings
     </a>
+    <a href="{{ route('super_admin.payment-reversals.index') }}"
+       class="nav-link {{ request()->routeIs('super_admin.payment-reversals.*') ? 'active' : '' }}">
+        <i class="bi bi-arrow-counterclockwise"></i> Payment Reversals
+    </a>
     <a href="{{ route('super_admin.sms.index') }}"
        class="nav-link {{ request()->routeIs('super_admin.sms.*') ? 'active' : '' }}">
         <i class="bi bi-chat-dots"></i> SMS Settings

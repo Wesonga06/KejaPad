@@ -4,8 +4,7 @@
 
 @section('content')
     <!-- Welcome Banner -->
-    <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #32145C, #5926C8); color: white;">
+    <div class="kp-welcome-banner">
         <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} &#128075;</h4>
         <p class="mb-0 opacity-75">
             {{ $tenant->property->name }} —

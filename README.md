@@ -51,8 +51,24 @@ The `/api/mpesa/callback` route is public and hardened:
 
 ## Scheduled Tasks
 
-`php artisan schedule:run` should be registered with the OS scheduler. The
-`rent:mark-overdue` command runs daily at 01:00 to flag overdue rent records.
+Register `php artisan schedule:run` to run once per minute with the operating
+system scheduler (for example, a cron entry or Windows Task Scheduler job).
+On Linux, the crontab entry is:
+
+```cron
+* * * * * cd /path/to/kejapad && php artisan schedule:run >> /dev/null 2>&1
+```
+
+The Laravel scheduler uses the application timezone (`UTC` in the current
+configuration). Its rent generation, overdue marking, rent reminders, alerts
+and maintenance escalation tasks have overlap and single-server locks. In a
+multi-server deployment, all scheduler hosts must use the same shared cache
+store (such as the production database or Redis) for those locks to coordinate.
+Ensure the cache tables are migrated if the database cache store is used, and
+monitor the scheduler's application logs for command failures.
+
+The rent schedule generates monthly records at 00:30 UTC on day 1; the other
+workflows run daily at their configured times in `routes/console.php`.
 
 ## Useful Commands
 

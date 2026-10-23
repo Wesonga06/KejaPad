@@ -19,6 +19,14 @@ class RentAudit extends Model
 
     public const ACTION_RECORD_RECALCULATED = 'record_recalculated';
 
+    public const ACTION_REVERSAL_INITIATED = 'payment_reversal_initiated';
+
+    public const ACTION_REVERSAL_APPROVED = 'payment_reversal_approved';
+
+    public const ACTION_REVERSAL_REJECTED = 'payment_reversal_rejected';
+
+    public const ACTION_EXTERNAL_REFUND_UPDATED = 'external_refund_updated';
+
     protected $fillable = [
         'auditable_type',
         'auditable_id',

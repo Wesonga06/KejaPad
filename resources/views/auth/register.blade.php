@@ -215,6 +215,7 @@
             .auth-wrapper { border-radius: 20px; }
         }
     </style>
+    <link href="{{ asset('css/kejapad-design.css') }}" rel="stylesheet">
 </head>
 <body>
 

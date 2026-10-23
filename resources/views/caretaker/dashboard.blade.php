@@ -4,8 +4,7 @@
 
 
 @section('content')
-    <div class="p-4 mb-4 rounded-3"
-         style="background: linear-gradient(135deg, #168653, #F4C542); color: white;">
+    <div class="kp-welcome-banner">
         <h4 class="fw-bold mb-1">Welcome, {{ auth()->user()->name }} 👋</h4>
         <p class="mb-0 opacity-75">Here are the maintenance requests for your properties.</p>
     </div>

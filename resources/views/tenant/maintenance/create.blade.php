@@ -4,19 +4,21 @@
 
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Submit Maintenance Request</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">Submit Maintenance Request</h1>
+            <p class="kp-page-subtitle">
                 Describe the issue and we'll get it sorted.
             </p>
         </div>
-        <a href="{{ route('tenant.maintenance.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('tenant.maintenance.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Back
+            </a>
+        </div>
     </div>
 
-    <div class="stat-card" style="max-width:650px;">
+    <div class="stat-card kp-form-narrow">
         <form method="POST" action="{{ route('tenant.maintenance.store') }}"
               enctype="multipart/form-data">
             @csrf

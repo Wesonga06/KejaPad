@@ -6,6 +6,7 @@ use App\Models\MoveOutInspection;
 use App\Models\MoveOutRequest;
 use App\Models\RentAudit;
 use App\Models\Tenant;
+use App\Models\Unit;
 use App\Models\User;
 use App\Notifications\InspectionAssignedNotification;
 use App\Notifications\InspectionCompletedNotification;
@@ -60,12 +61,6 @@ class MoveOutService
     // Create a tenant's notice-to-vacate request.
     public function createRequest(Tenant $tenant, array $data, User $submittedBy): MoveOutRequest
     {
-        if ($tenant->activeMoveOutRequest()->exists()) {
-            throw ValidationException::withMessages([
-                'proposed_move_out_date' => 'You already have an open Notice to Vacate request.',
-            ]);
-        }
-
         $months = $this->noticePeriodMonths();
         $submittedAt = now();
         $earliest = $this->earliestPermittedDate($submittedAt, $months);
@@ -80,6 +75,14 @@ class MoveOutService
         }
 
         return DB::transaction(function () use ($tenant, $data, $submittedBy, $months, $submittedAt, $earliest, $proposed) {
+            $tenant = Tenant::query()->whereKey($tenant->id)->lockForUpdate()->firstOrFail();
+
+            if ($tenant->activeMoveOutRequest()->exists()) {
+                throw ValidationException::withMessages([
+                    'proposed_move_out_date' => 'You already have an open Notice to Vacate request.',
+                ]);
+            }
+
             $request = MoveOutRequest::create([
                 'tenant_id' => $tenant->id,
                 'property_id' => $tenant->property_id,
@@ -117,15 +120,19 @@ class MoveOutService
     // Move a request through the workflow, enforcing valid transitions.
     public function transition(MoveOutRequest $request, string $status, User $actor, array $meta = []): MoveOutRequest
     {
-        if (! $request->canTransitionTo($status)) {
-            throw ValidationException::withMessages([
-                'status' => 'Invalid status transition from "'
-                    .MoveOutRequest::statusLabel($request->status).'" to "'
-                    .MoveOutRequest::statusLabel($status).'".',
-            ]);
-        }
-
         return DB::transaction(function () use ($request, $status, $actor, $meta) {
+            $lockedRequest = MoveOutRequest::query()->whereKey($request->id)->lockForUpdate()->firstOrFail();
+
+            $request->setRawAttributes($lockedRequest->getAttributes(), true);
+
+            if (! $request->canTransitionTo($status)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Invalid status transition from "'
+                        .MoveOutRequest::statusLabel($request->status).'" to "'
+                        .MoveOutRequest::statusLabel($status).'".',
+                ]);
+            }
+
             $old = $request->status;
             $updates = ['status' => $status];
 
@@ -326,25 +333,33 @@ class MoveOutService
     // Deactivate the tenancy and free the unit once clearance is complete.
     protected function closeTenancy(MoveOutRequest $request): void
     {
-        $request->tenant?->update([
+        $tenant = Tenant::query()->whereKey($request->tenant_id)->lockForUpdate()->first();
+        $unit = Unit::query()->whereKey($request->unit_id)->lockForUpdate()->first();
+
+        $tenant?->update([
             'is_active' => false,
             'move_out_date' => $request->actual_move_out_date?->toDateString() ?? now()->toDateString(),
         ]);
 
-        $request->unit?->update(['status' => 'vacant']);
+        $anotherActiveTenant = $unit && Tenant::where('unit_id', $unit->id)
+            ->where('is_active', true)
+            ->exists();
 
-        if ($request->unit) {
+        if ($unit && ! $anotherActiveTenant && $unit->status !== 'vacant') {
+            $previousStatus = $unit->status;
+            $unit->update(['status' => 'vacant']);
+
             $this->audit->record(
                 'unit_status_changed',
-                'Unit '.$request->unit->unit_number.' status changed to Vacant on move-out clearance.',
-                [],
+                'Unit '.$unit->unit_number.' status changed to Vacant on move-out clearance.',
+                ['status' => $previousStatus],
                 ['status' => 'vacant'],
-                $request->unit
+                $unit
             );
         }
 
-        if ($request->tenant?->user_id) {
-            $request->tenant->user->update(['is_active' => false]);
+        if ($tenant?->user_id && ! Tenant::where('user_id', $tenant->user_id)->where('is_active', true)->exists()) {
+            User::query()->whereKey($tenant->user_id)->lockForUpdate()->first()?->update(['is_active' => false]);
         }
     }
 }

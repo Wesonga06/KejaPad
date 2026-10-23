@@ -228,6 +228,25 @@ class DepositSettlementTest extends TestCase
             ->assertStatus(422);
     }
 
+    public function test_revised_zero_refund_releases_the_previous_refund_reservation(): void
+    {
+        $ctx = $this->scenario();
+        $service = app(DepositSettlementService::class);
+        $settlement = $service->ensure($ctx['moveOut'], $ctx['owner']);
+
+        $service->recordDecision($settlement, $ctx['owner'], ['approved_refund' => 10000]);
+        $this->assertSame(10000.0, $ctx['deposit']->fresh()->pendingRefunds());
+
+        $service->recordDecision($settlement->fresh(), $ctx['owner'], ['approved_refund' => 0]);
+
+        $this->assertSame(0.0, $ctx['deposit']->fresh()->pendingRefunds());
+        $this->assertSame(DepositSettlement::STATUS_APPROVED, $settlement->fresh()->status);
+        $this->assertSame(0.0, (float) $settlement->fresh()->approved_refund);
+        $this->assertSame(1, $ctx['deposit']->fresh()->refunds()
+            ->where('status', DepositTransaction::STATUS_REVERSED)
+            ->count());
+    }
+
     public function test_clearance_is_blocked_until_the_settlement_is_settled(): void
     {
         $ctx = $this->scenario();
@@ -252,6 +271,25 @@ class DepositSettlementTest extends TestCase
         $this->actingAs($ctx['user'])
             ->get(route('tenant.settlement.show', $settlement))
             ->assertStatus(403);
+    }
+
+    public function test_tenant_cannot_respond_again_after_landlord_approval(): void
+    {
+        $ctx = $this->scenario();
+        $service = app(DepositSettlementService::class);
+        $settlement = $service->ensure($ctx['moveOut'], $ctx['owner']);
+        $service->sendToTenant($settlement, $ctx['owner']);
+        $service->recordDecision($settlement->fresh(), $ctx['owner'], ['approved_refund' => 10000]);
+
+        $this->actingAs($ctx['user'])
+            ->post(route('tenant.settlement.respond', $settlement), [
+                'tenant_comment' => 'I disagree after the decision.',
+                'dispute' => [],
+            ])
+            ->assertForbidden();
+
+        $this->assertSame(DepositSettlement::STATUS_APPROVED, $settlement->fresh()->status);
+        $this->assertNull($settlement->fresh()->tenant_comment);
     }
 
     public function test_another_landlord_cannot_view_the_settlement(): void

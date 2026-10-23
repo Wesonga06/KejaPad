@@ -4,10 +4,10 @@
 
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Payment History</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">Payment History</h1>
+            <p class="kp-page-subtitle">
                 Ledger and transactions for
                 {{ $tenant->property->name }} — Unit {{ $tenant->unit->unit_number }}
             </p>

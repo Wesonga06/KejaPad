@@ -52,8 +52,9 @@
         <div class="col-6 col-xl-3">
             <div class="stat-card kp-kpi h-100">
                 <div class="kp-kpi-top"><div class="kp-kpi-icon gold"><i class="bi bi-arrow-return-left"></i></div></div>
-                <div class="kp-kpi-value" style="font-size:1.35rem;">KES {{ number_format($deposit->netRefundable(), 2) }}</div>
-                <p class="kp-kpi-label">Net Refundable</p>
+                <div class="kp-kpi-value" style="font-size:1.35rem;">KES {{ number_format($deposit->availableForRefund(), 2) }}</div>
+                <p class="kp-kpi-label">Available to Refund</p>
+                <p class="text-muted small mb-0">After approved deductions and pending refunds.</p>
             </div>
         </div>
     </div>

@@ -4,17 +4,19 @@
 
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Edit Tenant</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">Update details for {{ $tenant->full_name }}.</p>
+            <h1 class="kp-page-title">Edit Tenant</h1>
+            <p class="kp-page-subtitle">Update details for {{ $tenant->full_name }}.</p>
         </div>
-        <a href="{{ route('landlord.tenants.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('landlord.tenants.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Back
+            </a>
+        </div>
     </div>
 
-    <div class="stat-card" style="max-width:700px;">
+    <div class="stat-card kp-form-wide">
         <form method="POST" action="{{ route('landlord.tenants.update', $tenant) }}">
             @csrf @method('PUT')
 

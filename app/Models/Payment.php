@@ -38,6 +38,21 @@ class Payment extends Model
         return $this->hasMany(PaymentAllocation::class);
     }
 
+    public function reversals()
+    {
+        return $this->hasMany(PaymentReversal::class);
+    }
+
+    public function reversalAllocations()
+    {
+        return $this->hasManyThrough(
+            PaymentReversalAllocation::class,
+            PaymentReversal::class,
+            'payment_id',
+            'payment_reversal_id',
+        );
+    }
+
     public function rentRecords()
     {
         return $this->belongsToMany(RentRecord::class, 'payment_allocations')
@@ -58,7 +73,9 @@ class Payment extends Model
     // Amount of this payment that has been applied to rent periods.
     public function allocatedAmount(): float
     {
-        return (float) $this->allocations()->sum('amount');
+        return max(0.0, (float) $this->allocations()->sum('amount')
+            - (float) $this->reversalAllocations()->whereHas('reversal', fn ($query) => $query
+                ->where('status', PaymentReversal::STATUS_APPROVED))->sum('payment_reversal_allocations.amount'));
     }
 
     public function isFullyAllocated(): bool

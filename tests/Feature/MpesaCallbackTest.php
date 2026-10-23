@@ -98,6 +98,23 @@ class MpesaCallbackTest extends TestCase
         ]);
     }
 
+    public function test_callback_is_rejected_when_ip_enforcement_has_no_allowlist(): void
+    {
+        config([
+            'mpesa.callback_enforce_ip' => true,
+            'mpesa.callback_allowed_ips' => [],
+        ]);
+        $this->pendingPayment();
+
+        $this->postJson('/api/mpesa/callback', $this->successPayload())
+            ->assertStatus(403);
+
+        $this->assertDatabaseHas('mpesa_payments', [
+            'checkout_request_id' => 'CHECKOUT-1',
+            'status' => 'pending',
+        ]);
+    }
+
     public function test_successful_callback_confirms_and_credits_rent(): void
     {
         config(['mpesa.callback_enforce_ip' => false]);
@@ -121,5 +138,76 @@ class MpesaCallbackTest extends TestCase
         $this->postJson('/api/mpesa/callback', $this->successPayload())->assertOk();
 
         $this->assertSame('10000.00', (string) $payment->fresh()->rentRecord->amount_paid);
+    }
+
+    public function test_success_callback_with_short_amount_is_not_confirmed_or_credited(): void
+    {
+        config(['mpesa.callback_enforce_ip' => false]);
+        $payment = $this->pendingPayment();
+        $payload = $this->successPayload();
+        $payload['Body']['stkCallback']['CallbackMetadata']['Item'][0]['Value'] = 9999;
+
+        $this->postJson('/api/mpesa/callback', $payload)->assertOk();
+
+        $this->assertSame('pending', $payment->fresh()->status);
+        $this->assertStringContainsString('manual review', $payment->fresh()->result_desc);
+        $this->assertSame('0.00', (string) $payment->fresh()->rentRecord->amount_paid);
+    }
+
+    public function test_success_callback_without_amount_is_not_confirmed_or_credited(): void
+    {
+        config(['mpesa.callback_enforce_ip' => false]);
+        $payment = $this->pendingPayment();
+        $payload = $this->successPayload();
+        $payload['Body']['stkCallback']['CallbackMetadata']['Item'] = array_values(array_filter(
+            $payload['Body']['stkCallback']['CallbackMetadata']['Item'],
+            fn (array $item): bool => $item['Name'] !== 'Amount',
+        ));
+
+        $this->postJson('/api/mpesa/callback', $payload)->assertOk();
+
+        $this->assertSame('pending', $payment->fresh()->status);
+        $this->assertStringContainsString('manual review', $payment->fresh()->result_desc);
+        $this->assertSame('0.00', (string) $payment->fresh()->rentRecord->amount_paid);
+    }
+
+    public function test_landlord_cannot_manually_confirm_a_failed_payment(): void
+    {
+        $payment = $this->pendingPayment();
+        $payment->update(['status' => 'failed']);
+
+        $this->actingAs($payment->tenant->property->landlord)
+            ->post(route('landlord.mpesa-payments.confirm', $payment))
+            ->assertSessionHasErrors('payment');
+
+        $this->assertSame('failed', $payment->fresh()->status);
+        $this->assertDatabaseCount('payments', 0);
+        $this->assertSame('0.00', (string) $payment->rentRecord->fresh()->amount_paid);
+    }
+
+    public function test_landlord_cannot_reject_a_payment_after_it_was_confirmed(): void
+    {
+        $payment = $this->pendingPayment();
+        $payment->update(['status' => 'confirmed']);
+
+        $this->actingAs($payment->tenant->property->landlord)
+            ->post(route('landlord.mpesa-payments.reject', $payment))
+            ->assertSessionHasErrors('payment');
+
+        $this->assertSame('confirmed', $payment->fresh()->status);
+    }
+
+    public function test_callback_cannot_credit_a_cancelled_payment(): void
+    {
+        config(['mpesa.callback_enforce_ip' => false]);
+        $payment = $this->pendingPayment();
+        $payment->update(['status' => 'cancelled']);
+
+        $this->postJson('/api/mpesa/callback', $this->successPayload())
+            ->assertOk();
+
+        $this->assertSame('cancelled', $payment->fresh()->status);
+        $this->assertDatabaseCount('payments', 0);
+        $this->assertSame('0.00', (string) $payment->rentRecord->fresh()->amount_paid);
     }
 }

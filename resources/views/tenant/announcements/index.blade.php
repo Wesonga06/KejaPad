@@ -4,11 +4,11 @@
 
 
 @section('content')
-    <div class="mb-4">
-        <h5 class="fw-bold mb-1">Announcements</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">
-            Notices and updates from your landlord.
-        </p>
+    <div class="kp-page-header">
+        <div>
+            <h1 class="kp-page-title">Announcements</h1>
+            <p class="kp-page-subtitle">Notices and updates from your landlord.</p>
+        </div>
     </div>
 
     @if($announcements->isEmpty())

@@ -560,14 +560,15 @@
         body.dark-mode .kp-empty i { color: rgba(255,255,255,0.2); }
     </style>
 
+    <link href="{{ asset('css/kejapad-design.css') }}" rel="stylesheet">
     @stack('styles')
 </head>
 <body>
 
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<button class="sidebar-overlay" id="sidebarOverlay" type="button" aria-label="Close navigation" aria-hidden="true" tabindex="-1"></button>
 
 <!-- Sidebar -->
-<div class="sidebar" id="sidebar">
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
     <div class="sidebar-brand">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M3 10.5 12 3l9 7.5" stroke="#F4C542" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -580,7 +581,7 @@
         </div>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Primary">
         @include('partials.sidebar-nav')
     </nav>
 
@@ -597,7 +598,7 @@
             </button>
         </form>
     </div>
-</div>
+</aside>
 
 <!-- Main Content -->
 <div class="main-content">
@@ -609,11 +610,11 @@
     @endphp
 
     <!-- Topbar -->
-    <div class="topbar">
-        <button class="sidebar-toggle" id="sidebarToggle">
+    <header class="topbar">
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
             <i class="bi bi-list"></i>
         </button>
-        <h5 class="page-title">@yield('page-title', 'Dashboard')</h5>
+        <h1 class="page-title">@yield('page-title', 'Dashboard')</h1>
 
         @if($kpUser->isLandlord())
             <form class="topbar-search" method="GET" action="{{ route('landlord.tenants.index') }}" role="search">
@@ -629,7 +630,7 @@
             </button>
 
             <div class="dropdown">
-                <button class="icon-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+                <button class="icon-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Notifications{{ $kpUnread > 0 ? ', '.$kpUnread.' unread' : '' }}">
                     <i class="bi bi-bell"></i>
                     @if($kpUnread > 0)
                         <span class="kp-dot">{{ $kpUnread > 9 ? '9+' : $kpUnread }}</span>
@@ -659,14 +660,14 @@
             </div>
 
             <div class="dropdown">
-                <div class="topbar-profile" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="topbar-profile" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Account menu for {{ $kpUser->name }}">
                     <div class="kp-avatar sm">{{ strtoupper(substr($kpUser->name, 0, 2)) }}</div>
                     <div class="tp-meta d-none d-md-block">
                         <div class="tp-name">{{ $kpUser->name }}</div>
                         <div class="tp-role">{{ ucfirst(str_replace('_', ' ', $kpUser->role)) }}</div>
                     </div>
                     <i class="bi bi-chevron-down text-muted d-none d-md-block" style="font-size:0.7rem;"></i>
-                </div>
+                </button>
                 <div class="dropdown-menu dropdown-menu-end kp-menu">
                     <div class="kp-menu-header">{{ $kpUser->email }}</div>
                     @if($kpUser->isTenant())
@@ -688,10 +689,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </header>
 
     <!-- Page Content -->
-    <div class="page-content">
+    <main class="page-content">
 
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -707,8 +708,19 @@
             </div>
         @endif
 
+        @if($errors->any())
+            <div class="alert alert-danger" role="alert" aria-labelledby="form-errors-heading">
+                <strong id="form-errors-heading">Please review the following:</strong>
+                <ul class="mb-0 mt-2">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @yield('content')
-    </div>
+    </main>
 </div>
 
 <!-- Bootstrap 5 JS -->
@@ -720,18 +732,28 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
 
+        const closeSidebar = function () {
+            if (!sidebar || !overlay || !sidebarToggle) return;
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+            sidebarToggle.setAttribute('aria-expanded', 'false');
+            overlay.setAttribute('aria-hidden', 'true');
+        };
+
         if (sidebarToggle) {
             sidebarToggle.addEventListener('click', function () {
-                sidebar.classList.toggle('open');
-                overlay.classList.toggle('show');
+                const isOpen = sidebar.classList.toggle('open');
+                overlay.classList.toggle('show', isOpen);
+                sidebarToggle.setAttribute('aria-expanded', String(isOpen));
+                overlay.setAttribute('aria-hidden', String(!isOpen));
             });
         }
         if (overlay) {
-            overlay.addEventListener('click', function () {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('show');
-            });
+            overlay.addEventListener('click', closeSidebar);
         }
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') closeSidebar();
+        });
 
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');

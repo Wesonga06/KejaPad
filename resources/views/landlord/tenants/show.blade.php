@@ -12,14 +12,14 @@
         ][$indicators['trend']] ?? ['label' => 'Unchanged', 'badge' => 'secondary', 'icon' => 'arrow-right'];
     @endphp
 
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">{{ $tenant->full_name }}</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">{{ $tenant->full_name }}</h1>
+            <p class="kp-page-subtitle">
                 {{ $tenant->property->name }} — Unit {{ $tenant->unit->unit_number }}
             </p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="kp-page-actions">
             <a href="{{ route('landlord.tenants.edit', $tenant) }}" class="btn btn-outline-primary">
                 <i class="bi bi-pencil me-2"></i> Edit
             </a>
@@ -400,6 +400,7 @@
                             <th>Reference</th>
                             <th>Applied To</th>
                             <th class="text-end">Unallocated</th>
+                            <th>Reversal</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -424,6 +425,12 @@
                                 </td>
                                 <td class="text-end {{ $payment->unallocated_amount > 0 ? 'text-warning' : 'text-muted' }}">
                                     KES {{ number_format($payment->unallocated_amount, 2) }}
+                                </td>
+                                <td>
+                                    @if($payment->reversals->isNotEmpty())
+                                        @foreach($payment->reversals as $reversal)<span class="badge bg-light text-dark">{{ ucfirst($reversal->status) }} · KES {{ number_format($reversal->amount, 2) }}</span>@endforeach
+                                    @endif
+                                    <a class="btn btn-sm btn-outline-primary" href="{{ route('landlord.payments.reversals.create', $payment) }}">Request reversal</a>
                                 </td>
                             </tr>
                         @endforeach
@@ -477,7 +484,7 @@
     <div class="row g-4">
         <div class="col-md-4">
             <div class="stat-card text-center h-100">
-                <div class="mx-auto mb-3" style="width:70px; height:70px; background:linear-gradient(135deg,#32145C,#5926C8); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.5rem;">
+                <div class="kp-profile-avatar mx-auto mb-3" aria-hidden="true">
                     {{ strtoupper(substr($tenant->full_name, 0, 2)) }}
                 </div>
                 <h5 class="fw-bold mb-1">{{ $tenant->full_name }}</h5>

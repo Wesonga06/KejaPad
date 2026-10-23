@@ -16,17 +16,19 @@
         </ol>
     </nav>
 
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Add Unit to {{ $property->name }}</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">Fill in the unit details below.</p>
+            <h1 class="kp-page-title">Add Unit to {{ $property->name }}</h1>
+            <p class="kp-page-subtitle">Fill in the unit details below.</p>
         </div>
-        <a href="{{ route('landlord.units.index', $property) }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('landlord.units.index', $property) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Back
+            </a>
+        </div>
     </div>
 
-    <div class="kp-card mb-4" style="max-width:600px;" role="status">
+    <div class="kp-card kp-capacity-indicator mb-4" style="max-width:600px;" role="status">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
             <strong>Registered units: {{ $registeredUnits }} of {{ $property->total_units }}</strong>
             @if($remainingCapacity > 0)

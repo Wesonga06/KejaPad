@@ -196,4 +196,28 @@ class RentGenerationTest extends TestCase
         $this->assertSame('paid', $old->fresh()->status);
         $this->assertSame('0.00', (string) $payment->fresh()->unallocated_amount);
     }
+
+    public function test_held_credit_and_a_later_payment_cannot_allocate_more_than_the_rent_due(): void
+    {
+        $landlord = $this->landlord();
+        $property = $this->property($landlord);
+        $unit = $this->unit($property, 10000);
+        $tenant = $this->tenant($property, $unit);
+
+        $held = app(RentAllocationService::class)->recordPayment($tenant, 7000, [
+            'payment_date' => now()->toDateString(),
+        ]);
+
+        $this->generation()->generate(now()->month, now()->year);
+        $later = app(RentAllocationService::class)->recordPayment($tenant, 7000, [
+            'payment_date' => now()->toDateString(),
+        ]);
+
+        $rent = RentRecord::where('tenant_id', $tenant->id)->firstOrFail();
+
+        $this->assertSame('10000.00', (string) $rent->fresh()->amount_paid);
+        $this->assertSame('0.00', (string) $held->fresh()->unallocated_amount);
+        $this->assertSame('4000.00', (string) $later->fresh()->unallocated_amount);
+        $this->assertSame(10000.0, (float) $rent->allocations()->sum('amount'));
+    }
 }

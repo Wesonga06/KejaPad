@@ -101,7 +101,8 @@ class Tenant extends Model
     // Unallocated payment credit held on the tenant's account.
     public function creditBalance(): float
     {
-        return (float) $this->payments()->sum('unallocated_amount');
+        return max(0, (float) $this->payments()->sum('unallocated_amount') - (float) PaymentReversal::whereHas('payment', fn ($query) => $query->where('tenant_id', $this->id))
+            ->where('status', PaymentReversal::STATUS_PENDING)->sum('reversed_credit'));
     }
 
     public function firstName(): string

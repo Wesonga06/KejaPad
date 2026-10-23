@@ -4,11 +4,11 @@
 
 
 @section('content')
-    <div class="mb-4">
-        <h5 class="fw-bold mb-1">Announcements</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">
-            Notices and updates from landlords.
-        </p>
+    <div class="kp-page-header">
+        <div>
+            <h1 class="kp-page-title">Announcements</h1>
+            <p class="kp-page-subtitle">Notices and updates from landlords.</p>
+        </div>
     </div>
 
     @if($announcements->isEmpty())
@@ -20,7 +20,7 @@
     @else
         <div class="d-flex flex-column gap-3">
             @foreach($announcements as $ann)
-            <div class="stat-card">
+            <div class="kp-card">
                 <div class="d-flex align-items-start gap-3">
                     <div style="width:44px; height:44px; border-radius:10px; flex-shrink:0;
                                 display:flex; align-items:center; justify-content:center;

@@ -4,25 +4,20 @@
 
 
 @section('content')
-    <div class="mb-4">
-        <h5 class="fw-bold mb-1">My Profile</h5>
-        <p class="text-muted mb-0" style="font-size:0.85rem;">
-            Update your account details and password.
-        </p>
+    <div class="kp-page-header">
+        <div>
+            <h1 class="kp-page-title">My Profile</h1>
+            <p class="kp-page-subtitle">Update your account details and password.</p>
+        </div>
     </div>
 
     <div class="row g-4">
         <!-- Tenant Info (read-only) -->
         @if($tenant)
         <div class="col-md-4">
-            <div class="stat-card">
+            <div class="stat-card kp-profile-summary">
                 <div class="text-center mb-3">
-                    <div class="mx-auto mb-3"
-                         style="width:65px; height:65px;
-                                background:linear-gradient(135deg,#F4C542,#5926C8);
-                                border-radius:50%; display:flex;
-                                align-items:center; justify-content:center;
-                                color:white; font-weight:700; font-size:1.4rem;">
+                    <div class="kp-profile-avatar mx-auto mb-3" aria-hidden="true">
                         {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
                     </div>
                     <h6 class="fw-bold mb-0">{{ $tenant->full_name }}</h6>
@@ -66,8 +61,9 @@
                     </h6>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Full Name</label>
+                        <label class="form-label fw-semibold" for="profile_name">Full Name</label>
                         <input type="text" name="name"
+                               id="profile_name"
                                class="form-control @error('name') is-invalid @enderror"
                                value="{{ old('name', auth()->user()->name) }}">
                         @error('name')
@@ -76,8 +72,9 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Email Address</label>
+                        <label class="form-label fw-semibold" for="profile_email">Email Address</label>
                         <input type="email" name="email"
+                               id="profile_email"
                                class="form-control @error('email') is-invalid @enderror"
                                value="{{ old('email', auth()->user()->email) }}">
                         @error('email')
@@ -93,8 +90,9 @@
                     </h6>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Current Password</label>
+                        <label class="form-label fw-semibold" for="current_password">Current Password</label>
                         <input type="password" name="current_password"
+                               id="current_password"
                                class="form-control @error('current_password') is-invalid @enderror"
                                placeholder="Enter current password">
                         @error('current_password')
@@ -103,8 +101,9 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">New Password</label>
+                        <label class="form-label fw-semibold" for="new_password">New Password</label>
                         <input type="password" name="new_password"
+                               id="new_password"
                                class="form-control @error('new_password') is-invalid @enderror"
                                placeholder="Min 8 characters">
                         @error('new_password')
@@ -113,10 +112,9 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">
-                            Confirm New Password
-                        </label>
+                        <label class="form-label fw-semibold" for="new_password_confirmation">Confirm New Password</label>
                         <input type="password" name="new_password_confirmation"
+                               id="new_password_confirmation"
                                class="form-control"
                                placeholder="Repeat new password">
                     </div>

@@ -3,18 +3,20 @@
 @section('page-title', 'Request Details')
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">{{ $maintenance->title }}</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">{{ $maintenance->title }}</h1>
+            <p class="kp-page-subtitle">
                 Submitted {{ $maintenance->created_at->format('d M Y') }}
                 &bull;
                 <span class="badge bg-{{ $maintenance->statusColor() }}">{{ ucfirst(str_replace('_', ' ', $maintenance->status)) }}</span>
             </p>
         </div>
-        <a href="{{ route('tenant.maintenance.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('tenant.maintenance.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Back
+            </a>
+        </div>
     </div>
 
     @if($maintenance->isVerified())

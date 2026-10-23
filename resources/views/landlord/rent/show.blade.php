@@ -4,17 +4,19 @@
 
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Rent Record Detail</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">Rent Record Detail</h1>
+            <p class="kp-page-subtitle">
                 {{ $rent->monthName() }} {{ $rent->year }} —
                 {{ $rent->tenant->full_name }}
             </p>
         </div>
-        <a href="{{ route('landlord.rent.index') }}" class="btn btn-outline-secondary">
-            <i class="bi bi-arrow-left me-2"></i> Back
-        </a>
+        <div class="kp-page-actions">
+            <a href="{{ route('landlord.rent.index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i> Back
+            </a>
+        </div>
     </div>
 
     <div class="row g-4">

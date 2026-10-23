@@ -206,6 +206,7 @@
             .auth-right { flex: 1 1 100%; padding: 40px 30px; }
         }
     </style>
+    <link href="{{ asset('css/kejapad-design.css') }}" rel="stylesheet">
 </head>
 <body>
 

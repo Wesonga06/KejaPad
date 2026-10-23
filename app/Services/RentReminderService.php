@@ -8,6 +8,7 @@ use App\Models\Tenant;
 use App\Notifications\ArrearsEscalationNotification;
 use App\Notifications\RentOverdueNotification;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class RentReminderService
 {
@@ -46,13 +47,27 @@ class RentReminderService
                         continue;
                     }
 
-                    if ($this->recentlyNotified($tenant, $type, $cooldown, $date)) {
+                    // Serialize workers per tenant, then repeat the cooldown
+                    // check while holding the lock. The notice is committed
+                    // before dispatching notifications, so a concurrent run
+                    // cannot create a second notice for the same stage.
+                    $notice = DB::transaction(function () use ($tenant, $type, $cooldown, $date) {
+                        $lockedTenant = Tenant::whereKey($tenant->id)->lockForUpdate()->first();
+
+                        if (! $lockedTenant || $this->recentlyNotified($lockedTenant, $type, $cooldown, $date)) {
+                            return null;
+                        }
+
+                        return $this->createNotice($lockedTenant, $type, $date);
+                    }, 3);
+
+                    if (! $notice) {
                         $stats['skipped']++;
 
                         continue;
                     }
 
-                    $this->issue($tenant, $summary, $type, $date);
+                    $this->deliver($tenant, $summary, $type, $date, $notice);
                     $stats['reminders']++;
 
                     if ($type === 'escalation') {
@@ -89,6 +104,14 @@ class RentReminderService
      */
     public function issue(Tenant $tenant, array $summary, string $type, Carbon $date, ?int $userId = null): RentNotice
     {
+        $notice = $this->createNotice($tenant, $type, $date, $userId);
+        $this->deliver($tenant, $summary, $type, $date, $notice, $userId);
+
+        return $notice;
+    }
+
+    protected function createNotice(Tenant $tenant, string $type, Carbon $date, ?int $userId = null): RentNotice
+    {
         $recipient = $tenant->email ?? $tenant->user?->email ?? $tenant->phone;
 
         $stage = (int) array_search($type, array_keys(config('rent.reminder_schedule', [])), true) + 1;
@@ -104,6 +127,16 @@ class RentReminderService
             'created_by' => $userId,
         ]);
 
+        return $notice;
+    }
+
+    /**
+     * Send the tenant/landlord notifications and optional SMS for an issued notice.
+     *
+     * @param  array<string, mixed>  $summary
+     */
+    protected function deliver(Tenant $tenant, array $summary, string $type, Carbon $date, RentNotice $notice, ?int $userId = null): void
+    {
         $paymentsSince = $this->paymentsSinceLastReminder($tenant, $notice);
 
         if (config('rent.notify_tenant', true) && $tenant->user) {
@@ -129,7 +162,6 @@ class RentReminderService
             ['related' => $notice, 'sent_by' => $userId],
         );
 
-        return $notice;
     }
 
     /**

@@ -12,6 +12,7 @@ use App\Services\RentAllocationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class MpesaController extends Controller
 {
@@ -146,19 +147,28 @@ class MpesaController extends Controller
         DB::transaction(function () use ($payment, $body, $resultCode, $resultDesc, $checkoutRequestId) {
             $payment = MpesaPayment::whereKey($payment->id)->lockForUpdate()->first();
 
-            if (in_array($payment->status, ['confirmed', 'failed'], true)) {
+            if (in_array($payment->status, ['confirmed', 'failed', 'cancelled'], true)) {
                 return;
             }
 
             if ((int) $resultCode === 0) {
                 [$receiptNumber, $paidAmount] = $this->extractMetadata($body);
+                $expectedPaidAmount = (float) ceil((float) $payment->amount);
 
-                if ($paidAmount !== null && (float) $paidAmount + 0.01 < (float) $payment->amount) {
+                if ($paidAmount === null || ! is_finite($paidAmount) || abs($paidAmount - $expectedPaidAmount) > 0.001) {
                     Log::warning('M-Pesa callback amount mismatch', [
                         'checkout_request_id' => $checkoutRequestId,
-                        'expected' => $payment->amount,
+                        'expected' => $expectedPaidAmount,
                         'received' => $paidAmount,
                     ]);
+
+                    $payment->update([
+                        'mpesa_receipt_number' => $receiptNumber,
+                        'result_code' => $resultCode,
+                        'result_desc' => 'M-Pesa amount could not be verified; payment requires manual review.',
+                    ]);
+
+                    return;
                 }
 
                 // When payment verification is required the transaction is only
@@ -226,7 +236,9 @@ class MpesaController extends Controller
         $allowed = config('mpesa.callback_allowed_ips', []);
 
         if (empty($allowed)) {
-            return true;
+            Log::critical('M-Pesa callback IP enforcement is enabled but no allowed IPs are configured.');
+
+            return false;
         }
 
         return in_array($request->ip(), $allowed, true);
@@ -278,15 +290,13 @@ class MpesaController extends Controller
     {
         $this->authorize('confirm', $payment);
 
-        if ($payment->status === 'confirmed') {
-            return back()->with('error', 'This payment has already been confirmed.');
-        }
-
         DB::transaction(function () use ($payment) {
-            $payment = MpesaPayment::whereKey($payment->id)->lockForUpdate()->first();
+            $payment = MpesaPayment::whereKey($payment->id)->lockForUpdate()->firstOrFail();
 
-            if ($payment->status === 'confirmed') {
-                return;
+            if ($payment->status !== 'pending') {
+                throw ValidationException::withMessages([
+                    'payment' => 'Only a pending M-Pesa payment can be confirmed. This payment is '.$payment->status.'.',
+                ]);
             }
 
             $payment->update([
@@ -306,7 +316,7 @@ class MpesaController extends Controller
                     'mpesa_payment_id' => $payment->id,
                 ],
             );
-        });
+        }, 3);
 
         return back()->with('success', 'Payment confirmed and rent record updated.');
     }
@@ -316,10 +326,20 @@ class MpesaController extends Controller
     {
         $this->authorize('reject', $payment);
 
-        $payment->update([
-            'status' => 'failed',
-            'result_desc' => 'Rejected by landlord',
-        ]);
+        DB::transaction(function () use ($payment) {
+            $payment = MpesaPayment::whereKey($payment->id)->lockForUpdate()->firstOrFail();
+
+            if ($payment->status !== 'pending') {
+                throw ValidationException::withMessages([
+                    'payment' => 'Only a pending M-Pesa payment can be rejected. This payment is '.$payment->status.'.',
+                ]);
+            }
+
+            $payment->update([
+                'status' => 'failed',
+                'result_desc' => 'Rejected by landlord',
+            ]);
+        }, 3);
 
         return back()->with('success', 'Payment rejected.');
     }

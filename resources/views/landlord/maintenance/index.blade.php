@@ -3,10 +3,10 @@
 @section('page-title', 'Maintenance Requests')
 
 @section('content')
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+    <div class="kp-page-header">
         <div>
-            <h5 class="fw-bold mb-1">Maintenance Requests</h5>
-            <p class="text-muted mb-0" style="font-size:0.85rem;">
+            <h1 class="kp-page-title">Maintenance Requests</h1>
+            <p class="kp-page-subtitle">
                 Requests across your properties, with assignment and verification.
             </p>
         </div>
